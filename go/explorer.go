@@ -86,7 +86,7 @@ func OnExplorer(res http.ResponseWriter, req *http.Request) {
     }else if strings.Contains(req.URL.Path, "&editDir") {    
         io.WriteString(res, ExecEditDir())
     }else if strings.Contains(req.URL.Path, "&showLogDir") {    
-        io.WriteString(res, ExecOpenDirLog(".\\explorer.json"))
+        io.WriteString(res, ExecOpenDirLog(".\\json\\explorer.json"))
     }else {
         io.WriteString(res, "这是从后台发送的数据")
     } 
@@ -108,7 +108,7 @@ func ExecOpenDirLog(dirPth string) string{
 }
 //修改目录信息
 func ExecEditDir() string{
-    filePath := ".\\explorer.json"; 
+    filePath := ".\\json\\explorer.json"; 
     cmd := exec.Command("notepad", filePath)  
     err := cmd.Start()
     if err != nil {
