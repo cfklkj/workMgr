@@ -5,6 +5,7 @@ import (
     "log" 
     "runtime"  
     "time"
+    "strconv"
 )
 var realPath string
 // 端口
@@ -19,9 +20,9 @@ const (
     DART_CLIENT_PATH  = "/js/"
     IMAGE_CLIENT_PATH = "/image/"
 
-    CSS_SVR_PATH   = "../web"
-    DART_SVR_PATH  = "../web"
-    IMAGE_SVR_PATH = "../web"
+    CSS_SVR_PATH   = "web"
+    DART_SVR_PATH  = "web"
+    IMAGE_SVR_PATH = "web"
 )
 
 func init() {
@@ -30,6 +31,7 @@ func init() {
 
 func main() {    
      InitDBMgr();  
+     LoadConfig("json/config.json");
      // 先把css和脚本服务上去 
      http.Handle(CSS_CLIENT_PATH, http.FileServer(http.Dir(CSS_SVR_PATH)))
      http.Handle(DART_CLIENT_PATH, http.FileServer(http.Dir(DART_SVR_PATH)))
@@ -38,8 +40,8 @@ func main() {
      http.HandleFunc("/", HomePage) 
      http.HandleFunc("/DBMgr", OnDBMgr)
     //绑定socket方法
-  //  http.Handle("/webSocket", h_webSocket)
-    err := http.ListenAndServe("127.0.0.1:" + HTTP_PORT, nil) //设置监听的端口
+  //  http.Handle("/webSocket", h_webSocket) 
+    err := http.ListenAndServe("127.0.0.1:" + strconv.Itoa(webConfig.HttpPort), nil) //设置监听的端口
     if err != nil {
         log.Fatal("ListenAndServe: ", err)
     } 

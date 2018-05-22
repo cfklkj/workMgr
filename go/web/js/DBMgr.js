@@ -77,7 +77,7 @@ function getSelectedText(){
     DBNameValue = DBName.options[index].innerHTML
  
     sqlCodeValue = getSelectedText()
-    if(sqlCode == "") 
+    if(sqlCodeValue == "") 
     { 
          sqlCodeValue =  sqlCode.innerHTML
     } 

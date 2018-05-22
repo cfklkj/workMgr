@@ -5,7 +5,8 @@ var serverUrl = "127.0.0.1"
 var MyToken = ""
 var MylistArray = new Array()
 var listArrayCount = 0
-
+var Unrecognizable = false
+var isEditInfo = false
 
 function AjaxInfo(GOrP, URL, data, actType)
 { 
@@ -64,8 +65,12 @@ function main() {
    results = document.getElementById('results'); 
    butt_add = document.getElementById('butt_add'); 
    butt_add.onclick = onAddDir 
+   btn_regetAdd = document.getElementById('btn_regetAdd'); 
+   btn_regetAdd.onclick = onReLoadLogDir 
    butt_openDir = document.getElementById('butt_openDir'); 
    butt_openDir.onclick = onOpenDir 
+   btn_isDecode = document.getElementById('btn_isDecode'); 
+   btn_isDecode.onclick = onDecode 
    butt_keep = document.getElementById('butt_keep'); 
    butt_keep.onclick = onKeeptxt 
    onLoadLogDir()
@@ -74,14 +79,29 @@ function doword() {
     window.open("c:\\skill.xlsx"); 
 }
 
-function onLoadLogDir()
-{
-    AjaxInfo("post",serverUrl + '/Explorer&showLogDir', "", "onAddDirs")
-}
 //目录列表--start
+function onLoadLogDir()
+{    
+    explist.value = ".\\json"
+    explist.chilPath = "explorer.json"
+    var data = {"HomePath":explist.value, "ChilPath":explist.chilPath, "FileType":"txt", "Unrecognizable":Unrecognizable}  
+    explist.filePath = explist.value + "\\" + explist.chilPath
+    AjaxInfo("post",serverUrl + '/Explorer&getTxt', data, "onAddDirs")  
+}
+function onReLoadLogDir()
+{
+    Unrecognizable = !Unrecognizable 
+    explistLog.innerHTML = "";
+    onLoadLogDir()
+}
 function onAddDir()
 {        
-    AjaxInfo("post",serverUrl + '/Explorer&editDir', "", "showStatu")
+    isEditInfo = true
+    explist.value = ".\\json"
+    explist.chilPath = "explorer.json"
+    var data = {"HomePath":explist.value, "ChilPath":explist.chilPath, "FileType":"txt", "Unrecognizable":Unrecognizable}  
+    explist.filePath = explist.value + "\\" + explist.chilPath
+    AjaxInfo("post",serverUrl + '/Explorer&getTxt', data, "onShowTxt") 
 }
 //文件列表---start
 function onOpenDir()
@@ -129,8 +149,14 @@ function HrefDir(chilPath)
 }
 function HrefTxt(obj)
 {     
-    var data = {"HomePath":explist.value, "ChilPath":obj.innerHTML, "FileType":obj.valueType}
+    if(isEditInfo)
+    {
+        isEditInfo = false;
+        explist.value = MylistArray[listArrayCount-1]
+    } 
+    var data = {"HomePath":explist.value, "ChilPath":obj.innerHTML, "FileType":obj.valueType, "Unrecognizable":Unrecognizable}
     explist.filePath = explist.value + "\\" + obj.innerHTML
+    explist.chilPath = obj.innerHTML
     showStatu(explist.filePath)
     AjaxInfo("post",serverUrl + '/Explorer&getTxt', data, "onShowTxt")
 }
@@ -150,7 +176,8 @@ function onShowDir(jsonInfo)
           } else
           {
               if(jsonInfo.chils[i].path.indexOf(".txt") > 0 || jsonInfo.chils[i].path.indexOf(".ini") > 0 
-              || jsonInfo.chils[i].path.indexOf(".lua") > 0 || jsonInfo.chils[i].path.indexOf(".json") > 0)
+              || jsonInfo.chils[i].path.indexOf(".lua") > 0 || jsonInfo.chils[i].path.indexOf(".json") > 0
+              || jsonInfo.chils[i].path.indexOf(".bat") > 0 )
                  Ta_A = '<a href="javascript:void(0);" onclick="HrefTxt(this)" valueType="txt" style="color: rgb(75, 18, 141)">' + jsonInfo.chils[i].path + "</a><p/>";
               else
                  Ta_A = '<a>' + jsonInfo.chils[i].path + "</a><p/>";
@@ -165,7 +192,14 @@ function onShowTxt(txtInfo)
     Texts = '<textarea id="txtInfo">' + txtInfo + "</textarea>"
     results.innerHTML = Texts
 }
+function onDecode()
+{
+    Unrecognizable = !Unrecognizable
+    var data = {"HomePath":explist.value, "ChilPath":explist.chilPath, "FileType":"txt", "Unrecognizable":Unrecognizable} 
+    showStatu(explist.filePath)
+    AjaxInfo("post",serverUrl + '/Explorer&getTxt', data, "onShowTxt")
 
+}
 function onKeeptxt()
 {
     txtInfo = document.getElementById("txtInfo")
