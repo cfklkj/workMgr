@@ -21,6 +21,7 @@ type C2STxtInfo struct{
     HomePath string 
     ChilPath string 
     FileType string
+    Unrecognizable bool
 }
 type C2SFileInfo struct{
     FilePath string 
@@ -98,13 +99,33 @@ func getCurrentDirectory() string {
 	}
 	return strings.Replace(dir, "\\", "/", -1)
 }
+//读取文件
+func OpenTxt(filePath string, isUnrecognizable bool)string{
+    fileInfo, err := ioutil.ReadFile(filePath) 
+    if err != nil {
+        return  err.Error()
+    }  
+    if(isUnrecognizable){
+        return string(fileInfo); 
+    } else {        
+        decoder := mahonia.NewDecoder("gb18030")
+        return decoder.ConvertString(string(fileInfo));
+    } 
+}
 //打开目录文件
-func ExecOpenDirLog(dirPth string) string{ 
-    fileInfo, err := ioutil.ReadFile(dirPth)
+func ExecOpenDirLog(dirPth string) string{  
+    fileInfo, err := ioutil.ReadFile(dirPth) 
     if err != nil {
         return  err.Error()
     } 
-    return string(fileInfo);
+    if((fileInfo[0] == 49 && fileInfo[1] == 46) && fileInfo[2] > 225 || // && fileInfo[2] == 230 && fileInfo[3] == 184
+     (fileInfo[0] == 108 && fileInfo[1] == 111 && fileInfo[2] == 99 && fileInfo[3] ==97 ) || 
+      (fileInfo[0] == 239 && fileInfo[1] == 187 && fileInfo[2] == 191 && fileInfo[3] ==112 )  ){ //未编码文本 
+        return string(fileInfo); 
+    } else {        
+        decoder := mahonia.NewDecoder("gb18030")
+        return decoder.ConvertString(string(fileInfo));
+    } 
 }
 //修改目录信息
 func ExecEditDir() string{
@@ -118,39 +139,35 @@ func ExecEditDir() string{
 }
 //读取文本
 func ExecTxt(C2STxtInfo C2STxtInfo)string{    
-    dirPth := C2STxtInfo.HomePath + "\\" + C2STxtInfo.ChilPath; 
-    fileInfo, err := ioutil.ReadFile(dirPth)
-    if err != nil {
-        return  err.Error()
-    } 
-    if((fileInfo[0] == 49 && fileInfo[1] == 46 && fileInfo[2] == 230) || //&& fileInfo[3] == 184
-     (fileInfo[0] == 108 && fileInfo[1] == 111 && fileInfo[2] == 99 && fileInfo[3] ==97 ) || 
-     (fileInfo[0] == 239 && fileInfo[1] == 187 && fileInfo[2] == 191 && fileInfo[3] ==112 ) ){ //未编码文本
-        return string(fileInfo); 
-    } else {        
-        decoder := mahonia.NewDecoder("gb18030")
-        return decoder.ConvertString(string(fileInfo));
-    } 
+    dirPth := C2STxtInfo.HomePath + "\\" + C2STxtInfo.ChilPath;    
+    return OpenTxt(dirPth, C2STxtInfo.Unrecognizable)
 } 
 //写入文本
 func ExecFile(c2sFileInfo C2SFileInfo)string{
     filename := c2sFileInfo.FilePath;
     file, err := os.OpenFile(filename, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
     if err != nil {
-        return "open file failed.";
+        return "open file " + filename + " failed.";
     }
     defer file.Close()
     c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&gt;", ">", -1)
     c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&lt;", "<", -1)
     c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&amp;", "=", -1)
     file.WriteString(c2sFileInfo.TxtInfo);
-    return "keep file Ok";
+    return "keep file " + filename + " Ok";
 }
 //打开目录
 func ExecOpenDir(c2sOpenDir C2SOpenDir)string{
     dirPath := c2sOpenDir.DirPath;
     dirPath = strings.Replace(dirPath, "\\\\\\", "\\", -1)
-    dirPath = strings.Replace(dirPath, "/", "\\", -1)
+    dirPath = strings.Replace(dirPath, "\\\\", "\\", -1)
+    dirPath = strings.Replace(dirPath, "/", "\\", -1) 
+    dirPath = strings.TrimSpace(dirPath)
+    A :=strings.LastIndex(dirPath, "\\") + 1 
+    B := len(dirPath) 
+    if A  == B { 
+        dirPath = dirPath[0 : len(dirPath)-1] 
+    }
     cmd := exec.Command("explorer", dirPath) 
     err := cmd.Start()
     if err != nil {
@@ -184,3 +201,4 @@ func ExecDir(c2sDirinfo C2SDirInfo)string{
     } 
     return string(ret); 
 }
+ 

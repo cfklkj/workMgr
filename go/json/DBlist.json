@@ -1,22 +1,22 @@
 [ 
     { 
         "id":1,
-        "ip":"127.0.0.1",
+        "ip":"123.59.101.190",
         "user":"sa",
         "pwd":"sa", 
         "S2CInfo":{ 
-        "name":"测试-127.0.0.1",
-        "chileDB":["1","2","3","4"]
+        "name":"test-123.59.101.190",
+        "chileDB":["WLDiShu_channel1","WLDiShu_channel2","WLDiShu_channel3","DLGameDB","DLRecordDB"]
         }
     }, 
     {
         "id":2,
-        "ip":"127.0.0.2", 
+        "ip":"192.168.67.3", 
         "user":"sa",
         "pwd":"sa",
         "S2CInfo":{ 
-        "name":"local-127.0.0.2",
-        "chileDB":["1","2","3","4", "5"]
+        "name":"local-192.168.67.3",
+        "chileDB":["WLDiShu_channel1","WLDiShu_channel2","WLDiShu_channel3","DLGameDB","DLRecordDB"]
         }
     } 
 ] 

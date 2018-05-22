@@ -82,6 +82,7 @@ function doword() {
 //目录列表--start
 function onLoadLogDir()
 {    
+    explistLog.innerHTML = "";
     explist.value = ".\\json"
     explist.chilPath = "explorer.json"
     var data = {"HomePath":explist.value, "ChilPath":explist.chilPath, "FileType":"txt", "Unrecognizable":Unrecognizable}  
@@ -91,7 +92,6 @@ function onLoadLogDir()
 function onReLoadLogDir()
 {
     Unrecognizable = !Unrecognizable 
-    explistLog.innerHTML = "";
     onLoadLogDir()
 }
 function onAddDir()
@@ -203,8 +203,7 @@ function onDecode()
 function onKeeptxt()
 {
     txtInfo = document.getElementById("txtInfo")
-    var data = {"filePath":explist.filePath, "txtInfo":txtInfo.innerHTML} 
-    showStatu("保存文件:" +explist.filePath)
+    var data = {"filePath":explist.filePath, "txtInfo":txtInfo.innerHTML}  
     AjaxInfo("post",serverUrl + '/Explorer&keepTxt', data, "showStatu")
 }
 //状态----start
@@ -212,4 +211,8 @@ function showStatu(statusInfo)
 {    
     status = document.getElementById("status")
     status.innerHTML = statusInfo
+    if(isEditInfo)
+    {
+        onLoadLogDir()
+    }
 }

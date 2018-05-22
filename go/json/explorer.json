@@ -1,9 +1,47 @@
 [
 {
-    "tips":"����Ŀ¼",
-    "dir": "D:/document/me"
+    "tips":"个人目录",
+    "dir": "D:\\document\\me"
 },
 {
-    "tips":"��֧�ֹ���Ŀ¼"
+
+    "tips":"项目所在目录",
+    "dir": "D:/document/me/workMgr"
+},
+{
+    "tips":"工作目录",
+    "dir": "D:/document/work"
+},
+{
+    "tips":"捕鱼svn目录",
+    "dir": "D:/document/work/buyuSvn"
+},
+{
+    "tips":"捕鱼目录",
+    "dir": "D:/document/work/buyu"
+},
+{
+    "tips":"捕鱼运行目录",
+    "dir": "D:/document/work/buyu/catchFishServer/execute"
+},
+{
+    "tips":"dishu目录",
+    "dir": "D:/document/work/dishu"
+},
+{
+    "tips":"go目录",
+    "dir": "C:/Users/weile/go/src"
+},
+{
+    "tips":"vc工具目录",
+    "dir": "D:/Program Files (x86)",
+    "dir1": "C:/Program Files (x86)/Microsoft Visual Studio 9.0/Common7/Tools"
+},
+{
+    "tips":"临时",
+    "dir": "D:/document/work/buyu/DBServer/服务器组件/数据收集数据库服务器/Debug"
+},
+{
+    "tips":"不支持共享目录"
 }
 ]

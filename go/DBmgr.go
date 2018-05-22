@@ -8,6 +8,7 @@ import(
     "strings" 
     "text/template" 
     "encoding/json"  
+    "database/sql"
 
 )   
 func InitDBMgr(){    
@@ -46,37 +47,40 @@ func OnDBMgr(res http.ResponseWriter, req *http.Request) {
     }
 }
 
+func ExeSqls(db *sql.DB, strSql string) string{
+    stmt, err := db.Prepare(strSql) 
+    if err != nil {
+        return "SQL指令错误" 
+    } 
+    rows, err := stmt.Query()  
+    if err != nil {   
+        return err.Error()  
+    }       
+    dataRow, err :=  getMapFromRows(rows, 20);
+    rows.Close()
+    ret, err := json.Marshal(&dataRow)
+    if err != nil {
+        //c.String(500, "encode json")
+       return err.Error()  
+    } 
+    return string(ret)
+}
 func ExecSql(body C2SDBinfo) string{ 
     db := LinkDB(body.Name, body.ChileDB)
      if(db == nil){
         return "打开数据库错误"
      }
     //封装SQL指令 
-    sqlSplic :=  strings.Split(body.ExcuteSql, "go") 
+    sqlSplic :=  strings.Split(body.ExcuteSql, "go\n") 
     var retStr string
-    for _, value := range sqlSplic{ 
-        stmt, err := db.Prepare(value) 
-        if( retStr != ""){  
-          retStr += "<p/>"   //div  换行
+    for _, value := range sqlSplic{   
+        if(value == ""){
+            continue
         }
-        if err != nil {
-            retStr += "SQL指令错误"
-            continue
-        } 
-        rows, err := stmt.Query()  
-        if err != nil {   
-            retStr += err.Error() 
-            continue
-        }       
-        dataRow, err :=  getMapFromRows(rows, 20);
-        rows.Close()
-        ret, err := json.Marshal(&dataRow)
-        if err != nil {
-            //c.String(500, "encode json")
-            retStr +=  err.Error() 
-            continue
-        } 
-        retStr +=  string(ret);  
+        if( retStr != ""){  
+            retStr += "<p/>"   //div  换行
+        }
+        retStr +=  ExeSqls(db, value)
     }
     return retStr
 }

@@ -29,7 +29,7 @@ func init() {
     runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
-func main() {    
+func main() {     
      InitDBMgr();  
      LoadConfig("json/config.json");
      // 先把css和脚本服务上去 

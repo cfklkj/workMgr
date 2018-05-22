@@ -29,7 +29,7 @@ func HomePage(res http.ResponseWriter, req *http.Request) {
         fmt.Println("homepage")
         path := req.URL.Path
         if req.URL.Path == "/" {
-            path = "/index.html"
+            path = "/" + webConfig.DefaultHtml
         }
         t, err := template.ParseFiles(DART_SVR_PATH + path)
         if err != nil {
