@@ -24,6 +24,10 @@ function onDBinit()
     butt_js2tb.onclick = JsonToTable
     butt_base64 = document.getElementById('butt_base64');
     butt_base64.onclick = onBase64De 
+    butt_base64_rst = document.getElementById('butt_base64_rst');
+    butt_base64_rst.onclick = onBase64DeResult 
+    footer = document.getElementById('footer');
+    
 } 
 function copyResult()
 {
@@ -88,8 +92,30 @@ function getSelectedText(){
  function ShowResult(jsonInfo)
  {
     results.innerHTML = jsonInfo;
+    UpActionInfo()
+ }
+ function UpActionInfo()
+ {
+    var myDate = new Date();     //获取日期与时间
+    footer.innerHTML = "<p>数据更新--时间:" + myDate.toLocaleString() + "</p>"
  }
 
+ function onBase64DeResult()
+ {
+    sqlCodeValue =  results.innerHTML
+    var tbase64 = new Base64()
+    try{ 
+        jsonInfo = JSON.parse(sqlCodeValue)
+        for(var i=0,l=jsonInfo.length;i<l;i++){
+            for(var key in jsonInfo[i]){ 
+                jsonInfo[i][key] = tbase64.decode(jsonInfo[i][key]);
+            }
+        }
+        results.innerHTML  = JSON.stringify(jsonInfo);
+    }catch(err){
+        results.innerHTML = tbase64.decode(sqlCodeValue)
+    } 
+ }
  function AjaxInfo(GOrP, URL, data, actType)
  { 
     var xhr = new XMLHttpRequest();

@@ -35,6 +35,7 @@ func main() {
      // 先把css和脚本服务上去 
      http.Handle(CSS_CLIENT_PATH, http.FileServer(http.Dir(CSS_SVR_PATH)))
      http.Handle(DART_CLIENT_PATH, http.FileServer(http.Dir(DART_SVR_PATH)))
+     http.Handle(DART_CLIENT_PATH, http.FileServer(http.Dir(IMAGE_CLIENT_PATH)))
  
      // 网址与处理逻辑对应起来
      http.HandleFunc("/", HomePage) 

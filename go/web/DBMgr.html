@@ -24,29 +24,21 @@
             <select id="serverName"></select>&emsp;&emsp;
             <a>数据库：</a>
             <select id="DBName"></select>
-        </div>
-        <div id="m_butt">
-            <input id="butt_exec" type="button" value="提交代码">
-            <input id="butt_copy" type="button" value="拷贝结果到编辑区">
-        </div>
+        </div> 
         <div id="m_exec">
-            <h4>编辑sql代码：</h4>
+            <h4>编辑sql代码：<input class="input_css" id="butt_exec" type="button" value="提交代码"><input class="input_css" id="butt_base64" type="button" value="base64值解码"></h4>
             <textarea id="sqlCode" wrap="logic">
 
             </textarea>
         </div>
         <div id="m_result">
-            <h4>查看结果:</h4>
+            <h4>查看结果:<input class="input_css" id="butt_copy" type="button" value="拷贝结果到编辑区"><input class="input_css" id="butt_base64_rst" type="button" value="base64值解码"><input class="input_css" id="butt_js2tb" type="button" value="结果转table"></h4>
             <div id="results" frameborder="0"> 
             </div>
         </div>
         <div id="footer">
                 <p>请在上面的文本框中编辑您的代码，然后单击提交按钮查看结果。</p>
-        </div>
-        <div id="other">
-                <input id="butt_base64" type="button" value="base64值解码">
-                <input id="butt_js2tb" type="button" value="结果转table">
-        </div>
+        </div> 
         <div id="m_help">            
             <h4>帮助:</h4>
             <div id="helps" frameborder="0">

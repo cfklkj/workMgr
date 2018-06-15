@@ -7,7 +7,7 @@ var MylistArray = new Array()
 var listArrayCount = 0
 var Unrecognizable = false
 var isEditInfo = false
-
+document.onkeydown=onKeydown
 function AjaxInfo(GOrP, URL, data, actType)
 { 
    var xhr = new XMLHttpRequest();
@@ -70,18 +70,26 @@ function main() {
    butt_openDir = document.getElementById('butt_openDir'); 
    butt_openDir.onclick = onOpenDir 
    btn_isDecode = document.getElementById('btn_isDecode'); 
-   btn_isDecode.onclick = onDecode 
+   btn_isDecode.onclick = onDecode
+   btn_execBat = document.getElementById('btn_execBat'); 
+   btn_execBat.onclick = onExecBat 
+   status = document.getElementById("status")
    butt_keep = document.getElementById('butt_keep'); 
    butt_keep.onclick = onKeeptxt 
+   btn_execBat.style.visibility = "hidden"
    onLoadLogDir()
 }  
-function doword() { 
-    window.open("c:\\skill.xlsx"); 
-}
+function onKeydown()
+{ 
+    if (event.ctrlKey == true && event.keyCode == 83) {//Ctrl+S 
+        event.returnvalue = false; 
+        onKeeptxt()
+    } 
+} 
 
 //目录列表--start
 function onLoadLogDir()
-{    
+{   
     explistLog.innerHTML = "";
     explist.value = ".\\json"
     explist.chilPath = "explorer.json"
@@ -96,7 +104,9 @@ function onReLoadLogDir()
 }
 function onAddDir()
 {        
-    isEditInfo = true
+    isEditInfo = true    
+    btn_execBat.style.visibility = "hidden"
+    
     explist.value = ".\\json"
     explist.chilPath = "explorer.json"
     var data = {"HomePath":explist.value, "ChilPath":explist.chilPath, "FileType":"txt", "Unrecognizable":Unrecognizable}  
@@ -153,7 +163,14 @@ function HrefTxt(obj)
     {
         isEditInfo = false;
         explist.value = MylistArray[listArrayCount-1]
-    } 
+    }     
+    if(obj.innerHTML.indexOf(".bat") > 0 )
+    {
+        btn_execBat.style.visibility = "visible"
+    }else
+    {
+        btn_execBat.style.visibility = "hidden"
+    }
     var data = {"HomePath":explist.value, "ChilPath":obj.innerHTML, "FileType":obj.valueType, "Unrecognizable":Unrecognizable}
     explist.filePath = explist.value + "\\" + obj.innerHTML
     explist.chilPath = obj.innerHTML
@@ -177,7 +194,7 @@ function onShowDir(jsonInfo)
           {
               if(jsonInfo.chils[i].path.indexOf(".txt") > 0 || jsonInfo.chils[i].path.indexOf(".ini") > 0 
               || jsonInfo.chils[i].path.indexOf(".lua") > 0 || jsonInfo.chils[i].path.indexOf(".json") > 0
-              || jsonInfo.chils[i].path.indexOf(".bat") > 0 )
+              || jsonInfo.chils[i].path.indexOf(".bat") > 0 || jsonInfo.chils[i].path.indexOf(".cpp") > 0)
                  Ta_A = '<a href="javascript:void(0);" onclick="HrefTxt(this)" valueType="txt" style="color: rgb(75, 18, 141)">' + jsonInfo.chils[i].path + "</a><p/>";
               else
                  Ta_A = '<a>' + jsonInfo.chils[i].path + "</a><p/>";
@@ -200,6 +217,10 @@ function onDecode()
     AjaxInfo("post",serverUrl + '/Explorer&getTxt', data, "onShowTxt")
 
 }
+function onExecBat()
+{ 
+    AjaxInfo("post",serverUrl + '/Explorer&execBat', explist.filePath, "showStatu")
+}
 function onKeeptxt()
 {
     txtInfo = document.getElementById("txtInfo")
@@ -208,11 +229,17 @@ function onKeeptxt()
 }
 //状态----start
 function showStatu(statusInfo)
-{    
-    status = document.getElementById("status")
-    status.innerHTML = statusInfo
+{   
+    UpActionInfo() 
+    status.innerHTML += statusInfo
     if(isEditInfo)
     {
         onLoadLogDir()
     }
+}
+
+function UpActionInfo()
+{
+   var myDate = new Date();     //获取日期与时间
+   status.innerHTML = "数据更新--时间:" + myDate.toLocaleString() + "<br/>--"
 }

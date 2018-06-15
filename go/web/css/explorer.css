@@ -116,7 +116,12 @@ div#m_result input {
     height: 20px;
     font: 14px Verdana, Arial, Helvetica, sans-serif;
 }  
-
+div#m_result .btn_execBatHide{
+    visibility:hidden;
+}
+div#m_result .btn_execBatShow{
+    visibility:block;
+}
 #m_result div {
     width: 100%;
     height: 400px;
@@ -145,3 +150,38 @@ div#m_result input {
     font: 12px Verdana, Arial, Helvetica, sans-serif;    
 }
   
+
+#toolsOnline {
+    float: left;
+    height: 230px;
+    width: 99%;
+    margin-left: 5px;
+}
+#toolsOnline div{
+    width: 99%;
+    height: 100px;
+    overflow: auto;
+    border: 1px solid #c5c5c5; 
+    padding: 10px; 
+    font: 14px "Courier New", Courier, monospace;
+}
+
+
+.disTop {
+    height: 44px;
+    background: url(/image/opacity70.png) repeat;
+    line-height: 53px;
+    min-width: 1024px; 
+    padding-left: 10px;     
+    font: 12px/1.5 MIcrosoft YaHei,Arial, Helvetica, sans-serif;
+}
+
+.zhuantiku a {
+    float: left;
+    padding-top: 10px;
+    padding-right: 24px;
+    font-size: 16px;
+    color: #fff;
+    text-decoration: none;
+}
+

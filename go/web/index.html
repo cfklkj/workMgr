@@ -1,108 +1,20 @@
+<!DOCTYPE html>
 <html>
-<!--
-    
-                        <option value="1">我是下拉项目1</option>
-                        <option value="2">我是下拉项目2</option>
-                        <option value="3">我是下拉项目3</option>
-                        <option value="4">我是下拉项目4</option>
--->
 <head>
-<title>信息查询</title> 
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link type="text/css" rel="stylesheet" href="css/index.css" />  
-<script type="text/javascript" src="js/index.js"></script> 
-<script type="text/javascript" src="js/selectInfo.js"></script> 
-<script type="text/javascript" src="js/userMgr.js"></script> 
-</script>
+  <meta charset="UTF-8">
+  <title>左萧 五彩流体</title>
+  
+  
+  
+      <link rel="stylesheet" href="css/FromQQC.css">
+
+  
 </head>
 
-<body> 
-    <div class="cLogin" id="cLogin">
-            <a>用户名：</a>&emsp;
-            <input type="text" id="Uname" value="admin"></input>
-            <p></p>
-            <a>密码：&emsp;</a>&emsp;
-            <input type="password" id="Upwd" value="buyuadmin"></input>&emsp;&emsp;
-            <button style="width:80" id="login">登入</button>  
-    </div>
-    <div id="userManage">
-        <div id="userAddInfo">
-            <div id="alterUserName">
-                <a>新用户：</a>&emsp;&emsp;&emsp;
-                <input type="text" id="UnameNew" value=""></input>
-                <p></p>
-            </div>
-            <div id="alterUserPwd">
-                    <a>旧密码：&emsp;</a>&emsp;&emsp;
-                    <input type="password" id="UpwdOld" value=""></input>
-                    <p></p>
-            </div>
-            <a>密码：&emsp;</a>&emsp;&emsp;&emsp;
-            <input type="password" id="Upwd1" value=""></input>
-            <p></p>
-            <a>确认密码：&emsp;</a>&emsp;
-            <input type="password" id="Upwd2" value=""></input>&emsp;&emsp;
-            <button style="width:80" id="addUser">确认</button>  
-            <p></p>
-            <a>用户列表：</a>
-            <div id="userForm">
-                <table id="mgr_details">
-                    <thead>
-                        <tr id="tHead" onclick="setLineNum(this);"><td>ID</td><td>用户名</td></tr> 
-                    </thead>
-                    <tbody>
-                        <tr id="tr2" onclick="setLineNum(this);"><td>1</td><td>1</td></tr> 
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div id="userSelect">
-        <div class="user"> 
-                <a class="username" id="user">login</a>  
-        </div> 
-        <div class="menu" id="menu">
-            <div class="project">
-                <a>项目：</a>
-                <p></p>
-                <select id = "proInfo" > 
-                </select>  
-            </div>
-            <div class="selectTypes">
-                    <a>查询选项：</a>
-                    <p></p>
-                    <select id = "selectType"> 
-                    </select>  
-            </div>
-            <div class="action" id="action">
-                    <a>可选参数:</a>
-                    <p></p>
-                    <select id="ActInfo"></select>&emsp;
-                    <button id="addAct">添加参数</button>
-                    <p></p>
-                    <div id = "selectMenu"> 
-                    </div>
-                    <div id="orders">
-                        <p></p>
-                        <a>排序项:</a>&emsp;
-                        <select id="orderFile"></select>&emsp;
-                        <input id="isAsc" type="checkbox">是否升序</input>
-                        <p></p>
-                        <a>返回最大行数:</a>&emsp;
-                        <input id="MaxLenth" type="text" value="90"></input>
-                        <p></p>
-                    </div>
-                    <button id="onSelect">查询</button>
-            </div>
-        </div>
-        <div class="showInfo" id = "showInfo"> 
-            <div class="forms">
-                <table id="details">
-                        <tr><td>数据显示</td></tr>
-                </table>
-            </div> 
-        </div>
-    </div>
-</body>
+<body>
+  <canvas></canvas>
+  <div>More</div>
+    <script  src="js/FromQQC.js"></script>
 
+</body>
 </html>

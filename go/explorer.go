@@ -11,6 +11,7 @@ import(
     "os/exec"  
     "path/filepath"
     "github.com/axgle/mahonia"
+    "bytes"
 )   
 
 type C2SDirInfo struct{
@@ -84,8 +85,9 @@ func OnExplorer(res http.ResponseWriter, req *http.Request) {
             return
         }
         io.WriteString(res, ExecOpenDir(c2sOpenDir))
-    }else if strings.Contains(req.URL.Path, "&editDir") {    
-        io.WriteString(res, ExecEditDir())
+    }else if strings.Contains(req.URL.Path, "&execBat") {       
+        body, _ := ioutil.ReadAll(req.Body) 
+        io.WriteString(res, ExecBat(string(body)))
     }else if strings.Contains(req.URL.Path, "&showLogDir") {    
         io.WriteString(res, ExecOpenDirLog(".\\json\\explorer.json"))
     }else {
@@ -98,6 +100,53 @@ func getCurrentDirectory() string {
 		 return "";
 	}
 	return strings.Replace(dir, "\\", "/", -1)
+}
+//------------------------目录列表
+//遍历目录文件
+func ExecDir(c2sDirinfo C2SDirInfo)string{
+    dirPth :=  c2sDirinfo.HomePath + "\\" + c2sDirinfo.ChilPath;
+    dir, err := ioutil.ReadDir(dirPth)
+    if err != nil {
+    return  err.Error()
+    } 
+    var s2cInfo  S2CDirInfo
+    s2cInfo.HomePath = dirPth 
+    for _, fi := range dir {
+        var tDirInfo DirInfo
+        if fi.IsDir() { // 忽略目录   
+            tDirInfo.FileType = "dir"
+        }else{ 
+            tDirInfo.FileType = "file"
+        }
+        tDirInfo.Path = fi.Name()
+        s2cInfo.Chils = append(s2cInfo.Chils,  tDirInfo)
+    }  
+	ret, err := json.Marshal(&s2cInfo)
+	if err != nil {
+		//c.String(500, "encode json")
+		return err.Error()
+    } 
+    return string(ret); 
+}
+ //----------------------文件列表
+//打开目录
+func ExecOpenDir(c2sOpenDir C2SOpenDir)string{
+    dirPath := c2sOpenDir.DirPath;
+    dirPath = strings.Replace(dirPath, "\\\\\\", "\\", -1)
+    dirPath = strings.Replace(dirPath, "\\\\", "\\", -1)
+    dirPath = strings.Replace(dirPath, "/", "\\", -1) 
+    dirPath = strings.TrimSpace(dirPath)
+    A :=strings.LastIndex(dirPath, "\\") + 1 
+    B := len(dirPath) 
+    if A  == B { 
+        dirPath = dirPath[0 : len(dirPath)-1] 
+    }
+    cmd := exec.Command("explorer", dirPath) 
+    err := cmd.Start()
+    if err != nil {
+        return err.Error()
+    }
+    return "open file " + dirPath +" Ok";
 }
 //读取文件
 func OpenTxt(filePath string, isUnrecognizable bool)string{
@@ -127,15 +176,21 @@ func ExecOpenDirLog(dirPth string) string{
         return decoder.ConvertString(string(fileInfo));
     } 
 }
-//修改目录信息
-func ExecEditDir() string{
-    filePath := ".\\json\\explorer.json"; 
-    cmd := exec.Command("notepad", filePath)  
+//--------------------详情
+//执行bat
+func ExecBat(filepath string) string{ 
+    filepath = strings.Replace(filepath, "\\\\\\", "\\", -1)
+    filepath = strings.Replace(filepath, "\\\\", "\\", -1)
+    filepath = strings.Replace(filepath, "/", "\\", -1)  
+    filepath = strings.Replace(filepath, "\"", "", -1) 
+    cmd := exec.Command("cmd", "/c", filepath)  
+    var out bytes.Buffer
+	cmd.Stdout = &out
     err := cmd.Start()
     if err != nil {
         return err.Error()
     }  
-    return "修改文件后请刷新网页"; 
+    return "已执行--" + out.String(); 
 }
 //读取文本
 func ExecTxt(C2STxtInfo C2STxtInfo)string{    
@@ -156,49 +211,3 @@ func ExecFile(c2sFileInfo C2SFileInfo)string{
     file.WriteString(c2sFileInfo.TxtInfo);
     return "keep file " + filename + " Ok";
 }
-//打开目录
-func ExecOpenDir(c2sOpenDir C2SOpenDir)string{
-    dirPath := c2sOpenDir.DirPath;
-    dirPath = strings.Replace(dirPath, "\\\\\\", "\\", -1)
-    dirPath = strings.Replace(dirPath, "\\\\", "\\", -1)
-    dirPath = strings.Replace(dirPath, "/", "\\", -1) 
-    dirPath = strings.TrimSpace(dirPath)
-    A :=strings.LastIndex(dirPath, "\\") + 1 
-    B := len(dirPath) 
-    if A  == B { 
-        dirPath = dirPath[0 : len(dirPath)-1] 
-    }
-    cmd := exec.Command("explorer", dirPath) 
-    err := cmd.Start()
-    if err != nil {
-        return err.Error()
-    }
-    return "open file " + dirPath +" Ok";
-}
-//遍历目录文件
-func ExecDir(c2sDirinfo C2SDirInfo)string{
-    dirPth :=  c2sDirinfo.HomePath + "\\" + c2sDirinfo.ChilPath;
-    dir, err := ioutil.ReadDir(dirPth)
-    if err != nil {
-    return  err.Error()
-    } 
-    var s2cInfo  S2CDirInfo
-    s2cInfo.HomePath = dirPth 
-    for _, fi := range dir {
-        var tDirInfo DirInfo
-        if fi.IsDir() { // 忽略目录   
-            tDirInfo.FileType = "dir"
-        }else{ 
-            tDirInfo.FileType = "file"
-        }
-        tDirInfo.Path = fi.Name()
-        s2cInfo.Chils = append(s2cInfo.Chils,  tDirInfo)
-    }  
-	ret, err := json.Marshal(&s2cInfo)
-	if err != nil {
-		//c.String(500, "encode json")
-		return err.Error()
-    } 
-    return string(ret); 
-}
- 
