@@ -25,9 +25,9 @@ function AjaxInfo(GOrP, URL, data, actType)
    xhr.onreadystatechange = function () {;
        if (xhr.readyState == 4) { // 读取完成
            if (xhr.status == 200) { 
-               if(actType == "onGetDBlist")
+               if(actType == "listImport")
                {
-                   onGetDBlist(JSON.parse(xhr.responseText))
+                    listImport()
                }
                else if(actType == "onShowDir")
                {
@@ -83,8 +83,10 @@ function main() {
    m_newFile.onclick = onAddFile
    m_newFolder = document.getElementById('new-folder'); 
    m_newFolder.onclick = onAddFolder
-   m_create = document.getElementById('create'); 
-   m_create.onclick = onCreate
+   m_listImport = document.getElementById('list-import'); 
+   m_listImport.onclick = onListImport
+   m_listExport = document.getElementById('list-export'); 
+   m_listExport.onclick = onListExport
    
    InitGlobalCtrl()
    InitGlobalParame() 
@@ -92,9 +94,12 @@ function main() {
 }  
 function InitGlobalCtrl()
 {    
+    m_create = document.getElementById('create'); 
+    m_create.onclick = onCreate
     g_folderContainer = document.getElementById('folder-Container'); 
     g_searchContainer = document.getElementById('search-Container'); 
     g_listSearch = document.getElementById('list-search'); 
+    g_listSearch.onclick = list_menus
     g_searchValue = document.getElementById('search-value'); 
     g_detailValue = document.getElementById('detail-value'); 
     g_topFileName = document.getElementById('top-fileName'); 
@@ -973,7 +978,41 @@ function list_upDirName(parentId)
 }
 
 
+function list_menus()
+{ 
+    var ul = g_listSearch.getElementsByTagName("ul") 
+    if(g_creatUl && g_creatUl.style.visibility == "visible")
+    {           
+        if(g_creatUl == ul[0]) 
+        { 
+            g_creatUl.style.visibility = "hidden"
+        }else
+        {
+            g_creatUl.style.visibility = "hidden" 
+            g_creatUl = ul[0]
+            g_creatUl.style.visibility = "visible"
+        }
+    }else
+    {
+        g_creatUl = ul[0]
+        g_creatUl.style.visibility = "visible"
+    } 
+} 
 
+function onListImport()
+{ 
+    var data = {"Package":"import"}  
+    AjaxInfo("post",serverUrl + '/Workbook&pakage', data, "listImport") 
+}
 
+function listImport()
+{
+    location.reload()
+}
 
+function onListExport()
+{  
+    var data = {"Package":"export"}  
+    AjaxInfo("post",serverUrl + '/Workbook&pakage', data, "showStatu")
+}
  

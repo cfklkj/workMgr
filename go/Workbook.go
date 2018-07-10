@@ -6,6 +6,8 @@ import(
     "os"
     "io"
     "io/ioutil"
+    "os/exec"  
+    "bytes"
     "strings"  
     "encoding/json"    
 )   
@@ -28,8 +30,12 @@ type C2SUPJSON struct{
     TxtInfo string 
 } 
 
-var g_dirPath = ".\\workbook\\"
+type C2SPACKAGE struct{
+    Package string 
+    Source string 
+} 
 var g_workbookPath = "d:\\workbook\\"
+var g_dirPath = g_workbookPath
 func OnWorkbook(res http.ResponseWriter, req *http.Request) { 
     req.ParseForm()
     fmt.Println(req.URL.Path) 
@@ -93,9 +99,21 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             return
         }
         io.WriteString(res, DeleteWorkbookTxt(c2sTxtInfo))
-    }else if strings.Contains(req.URL.Path, "&execBat") {       
-        body, _ := ioutil.ReadAll(req.Body) 
-        io.WriteString(res, ExecBat(string(body)))
+    }else if strings.Contains(req.URL.Path, "&pakage") {   
+        body, _ := ioutil.ReadAll(req.Body)
+        var  c2sPackInfo  C2SPACKAGE     
+        err := json.Unmarshal(body, &c2sPackInfo)
+        if err != nil {
+            //   c.String(500, "decode json error")
+            io.WriteString(res, "decode json error")
+            return
+        }
+        if(c2sPackInfo.Package == "import"){
+            io.WriteString(res, ImportWorkBook(c2sPackInfo.Source))  
+        }else{
+            ExportWorkBook()
+        }   
+
     }else if strings.Contains(req.URL.Path, "&showLogDir") {    
         io.WriteString(res, ExecOpenDirLog(".\\json\\explorer.json"))
     }else {
@@ -157,3 +175,28 @@ func GetWorkbookJson(c2sJsonInfo C2SGETJSON)string{
     } 
     return OpenTxt(dirPath, true)
 } 
+
+//导入 导出
+func ImportWorkBook(path string)string{ 
+
+    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 2 "+ g_workbookPath )  
+    var out bytes.Buffer
+	cmd.Stdout = &out
+    err := cmd.Start()
+    cmd.Wait()
+    if err != nil {
+        return err.Error()
+    }  
+    return "已执行--" + out.String(); 
+}
+
+func ExportWorkBook(){
+    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 1 "+ g_workbookPath)  
+    var out bytes.Buffer
+	cmd.Stdout = &out
+    err := cmd.Start()
+    if err != nil {
+        fmt.Println(err.Error())
+    }  
+    fmt.Println("已执行--" + out.String())
+}
