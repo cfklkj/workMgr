@@ -1,0 +1,101 @@
+﻿<html>
+<!--
+    
+                        <option value="1">我是下拉项目1</option>
+                        <option value="2">我是下拉项目2</option>
+                        <option value="3">我是下拉项目3</option>
+                        <option value="4">我是下拉项目4</option>
+-->
+<head>
+<title>工作簿</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link type="text/css" rel="stylesheet" href="css/explorer.css" />   
+<link type="text/css" rel="stylesheet" href="css/workbook.css" />   
+<script type="text/javascript" src="js/workbook.js"></script> 
+</head>
+
+<body> 
+    <div class="disTop">
+        <p class="zhuantiku" style="float: left;">
+                <a href="http://127.0.0.1" target="_blank">首页</a>
+                <a href="http://127.0.0.1/DBMgr" target="_blank">数据库</a> 
+                <a href="http://127.0.0.1/webLink.html" target="_blank">学习资源</a> 
+                <a href="http://127.0.0.1/workbook.html" target="_blank">工作簿</a> 
+        </p>
+    </div>
+    <div class="main-container">
+        <div class="sidebar" style="width:240px">
+            <div class="hd">
+                <div class="create" widget-toggle="false" id="create">
+                    <i class="icon-creates"></i>
+                    <span class="create-text">新文档</span>
+                    <i class="arrow arrowA"></i>
+                    <ul class="widget-menu" style="top: 40px; right: -20px; display: block; visibility: hidden;" widget-toggle-content="right">
+                        <li class="widget-menu-item can-disabled" id="new-file">
+                            新建笔记
+                        </li> 
+                        <li class="widget-menu-item can-disabled" id="new-folder">
+                            新建文件夹
+                        </li>   
+                    </ul>
+                </div>
+            </div>
+            <div class="slidebar-content">
+                    <div class="sidebar-item" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">
+                        <i class="icon-recent-modified"></i>
+                        <span class="sidebar-item-text">最新文档</span>                        
+                    </div>
+            </div> 
+            <div class="slidebar-content" id="loadFolder">    
+                    <div class="sidebar-item slidebar-contentMove" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker=""  onmouseenter=mouseenterFileA(this) onmouseleave=mouseleaveFileA()>  
+                        <i class="arrow arrowB"></i>                 
+                        <i class="icon-file"></i>
+                        <span class="sidebar-item-text">我的文件夹</span>            
+                        <i title="删除目录" i class="icon_delete editC"></i>
+                    </div>
+            </div> 
+            <ul class="tree-container" id='folder-Container'>
+            </ul>     
+            <div  class="slidebar-content" widget-context-menu="" id="crash">
+                    <div class="sidebar-item" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">
+                        <i class="icon_delete arrowC"></i>
+                        <span class="sidebar-item-text">回收站</span>                        
+                    </div>
+            </div>
+            <div class="drag-line"></div>  
+        </div>
+        <div class="viewport" id="flexible-right" style="left: 242px;">
+                <div class="list-detail" style="min-width: 220px;" flexible-list="">
+                    <div class="hdA">
+                        <div class="list-search" id="list-search">
+                                <span title="返回上一级" class="icon-back"></span>
+                                <span class="icon-search"></span>
+                                <input name="search" class="search-text input-search" placeholder="搜索..." autocomplete="off"></input>
+                                <span class="icon-setting setting_abstract"></span> 
+                        </div>                
+                        <ul class="search-result" id='search-Container'>
+                        </ul>   
+                        <div class="search-statu"> 
+                            <div class="file-tree-toggle folded">
+                                <i class="icon_arrow_right"></i>
+                            </div>
+                            <div id="search-value">
+                                状态信息sdfasf
+                            </div>
+                        </div>
+                    </div>               
+                </div>
+                <div class="drag-line"></div>  
+        </div>
+        <div class="detail-container" id="flexible-right" style="left: 566px;"> 
+            <div class="hdB">
+                <input id="top-fileName" class="top-title" type="text" maxlength="250" value="">
+                <div class="note-tip" id="note-save-btn" style="right: 170px;">保存</div>
+            </div>     
+            <textarea class="top-value" id="detail-value" wrap="logic"> 
+            </textarea>
+        </div> 
+    </div>
+</body>
+
+</html>
