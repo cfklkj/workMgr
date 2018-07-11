@@ -2,13 +2,15 @@ package main
 
 import(   
     "net/http" 
-    "fmt"   
+    "fmt" 
+    "path"
+    "path/filepath"
+    "strings"  
     "os"
     "io"
     "io/ioutil"
     "os/exec"  
     "bytes"
-    "strings"  
     "encoding/json"    
 )   
 
@@ -29,17 +31,65 @@ type C2SUPJSON struct{
     JsonType string 
     TxtInfo string 
 } 
+type C2SPROINFO struct{
+    ProType string 
+    ProName string 
+} 
 
 type C2SPACKAGE struct{
     Package string 
     Source string 
 } 
-var g_workbookPath = "d:\\workbook\\"
-var g_dirPath = g_workbookPath
+var g_dirPath = "d:\\workbook\\"
+var g_ProName = "working"
+var g_workbookPath = ""
 func OnWorkbook(res http.ResponseWriter, req *http.Request) { 
     req.ParseForm()
     fmt.Println(req.URL.Path) 
-    if strings.Contains(req.URL.Path, "&upJson") { 
+    if strings.Contains(req.URL.Path, "&ProInfo") { 
+        body, _ := ioutil.ReadAll(req.Body)
+        var  c2sProInfo  C2SPROINFO     
+        err := json.Unmarshal(body, &c2sProInfo)
+        if err != nil {
+            //   c.String(500, "decode json error")
+            io.WriteString(res, "decode json error")
+            return
+        }   
+        if(c2sProInfo.ProType == "get"){
+            if(g_workbookPath == ""){
+                setWorkbookPath(webConfig.WorkBook.ProName)
+            }
+            io.WriteString(res, g_ProName)
+            return
+        }else if(c2sProInfo.ProType == "new"){
+             
+            for{
+                setWorkbookPath(c2sProInfo.ProName)
+                err := os.Mkdir(g_workbookPath, os.ModePerm)
+                if err != nil {
+                    fmt.Println(err)
+                }else{ 
+                   break;   
+                }              
+                c2sProInfo.ProName += "1"
+             }
+            io.WriteString(res, g_ProName)
+            return
+        }else if(c2sProInfo.ProType == "open"){ 
+            io.WriteString(res, OpenWorkBook())
+            return
+        }else{ 
+            //重命名文件夹
+            originalPath := g_workbookPath
+            newPath := g_dirPath + c2sProInfo.ProName
+            err := os.Rename(originalPath, newPath) 
+            if err != nil {
+                io.WriteString(res, "重命名失败")
+                return
+            } 
+            setWorkbookPath(c2sProInfo.ProName)
+        }
+    }else if strings.Contains(req.URL.Path, "&upJson") { 
         body, _ := ioutil.ReadAll(req.Body)
         var  c2sJsonInfo  C2SUPJSON     
         err := json.Unmarshal(body, &c2sJsonInfo)
@@ -109,7 +159,7 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             return
         }
         if(c2sPackInfo.Package == "import"){
-            io.WriteString(res, ImportWorkBook(c2sPackInfo.Source))  
+            io.WriteString(res, ImportWorkBook())  
         }else{
             ExportWorkBook()
         }   
@@ -119,6 +169,12 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
     }else {
         io.WriteString(res, "这是从后台发送的数据")
     } 
+}
+func setWorkbookPath(ProName string){    
+    g_ProName = ProName
+    webConfig.WorkBook.ProName = g_ProName
+    g_workbookPath =  g_dirPath + ProName + "\\"
+    UpLoadConfig("json/config.json");
 }
 //读取文本
 func GetWorkbookTxt(C2STxtInfo C2SGETTXT)string{    
@@ -151,7 +207,7 @@ func KeepWorkbookTxt(c2sFileInfo C2SKEEPTXT)string{
 }
 //更新json文件列表
 func WriteWorkBookJson(c2sJsonInfo  C2SUPJSON){ 
-    dirPath := g_dirPath
+    dirPath := g_workbookPath
     if(c2sJsonInfo.JsonType == "Dir"){
         dirPath += "dirNames.json"
     }else{
@@ -166,7 +222,7 @@ func WriteWorkBookJson(c2sJsonInfo  C2SUPJSON){
 }
 //读取JSON文本
 func GetWorkbookJson(c2sJsonInfo C2SGETJSON)string{   
-    dirPath := g_dirPath
+    dirPath := g_workbookPath
     os.Mkdir(dirPath, os.ModePerm)
     if(c2sJsonInfo.JsonType == "Dir"){
         dirPath += "dirNames.json"
@@ -177,21 +233,40 @@ func GetWorkbookJson(c2sJsonInfo C2SGETJSON)string{
 } 
 
 //导入 导出
-func ImportWorkBook(path string)string{ 
+func getPathName(fullFilename string)string{  
+    var filenameWithSuffix string 
+    filenameWithSuffix = path.Base(fullFilename) 
+    var fileSuffix string
+    fileSuffix = path.Ext(filenameWithSuffix)   
+    g_ProName = strings.TrimSuffix(filenameWithSuffix, fileSuffix)  
+    return g_ProName
+}
 
-    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 2 "+ g_workbookPath )  
-    var out bytes.Buffer
-	cmd.Stdout = &out
-    err := cmd.Start()
-    cmd.Wait()
-    if err != nil {
-        return err.Error()
-    }  
-    return "已执行--" + out.String(); 
+func exists(path string) (bool, error) {
+    _, err := os.Stat(path)
+    if err != nil { return false, err }
+    if os.IsNotExist(err) { return false, nil }
+    return true, err
+}
+func ImportWorkBook()string{ 
+ 
+    proPath := OpenKeepDialog()
+    if(proPath != ""){ 
+        cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 3 "+ g_workbookPath + " " + proPath)   
+        var out bytes.Buffer
+        cmd.Stdout = &out
+        err := cmd.Start()
+        cmd.Wait()
+        if err != nil {
+            return err.Error()
+        }  
+        return "已执行--"
+    }
+    return "error--" 
 }
 
 func ExportWorkBook(){
-    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 1 "+ g_workbookPath)  
+    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 1 "+ g_workbookPath + "\\ " + g_ProName)  
     var out bytes.Buffer
 	cmd.Stdout = &out
     err := cmd.Start()
@@ -200,3 +275,52 @@ func ExportWorkBook(){
     }  
     fmt.Println("已执行--" + out.String())
 }
+
+
+func OpenKeepDialog()string{ 
+
+    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 2 ")   
+    var out bytes.Buffer
+	cmd.Stdout = &out
+    err := cmd.Start()
+    cmd.Wait()
+    if err != nil {
+        return ""
+    }  
+    outStr := strings.Split(out.String(), "\r\n");
+    if(outStr[2] != ""){  
+        proPath := outStr[2]
+        ok, _ := exists(proPath)
+        if !ok {
+            return ""
+        }    
+        _, fileName := filepath.Split(proPath)  
+        setWorkbookPath(getPathName(fileName)) 
+        return proPath
+    }
+    return ""
+}
+func OpenWorkBook()string{ 
+
+    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 4")   
+    var out bytes.Buffer
+	cmd.Stdout = &out
+    err := cmd.Start()
+    cmd.Wait()
+    if err != nil {
+        return ""
+    }  
+    outStr := strings.Split(out.String(), "\r\n");
+    if(outStr[2] != ""){  
+        proPath := outStr[2] 
+        ok, _ := exists(proPath + "\\dirNames.json")
+        if !ok {
+            return ""
+        }    
+        _, fileName := filepath.Split(proPath) 
+        setWorkbookPath(getPathName(fileName)) 
+        return proPath
+    }
+    return ""
+}
+

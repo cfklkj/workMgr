@@ -27,7 +27,13 @@ function AjaxInfo(GOrP, URL, data, actType)
            if (xhr.status == 200) { 
                if(actType == "listImport")
                {
-                    listImport()
+                   if(xhr.responseText == "已执行--")
+                   {
+                        listImport()
+                   }else
+                   {
+                       onShowTxt(xhr.responseText)
+                   }
                }
                else if(actType == "onShowDir")
                {
@@ -56,6 +62,14 @@ function AjaxInfo(GOrP, URL, data, actType)
                    {
                         loadDirJson(0)
                    }
+               } 
+               else if(actType == "loadProJson")
+               {
+                    loadProJson(xhr.responseText)
+               } 
+               else if(actType == "newPro")
+               {
+                    newPro(xhr.responseText)
                } 
                else if(actType == "showStatu")
                {
@@ -87,19 +101,26 @@ function main() {
    m_listImport.onclick = onListImport
    m_listExport = document.getElementById('list-export'); 
    m_listExport.onclick = onListExport
+   m_listCreate = document.getElementById('list-create'); 
+   m_listCreate.onclick = onNewPro
+   m_listOpen = document.getElementById('list-open'); 
+   m_listOpen.onclick = onOpenPro
+   g_listMenu = document.getElementById('list-menu'); 
+   g_listMenu.onclick = list_menus
    
    InitGlobalCtrl()
    InitGlobalParame() 
-   onLoadDirJson()
+   onGetProject()
 }  
 function InitGlobalCtrl()
 {    
+    g_loadFolder = document.getElementById('loadFolder'); 
+    g_loadFolder.onclick = onLoadFolders
     m_create = document.getElementById('create'); 
     m_create.onclick = onCreate
     g_folderContainer = document.getElementById('folder-Container'); 
     g_searchContainer = document.getElementById('search-Container'); 
-    g_listSearch = document.getElementById('list-search'); 
-    g_listSearch.onclick = list_menus
+    g_listSearch = document.getElementById('list-search');  
     g_searchValue = document.getElementById('search-value'); 
     g_detailValue = document.getElementById('detail-value'); 
     g_topFileName = document.getElementById('top-fileName'); 
@@ -121,26 +142,49 @@ function InitGlobalParame()
 
     g_newFile = 0;
     g_deleteTagI = []; 
+    g_proName = ""
+}
+
+//获取项目
+function onGetProject()
+{    
+    var data = {"ProType":"get"}    
+    AjaxInfo("post",serverUrl + '/Workbook&ProInfo', data, "loadProJson")  
+}
+function loadProJson(proName)
+{ 
+    list_setProject(proName)
+    //加载目录
+    onLoadDirJson()
+}
+function UpProject()
+{    
+    var data = {"ProType":"up", "proName":g_proName}     
+    AjaxInfo("post",serverUrl + '/Workbook&ProInfo', data, "onShowStatu")  
+}
+
+function onNewPro()
+{    
+    g_creatUl.style.visibility = "hidden"
+    g_proName = "newPro"
+    var data = {"ProType":"new", "proName":g_proName}     
+    AjaxInfo("post",serverUrl + '/Workbook&ProInfo', data, "newPro")     
+}
+function onOpenPro()
+{
+    g_creatUl.style.visibility = "hidden"
+    var data = {"ProType":"open"}     
+    AjaxInfo("post",serverUrl + '/Workbook&ProInfo', data, "newPro")   
+}
+function newPro(proName)
+{
+    if(proName != ""){ 
+        location.reload()
+    }
 }
 function onDelete()
 { 
-    if(g_choiceDirObj)
-    {
-        if(g_choiceDirObj == this)
-        {
-            return
-        }
-        g_choiceDirObj.par.className = g_choiceDirObj.oldClass
-        if(g_choiceDirObj.style.visibility == "visible")
-        {
-             g_choiceDirObj.style.visibility = "hidden"
-        } 
-    }
-    g_choiceDirObj = this
-
-    g_choiceDirObj.oldClass = this.className 
-    g_choiceDirObj.par = this 
-    g_choiceDirObj.par.className = "selected" 
+    selectFolde(this)
     g_choiceDirObj.thisType="crash"
 
     initFileInfo();
@@ -188,12 +232,19 @@ if (btnNum==2)
 else if(btnNum==0)
 {
     var par = getParentObj(event.srcElement)
-    if(event.srcElement.className.indexOf('editC') != -1)  //删除目录
+    if(event.srcElement.className.indexOf('editC') != -1 || event.srcElement.className.indexOf('editD') != -1)  //删除目录
     { 
         if(g_choiceDirObj.id > 100)
         { 
-            moveFolder() 
-            selectDefualtFolde(g_choiceDirIndex)
+            moveFolder(g_choiceDirObj.id)             
+            recodeChangeFolderContianer(g_choiceDirObj.par) 
+            selectDefualtFolde(g_choiceDirIndex) 
+        }else if(par.id > 100)
+        {
+            moveFolder(par.id)
+            recodeChangeFileContianer(par)
+            selectDefualtFile(g_choiceFileIndex)
+            loadFolder(g_jsonDirInfo)
         }
         return
     }
@@ -208,7 +259,9 @@ else if(btnNum==0)
         }else{
             if(g_choiceDirObj.thisType == "unCrash")
             { 
-                moveFile(par) 
+                moveFile(par)     
+                recodeChangeFolderContianer(par) 
+                selectDefualtFolde(g_choiceDirIndex)
             }else  //彻底删除
             { 
                 deleteFile(par)
@@ -272,11 +325,14 @@ function mouseleaveFile()
 }
 function mouseenterFileA(obj)
 { 
+    if(g_choiceDirIndex < 0)
+    {
+        return 
+    } 
     var tagI = obj.getElementsByTagName("i") 
     mouseleaveFileA()
     g_deleteTagI.A = tagI
-    tagI[2].style.visibility = "visible" 
-    
+    tagI[2].style.visibility = "visible"      
 }
 function mouseleaveFileA()
 {
@@ -388,8 +444,15 @@ function recodeFileIndex(parent)
 {
     g_choiceFileIndex = fileIndex(parent) 
 }
-function selectFolde(parent)
-{ 
+function unselectFolder()
+{
+    if(g_choiceDirObj && g_choiceDirObj.style.visibility == "visible")
+    {
+         g_choiceDirObj.style.visibility = "hidden"
+    } 
+}
+function selectFoldeStatu(parent)
+{    
     var tagI = parent.getElementsByTagName("i")
     if(g_choiceDirObj)
     {
@@ -397,11 +460,8 @@ function selectFolde(parent)
         {
             return
         }
-        g_choiceDirObj.par.className = g_choiceDirObj.oldClass
-        if(g_choiceDirObj.style.visibility == "visible")
-        {
-             g_choiceDirObj.style.visibility = "hidden"
-        } 
+        g_choiceDirObj.par.className = g_choiceDirObj.oldClass       
+        unselectFolder()
     }
     g_choiceDirObj = tagI[0]
 
@@ -412,6 +472,10 @@ function selectFolde(parent)
 
     g_choiceDirObj.id = parent.id 
     g_choiceDirObj.style.visibility = "visible";  
+}
+function selectFolde(parent)
+{ 
+    selectFoldeStatu(parent)
     list_setOpenDir(parent)
     onLoadFile(g_choiceDirObj.id);  
     recodeFoldeIndex(parent)
@@ -435,6 +499,21 @@ function selectDefualtFolde(index)
     selectFolde(parent)
 }
 //刷新文件夹 
+function onLoadFolders()
+{
+
+    selectFoldeStatu(this) 
+    
+    initFileInfo()
+    loadFolder(g_jsonDirInfo)
+    loadUnDeleteFolde()
+    g_choiceFileIndex = 0
+    selectDefualtFile(0)
+    g_choiceDirIndex = -1
+    mouseleaveFileA()   
+    var span = this.getElementsByTagName("span")
+    list_setProject(span[0].title)
+}
 function onLoadFolder()
 { 
     loadFolder(g_jsonDirInfo)
@@ -463,6 +542,7 @@ function loadDirJson(jsonInfo)
         g_jsonDirInfo = jsonInfo
     }else{
         g_jsonDirInfo = []//JSON.parse('[{"fName":"c++","id":101},{"fName":"java","id":102}]')
+        onAddFolder()
     }
     onLoadFileJson()
 }
@@ -527,9 +607,8 @@ function onAddFolder()
     selectFolde(bObj)  
     upDirJson()
 }
-function moveFolder()
-{  
-    parentId = g_choiceDirObj.id  
+function moveFolder(parentId)
+{    
     for(j = 0; g_jsonDirInfo[j]; j ++)
     {
         if( g_jsonDirInfo[j].id == parentId)
@@ -538,7 +617,6 @@ function moveFolder()
             break;
         }
     }    
-    recodeChangeFolderContianer(g_choiceDirObj.par) 
 }
 function unMoveFolder(parent)
 {     
@@ -656,7 +734,18 @@ function loadDeleteFolde()
         {
             continue;
         } 
-        addCrashFolde(jsonInfo[i].id, jsonInfo[i].id, jsonInfo[i].fName)   
+        addCrashFolde(jsonInfo[i].id, jsonInfo[i].id, jsonInfo[i].fName, "永久删除")   
+    }      
+}
+function loadUnDeleteFolde()
+{   
+    jsonInfo = g_jsonDirInfo;
+    for(i = 0; jsonInfo[i]; i++){  
+        if(jsonInfo[i]["isDelete"])
+        {
+            continue;
+        } 
+        addUnCrashFolde(jsonInfo[i].id, jsonInfo[i].id, jsonInfo[i].fName, "移到回收站")   
     }      
 }
 
@@ -703,7 +792,7 @@ function loadFile(key, isDelete)
     }
 }
 function onAddFile()
-{    
+{      
     jsonInfo =  g_jsonFileInfo[g_choiceDirObj.id]    
     var g_newFile = 0
      if(!jsonInfo)
@@ -770,9 +859,23 @@ function addCrashFile(divId, spanID, spanValue)
     </li>'
     g_searchContainer.innerHTML += Ta
 }
-function addCrashFolde(divId, spanID, spanValue)
-{ 
-    deleteValue = "永久删除"
+function addUnCrashFolde(divId, spanID, spanValue,  deleteValue)
+{  
+    unCrashValue = "还原"
+    Ta = '\
+    <li>\
+        <div class="search-content" id=' + divId + '>\
+            <div class="search-item " file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
+                <i class="icon-folder folderA"></i>\
+                <span class="search-item-text" id=' + spanID + '>' + spanValue + '</span>\
+                <i title="' + deleteValue + '" i class="icon_delete editD"></i>\
+            </div>\
+        </div>\
+    </li>'
+    g_searchContainer.innerHTML += Ta
+} 
+function addCrashFolde(divId, spanID, spanValue,  deleteValue)
+{  
     unCrashValue = "还原"
     Ta = '\
     <li>\
@@ -786,7 +889,7 @@ function addCrashFolde(divId, spanID, spanValue)
         </div>\
     </li>'
     g_searchContainer.innerHTML += Ta
-}
+} 
 function moveFile(parent)
 {
     var span = parent.getElementsByTagName("span")
@@ -918,10 +1021,10 @@ function search_UpFileName(fileObj)
 }
 //文件内容-----------------------------------
 function onShowTxt(parentId, fileId)
-{           
+{         
     fileObj = getJsonFileById(parentId, fileId) 
     if( fileObj)
-    {
+    {    
         g_topFileName.value = fileObj.fName
         var data = {"parentId":parentId, "fileId": fileObj.id, "unrecognizable":true}   
         AjaxInfo("post",serverUrl + '/Workbook&getTxt', data, "showTxt")  
@@ -940,14 +1043,19 @@ function showTxt(txtInfo)
 }
 function onKeeptxt()
 { 
-    fileObj = getJsonFileById(g_choiceDirObj.id, g_choiceFileObj.id) 
-    if( fileObj)
-    {
-        var data = {"parentId":g_choiceDirObj.id, "fileId": fileObj.id, "txtInfo":g_detailValue.innerHTML}   
-        list_upDirName(g_choiceDirObj.id)
-        search_UpFileName(fileObj)
-        var data = {"parentId":parseInt(g_choiceDirObj.id), "fileId": fileObj.id, "txtInfo":g_detailValue.innerHTML}  
-        AjaxInfo("post",serverUrl + '/Workbook&keepTxt', data, "showStatu")
+    if(g_choiceDirObj.id > 100)
+    { 
+        fileObj = getJsonFileById(g_choiceDirObj.id, g_choiceFileObj.id) 
+        if( fileObj)
+        {
+            var data = {"parentId":g_choiceDirObj.id, "fileId": fileObj.id, "txtInfo":g_detailValue.innerHTML}   
+            list_upDirName(g_choiceDirObj.id)
+            search_UpFileName(fileObj)
+            var data = {"parentId":parseInt(g_choiceDirObj.id), "fileId": fileObj.id, "txtInfo":g_detailValue.innerHTML}  
+            AjaxInfo("post",serverUrl + '/Workbook&keepTxt', data, "showStatu")
+        }
+    }else{
+        list_UpProject();
     }
 }
 
@@ -955,6 +1063,24 @@ function onKeeptxt()
 
 
 //list-search
+function list_setProject(projectName)
+{
+    g_proName = projectName
+    var span = g_listSearch.getElementsByTagName("span")
+    var input = g_listSearch.getElementsByTagName("input")
+    span[1].className = "icon-oFolde"
+    input[0].value = g_proName
+    var span = g_loadFolder.getElementsByTagName("span")
+    span[0].title = g_proName
+}
+function list_UpProject()
+{ 
+    if(g_choiceDirObj.par != g_loadFolder)
+        return
+    var input = g_listSearch.getElementsByTagName("input") 
+    g_proName =  input[0].value
+    UpProject()
+}
 function list_setOpenDir(parent)
 {
     var span = g_listSearch.getElementsByTagName("span")
@@ -1000,18 +1126,20 @@ function list_menus()
 } 
 
 function onListImport()
-{ 
+{     
+    g_creatUl.style.visibility = "hidden"
     var data = {"Package":"import"}  
     AjaxInfo("post",serverUrl + '/Workbook&pakage', data, "listImport") 
 }
 
 function listImport()
 {
-    location.reload()
+    location.reload() 
 }
 
 function onListExport()
-{  
+{      
+    g_creatUl.style.visibility = "hidden"
     var data = {"Package":"export"}  
     AjaxInfo("post",serverUrl + '/Workbook&pakage', data, "showStatu")
 }

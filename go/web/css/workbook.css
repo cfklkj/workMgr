@@ -198,7 +198,7 @@ html, body {
     font-size: 100%;
     vertical-align: baseline; 
 }
-.editB {
+.editB, .editD {
     display: inline-block;
     visibility: hidden;
     float: right;
@@ -261,16 +261,16 @@ html, body {
  
 .icon-folder {
     background: url(/image/sprite-268ba431f9.svg) no-repeat;
-    background-position: 46.02739726027397% 81.62650602409639%;
+    background-position: 46.02739726027397% 82%;
     width: 24px;
-    height: 24px;
+    height: 24px; 
 }
 
 .folderA {    
     display: inline-block;
     vertical-align: middle; 
     font-size: 100%;
-    vertical-align: baseline; 
+    vertical-align: baseline;  
 }
  
 
@@ -583,4 +583,9 @@ h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cit, code, del, df
     left: 58px;
     display: inline-block;
     cursor: pointer;
+}
+
+.split-line {
+    background: #ebf3fd;
+    height: 1px;
 }

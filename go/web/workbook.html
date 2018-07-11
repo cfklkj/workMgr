@@ -50,7 +50,7 @@
                     <div class="sidebar-item slidebar-contentMove" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker=""  onmouseenter=mouseenterFileA(this) onmouseleave=mouseleaveFileA()>  
                         <i class="arrow arrowB"></i>                 
                         <i class="icon-file"></i>
-                        <span class="sidebar-item-text">我的文件夹</span>            
+                        <span class="sidebar-item-text" title="newProject">我的文件夹</span>            
                         <i title="删除目录" i class="icon_delete editC"></i>
                     </div>
             </div> 
@@ -58,6 +58,7 @@
             </ul>     
             <div  class="slidebar-content" widget-context-menu="" id="crash">
                     <div class="sidebar-item" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">
+                        <i></i>
                         <i class="icon_delete arrowC"></i>
                         <span class="sidebar-item-text">回收站</span>                        
                     </div>
@@ -71,13 +72,20 @@
                                 <span title="返回上一级" class="icon-back"></span>
                                 <span class="icon-search"></span>
                                 <input name="search" class="search-text input-search" placeholder="搜索..." autocomplete="off"></input>
-                                <span class="icon-setting setting_abstract"></span> 
+                                <span class="icon-setting setting_abstract" id="list-menu"></span> 
                                 <ul class="widget-menu" style="top: 40px; right: -20px; display: block; visibility: hidden;" widget-toggle-content="right">
+                                    <li class="widget-menu-item can-disabled" id="list-create">
+                                        新建项目
+                                    </li>
+                                    <li class="widget-menu-item can-disabled" id="list-open">
+                                        打开项目
+                                    </li>
+                                    <li class="widget-menu-item split-line"></li>
                                     <li class="widget-menu-item can-disabled" id="list-import">
-                                        导入
+                                        导入项目
                                     </li> 
                                     <li class="widget-menu-item can-disabled" id="list-export">
-                                        导出
+                                        导出项目
                                     </li>   
                                 </ul>
                         </div>                
