@@ -21,6 +21,7 @@ html, body {
     left: 0px;
     right: 0px;
     height: 100%;
+    width: 100%;
     background: rgb(245,245,245);
 } 
  
@@ -32,16 +33,14 @@ html, body {
     line-height: 40px;
     padding: 10px 0;
     white-space: nowrap;
-}
-.hdA {
-    height: 100%;
-    width:320px;
-    line-height: 60px;
-    position: relative;
-    display: flex;
-    display: -webkit-flex;
-    justify-content: center;
-    -webkit-justify-content: center;
+} 
+.list-search {
+    width: 100%; 
+    position: absolute; 
+    height: 60px;
+    border-right: 1px solid #e0e1e5;
+    border-bottom: 1px solid #e0e1e5;
+    background-color: #fff; 
 }
 
 .hdB {
@@ -78,7 +77,7 @@ html, body {
 .sidebar .hd .create:hover .create-text, .sidebar .hd .create:active .create-text {
     color: #398dee;
 }
-.sidebar .hd .create .create-text, .sidebar .hd .upload .create-text, .sidebar .hd .create .upload-text, .sidebar .hd .upload .upload-text {
+.sidebar1 .hd .create .create-text, .sidebar1 .hd .upload .create-text, .sidebar1 .hd .create .upload-text, .sidebar1 .hd .upload .upload-text {
     display: inline-block;
     font-size: 12px;
     margin-left: 8px;
@@ -124,7 +123,12 @@ html, body {
 .search-resulMove{
     margin-left: -10px;
 }
-.sidebar  .icon-recent-modified {
+
+.search_resulMoveB{
+    padding: 7px 13px 8px 11px;
+}
+
+.icon-recent-modified {
     background: url(/image/sprite-268ba431f9.svg) no-repeat;
     background-position: 59.178082191780824% 81.62650602409639%;
     width: 24px;
@@ -157,7 +161,7 @@ html, body {
 
 .icon-Edit {
     background: url(/image/sprite-268ba431f9.svg) no-repeat;
-    background-position: 32.39% 93.85%;
+    background-position: 32.39% 94%;
     width: 24px;
     height: 24px;
     display: inline-block;
@@ -172,13 +176,11 @@ html, body {
     width: 100%;
     height: 40px;
     cursor: pointer;
-    padding: 0px 14px;
     box-sizing: border-box;
     border: 1px solid transparent;
     color: #393939;
     white-space: nowrap;
-    -webkit-user-drag: none;
-    padding-top: -3px;
+    -webkit-user-drag: none; 
 }
 .search-item-text {
     display: inline-block;
@@ -198,11 +200,11 @@ html, body {
     font-size: 100%;
     vertical-align: baseline; 
 }
-.editB, .editD {
+.editB{
     display: inline-block;
     visibility: hidden;
     float: right;
-    margin-top: 15px;
+    margin-top: 5px;
 }
  
 .editC {
@@ -211,12 +213,19 @@ html, body {
     float: right;
     margin-top: 5px;
 }
+
+.editD {
+    display: inline-block;
+    visibility: hidden;
+    float: right;
+    margin-top: 15px;
+}
  
 
 .sidebar-item {
     display: block;
     position: relative;
-    width: 120%;
+    width: 100%;
     height: 40px;
     cursor: pointer;
     padding: 8px 30px;
@@ -228,7 +237,7 @@ html, body {
 } 
 
  
-.sidebar .sidebar-item .sidebar-item-text {
+.sidebar-item .sidebar-item-text {
     display: inline-block;
     margin-top: -15px;
     margin-left: 5px;
@@ -287,24 +296,23 @@ h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cit, code, del, df
 .drag-line {
     cursor: ew-resize !important;
     top: 0px; 
-    width: 7px; 
-    height: 100%;
-    right: -4px;
+    width: 4px; 
+    height: 100%; 
     position: absolute;
-    z-index: 1;
-}
-  
-.viewport {
-    position: absolute;
-    top: 0px;
-    left: 7px;  
-    height: 100%;
-    width: 320px;
-    z-index: 2;
+    z-index: 1; 
 }
 
+.moveDrag-lineA{ 
+    left: 12%; 
+}
+   
+.moveDrag-lineB{ 
+    right: 0.1%; 
+}
+   
 
-.list-search {
+
+.list-search1 {
     position: absolute;
     top:0px;
     left: 0px;
@@ -361,7 +369,7 @@ h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cit, code, del, df
     height: 38px;
 } 
 
-.setting_abstract:hover {
+.icon-setting:hover {
     background: url(/image/sprite-268ba431f9.svg) no-repeat;
     background-position: 54.08450704225352% 35.8433734939759%;
     width: 34px;
@@ -376,7 +384,7 @@ h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cit, code, del, df
     
     position: absolute;
     top: 19px;
-    left: 78%;
+    left: 80%;
     display: inline-block;
     cursor: pointer;
 }
@@ -393,29 +401,23 @@ h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cit, code, del, df
     top: 3px;
     display: inline-block;
 }
- 
-
-
- 
+  
 .search-result {
     position: absolute;
-    top: 61px; 
-    left: 0px;
     width: 100%;
-    bottom: 30px; 
+    top: 61px;
+    bottom: 75px;
     background-color: #fff;
     border-right: 1px solid #e0e1e5; 
-    padding-top: 10px
+    height: auto; 
 }
 
 .search-statu {
     position: absolute; 
-    top: 92%;
-    left: 0px;
+    bottom: 0;
     width: 100%;
-    bottom: 0px; 
-    background-color: #fff;
-    border-top: 1px solid #e0e1e5; 
+    height: 75px; 
+    background-color: #fff; 
     border-right: 1px solid #e0e1e5; 
 
 }
@@ -461,7 +463,7 @@ h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cit, code, del, df
     height: 20px;
 }
 
-.detail-container {
+.detail-container1 {
     position: absolute;
     left: 321px;
     top: 0px;
@@ -504,7 +506,7 @@ h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cit, code, del, df
     line-height: 30px;
     position: absolute;
     top: 13px;
-    right: 170px;
+    left: 58%;
     font-size: 11px;
     color: #82b6f4;
     text-align: center;
@@ -588,4 +590,28 @@ h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cit, code, del, df
 .split-line {
     background: #ebf3fd;
     height: 1px;
+}
+ 
+.sidebar{   
+    float: left;
+    width: 12%; 
+    height: 100%; 
+    min-width: 200px;  
+}
+
+.viewport{
+    position: absolute;
+    left: 12.1%;
+    width: 15%;
+    height: 100%;
+    min-width: 200px; 
+    background-color: rgb(245,245,245);  
+}
+.detail-container {
+    position: absolute;
+    left: 27.2%;
+    width: 100%; 
+    height: 100%;
+    min-width: 200px;
+    background-color: #fff; 
 }

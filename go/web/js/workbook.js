@@ -9,6 +9,8 @@ var Unrecognizable = false
 var isEditInfo = false
 document.onkeydown=onKeydown
 document.onmousedown=onMouseDwon 
+document.onmouseup=onMouseUp 
+document.onmousemove=onMouseMove 
 function AjaxInfo(GOrP, URL, data, actType)
 { 
    var xhr = new XMLHttpRequest();
@@ -106,7 +108,7 @@ function main() {
    m_listOpen = document.getElementById('list-open'); 
    m_listOpen.onclick = onOpenPro
    g_listMenu = document.getElementById('list-menu'); 
-   g_listMenu.onclick = list_menus
+   g_listMenu.onclick = list_menus 
    
    InitGlobalCtrl()
    InitGlobalParame() 
@@ -124,6 +126,11 @@ function InitGlobalCtrl()
     g_searchValue = document.getElementById('search-value'); 
     g_detailValue = document.getElementById('detail-value'); 
     g_topFileName = document.getElementById('top-fileName'); 
+    g_flexibleLeft = document.getElementById('flexible-left'); 
+    g_flexibleMide = document.getElementById('flexible-mide'); 
+    g_flexibleRight = document.getElementById('flexible-right'); 
+    g_dragMide = document.getElementById('dragMid');  
+    g_dragLeft = document.getElementById('dragSide');  
 }
 
 function InitGlobalParame()
@@ -143,8 +150,48 @@ function InitGlobalParame()
     g_newFile = 0;
     g_deleteTagI = []; 
     g_proName = ""
+    g_dragMove = 0;
 }
+function getStyle(obj, attr)
+{  
 
+    if(obj.currentStyle)  {  
+  
+      return obj.currentStyle[attr];  
+  
+    } else{  
+  
+      return getComputedStyle(obj,false)[attr];  
+    }
+  
+} 
+//drag
+function onDragMid(Y)
+{ 
+    var widthLeft =  parseInt(getStyle(g_flexibleLeft, "width"))
+    newWidth = Y - widthLeft
+    if(newWidth  > 200 && newWidth < 800)
+    {
+        var widthMide =  parseInt(getStyle(g_flexibleMide, "width"))  
+        g_flexibleMide.style.width = newWidth
+        g_flexibleRight.style.left = Y + 2
+        bodyWidth =  document.body.clientWidth   
+        g_flexibleRight.style.width = bodyWidth - newWidth
+    } 
+}
+function onDragLeft(Y)
+{  
+    if( Y > 150 && Y < 500)
+    {
+        var widthMide =  parseInt(getStyle(g_flexibleMide, "width"))  
+        g_dragLeft.style.left = Y
+        g_flexibleLeft.style.width = Y
+        g_flexibleMide.style.left = Y + 2
+        g_flexibleRight.style.left = Y + widthMide + 2*2
+        bodyWidth =  document.body.clientWidth   
+        g_flexibleRight.style.width = bodyWidth - Y- widthMide
+    } 
+}
 //获取项目
 function onGetProject()
 {    
@@ -222,15 +269,48 @@ function onKeydown()
         onKeeptxt()
     } 
 } 
+function onMouseUp()
+{
+    var btnNum = event.button;
+   // console.log("eventUp %d", btnNum)
+   if(btnNum==0)
+   { 
+        g_dragMove = 0; 
+   }
+
+}
+function onMouseMove(event)
+{
+    var btnNum = event.button; 
+   if(g_dragMove == 1)
+   {
+        onDragMid(event.clientX)
+   }
+   if(g_dragMove == 2)
+   {
+        onDragLeft(event.clientX)
+   }
+
+}
 function onMouseDwon(event)
 {
-var btnNum = event.button;
+var btnNum = event.button; 
 if (btnNum==2)
-{
-//alert("您点击了鼠标右键！")
+{ 
+    console.log("您点击了鼠标右键！")
 }
 else if(btnNum==0)
 {
+    if(event.srcElement == g_dragMide)
+    {
+        g_dragMove = 1; 
+        return;
+    }
+    if(event.srcElement == g_dragLeft)
+    {
+        g_dragMove = 2; 
+        return;
+    }
     var par = getParentObj(event.srcElement)
     if(event.srcElement.className.indexOf('editC') != -1 || event.srcElement.className.indexOf('editD') != -1)  //删除目录
     { 
@@ -832,7 +912,7 @@ function addFile(divId, spanID, spanValue)
     Ta = '\
     <li>\
         <div class="search-content" id=' + divId + '>\
-            <div class="search-item " file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
+            <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
                 <i class="icon-Edit editA"></i>\
                 <span class="search-item-text" id=' + spanID + '>' + spanValue + '</span>\
                 <spn title="' + deleteValue + '"><i class="icon_delete editB"></span>\
@@ -849,7 +929,7 @@ function addCrashFile(divId, spanID, spanValue)
     Ta = '\
     <li>\
         <div class="search-content" id=' + divId + '>\
-            <div class="search-item " file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
+            <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
                 <i class="icon-Edit editA"></i>\
                 <span class="search-item-text" id=' + spanID + '>' + spanValue + '</span>\
                 <i title="' + deleteValue + '" i class="icon_delete editB"></i>\
@@ -865,7 +945,7 @@ function addUnCrashFolde(divId, spanID, spanValue,  deleteValue)
     Ta = '\
     <li>\
         <div class="search-content" id=' + divId + '>\
-            <div class="search-item " file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
+            <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
                 <i class="icon-folder folderA"></i>\
                 <span class="search-item-text" id=' + spanID + '>' + spanValue + '</span>\
                 <i title="' + deleteValue + '" i class="icon_delete editD"></i>\
@@ -880,7 +960,7 @@ function addCrashFolde(divId, spanID, spanValue,  deleteValue)
     Ta = '\
     <li>\
         <div class="search-content" id=' + divId + '>\
-            <div class="search-item " file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
+            <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
                 <i class="icon-folder folderA"></i>\
                 <span class="search-item-text" id=' + spanID + '>' + spanValue + '</span>\
                 <i title="' + deleteValue + '" i class="icon_delete editB"></i>\

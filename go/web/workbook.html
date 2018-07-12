@@ -11,7 +11,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link type="text/css" rel="stylesheet" href="css/explorer.css" />   
 <link type="text/css" rel="stylesheet" href="css/workbook.css" />   
-<script type="text/javascript" src="js/workbook.js"></script> 
+<script type="text/javascript" src="js/workbook.js"></script>  
 </head>
 
 <body> 
@@ -24,7 +24,7 @@
         </p>
     </div>
     <div class="main-container">
-        <div class="sidebar" style="width:240px">
+        <div class="sidebar" id="flexible-left">  
             <div class="hd">
                 <div class="create" widget-toggle="false" id="create">
                     <i class="icon-creates"></i>
@@ -62,56 +62,49 @@
                         <i class="icon_delete arrowC"></i>
                         <span class="sidebar-item-text">回收站</span>                        
                     </div>
-            </div>
-            <div class="drag-line"></div>  
+            </div> 
+            <div class="moveDrag-lineA drag-line" id="dragSide"></div>  
         </div>
-        <div class="viewport" id="flexible-right" style="left: 242px;">
-                <div class="list-detail" style="min-width: 220px;" flexible-list="">
-                    <div class="hdA">
-                        <div class="list-search" id="list-search">
-                                <span title="返回上一级" class="icon-back"></span>
-                                <span class="icon-search"></span>
-                                <input name="search" class="search-text input-search" placeholder="搜索..." autocomplete="off"></input>
-                                <span class="icon-setting setting_abstract" id="list-menu"></span> 
-                                <ul class="widget-menu" style="top: 40px; right: -20px; display: block; visibility: hidden;" widget-toggle-content="right">
-                                    <li class="widget-menu-item can-disabled" id="list-create">
-                                        新建项目
-                                    </li>
-                                    <li class="widget-menu-item can-disabled" id="list-open">
-                                        打开项目
-                                    </li>
-                                    <li class="widget-menu-item split-line"></li>
-                                    <li class="widget-menu-item can-disabled" id="list-import">
-                                        导入项目
-                                    </li> 
-                                    <li class="widget-menu-item can-disabled" id="list-export">
-                                        导出项目
-                                    </li>   
-                                </ul>
-                        </div>                
-                        <ul class="search-result" id='search-Container'>
-                        </ul>   
-                        <div class="search-statu"> 
-                            <div class="file-tree-toggle folded">
-                                <i class="icon_arrow_right"></i>
-                            </div>
-                            <div id="search-value">
-                                状态信息sdfasf
-                            </div>
-                        </div>
-                    </div>               
-                </div>
-                <div class="drag-line"></div>  
+        <div class="viewport" id="flexible-mide"> 
+                <div class="list-search" id="list-search">
+                        <span title="返回上一级" class="icon-back"></span>
+                        <span class="icon-search"></span>
+                        <input name="search" class="search-text input-search" placeholder="搜索..." autocomplete="off"></input>
+                        <span class="icon-setting" id="list-menu"></span> 
+                        <ul class="widget-menu" style="top: 40px; right: -20px; display: block; visibility: hidden;" widget-toggle-content="right">
+                            <li class="widget-menu-item can-disabled" id="list-create">
+                                新建项目
+                            </li>
+                            <li class="widget-menu-item can-disabled" id="list-open">
+                                打开项目
+                            </li>
+                            <li class="widget-menu-item split-line"></li>
+                            <li class="widget-menu-item can-disabled" id="list-import">
+                                导入项目
+                            </li> 
+                            <li class="widget-menu-item can-disabled" id="list-export">
+                                导出项目
+                            </li>   
+                        </ul>
+                </div>                
+                <ul class="search-result" id='search-Container'>
+                </ul>   
+                <div class="search-statu"> 
+                    <i class="file-tree-toggle folded icon_arrow_right"></i>
+                    <div id="search-value">
+                        状态信息sdfasf
+                    </div>
+                </div>        
+                <div class="moveDrag-lineB drag-line" id="dragMid"></div>  
         </div>
-        <div class="detail-container" id="flexible-right" style="left: 566px;"> 
+        <div class="detail-container" id="flexible-right"> 
             <div class="hdB">
                 <input id="top-fileName" class="top-title" type="text" maxlength="250" value="">
                 <div class="note-tip" id="note-save-btn" style="right: 170px;">保存</div>
             </div>     
             <textarea class="top-value" id="detail-value" wrap="logic"> 
             </textarea>
-        </div> 
-        <iframe src="" name="show"  style="width:0;height:0"></iframe>
+        </div>  
     </div>
 </body>
 
