@@ -174,7 +174,7 @@ function onDragMid(Y)
     {
         var widthMide =  parseInt(getStyle(g_flexibleMide, "width"))  
         g_flexibleMide.style.width = newWidth
-        g_flexibleRight.style.left = Y + 2
+        g_flexibleRight.style.left = Y + 4
         bodyWidth =  document.body.clientWidth   
         g_flexibleRight.style.width = bodyWidth - newWidth
     } 
