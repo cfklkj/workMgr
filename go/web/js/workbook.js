@@ -1,16 +1,9 @@
 
 window.onload = main
   
-var serverUrl = "127.0.0.1"
+var serverUrl = "127.0.0.1"  
 var MyToken = ""
-var MylistArray = new Array()
-var listArrayCount = 0
-var Unrecognizable = false
-var isEditInfo = false
-document.onkeydown=onKeydown
-document.onmousedown=onMouseDwon 
-document.onmouseup=onMouseUp 
-document.onmousemove=onMouseMove 
+var Unrecognizable = false 
 function AjaxInfo(GOrP, URL, data, actType)
 { 
    var xhr = new XMLHttpRequest();
@@ -90,6 +83,12 @@ function AjaxInfo(GOrP, URL, data, actType)
 }
     
 function main() {   
+   InitGlobalParame() 
+   document.onkeydown=onKeydown
+   document.onmousedown=onMouseDwon 
+   document.onmouseup=onMouseUp 
+   document.onmousemove=onMouseMove 
+
    // document.onkeydown=onKeyLogin     
    m_crash = document.getElementById('crash'); 
    m_crash.onclick = onDelete
@@ -111,7 +110,6 @@ function main() {
    g_listMenu.onclick = list_menus 
    
    InitGlobalCtrl()
-   InitGlobalParame() 
    onGetProject()
 }  
 function InitGlobalCtrl()
@@ -151,6 +149,7 @@ function InitGlobalParame()
     g_deleteTagI = []; 
     g_proName = ""
     g_dragMove = 0;
+    g_isDeleteFolder  = false;
 }
 function getStyle(obj, attr)
 {  
@@ -170,7 +169,7 @@ function onDragMid(Y)
 { 
     var widthLeft =  parseInt(getStyle(g_flexibleLeft, "width"))
     newWidth = Y - widthLeft
-    if(newWidth  > 200 && newWidth < 800)
+    if(newWidth  > 300 && newWidth < 800)
     {
         var widthMide =  parseInt(getStyle(g_flexibleMide, "width"))  
         g_flexibleMide.style.width = newWidth
@@ -181,7 +180,11 @@ function onDragMid(Y)
 }
 function onDragLeft(Y)
 {  
-    if( Y > 150 && Y < 500)
+    if( Y <250)
+    {
+        Y = 251
+    }
+    if(Y < 500)
     {
         var widthMide =  parseInt(getStyle(g_flexibleMide, "width"))  
         g_dragLeft.style.left = Y
@@ -316,6 +319,7 @@ else if(btnNum==0)
     { 
         if(g_choiceDirObj.id > 100)
         { 
+            g_isDeleteFolder = true;
             moveFolder(g_choiceDirObj.id)             
             recodeChangeFolderContianer(g_choiceDirObj.par) 
             selectDefualtFolde(g_choiceDirIndex) 
@@ -523,14 +527,7 @@ function recodeFoldeIndex(parent)
 function recodeFileIndex(parent)
 {
     g_choiceFileIndex = fileIndex(parent) 
-}
-function unselectFolder()
-{
-    if(g_choiceDirObj && g_choiceDirObj.style.visibility == "visible")
-    {
-         g_choiceDirObj.style.visibility = "hidden"
-    } 
-}
+} 
 function selectFoldeStatu(parent)
 {    
     var tagI = parent.getElementsByTagName("i")
@@ -581,7 +578,11 @@ function selectDefualtFolde(index)
 //刷新文件夹 
 function onLoadFolders()
 {
-
+    if(g_isDeleteFolder)
+    {
+        g_isDeleteFolder = false
+        return 
+    }
     selectFoldeStatu(this) 
     
     initFileInfo()
