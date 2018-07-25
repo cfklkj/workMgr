@@ -55,13 +55,7 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             io.WriteString(res, "decode json error")
             return
         }   
-        if(c2sProInfo.ProType == "get"){
-            if(g_workbookPath == ""){
-                setWorkbookPath(webConfig.WorkBook.ProName)
-            }
-            io.WriteString(res, g_ProName)
-            return
-        }else if(c2sProInfo.ProType == "new"){
+        if(c2sProInfo.ProType == "new"){
              
             for{
                 setWorkbookPath(c2sProInfo.ProName)
@@ -84,10 +78,11 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             newPath := g_dirPath + c2sProInfo.ProName
             err := os.Rename(originalPath, newPath) 
             if err != nil {
-                io.WriteString(res, "重命名失败")
+                io.WriteString(res, "重命名失败--可能存在同命项目")
                 return
             } 
             setWorkbookPath(c2sProInfo.ProName)
+            io.WriteString(res, "ok")
         }
     }else if strings.Contains(req.URL.Path, "&upJson") { 
         body, _ := ioutil.ReadAll(req.Body)
@@ -99,6 +94,7 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             return
         }
         WriteWorkBookJson(c2sJsonInfo)
+        io.WriteString(res, "act success")
     }else if strings.Contains(req.URL.Path, "&getJson") {      
         body, _ := ioutil.ReadAll(req.Body)
         var  c2sJsonInfo  C2SGETJSON     
@@ -108,7 +104,21 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             io.WriteString(res, "decode json error")
             return
         }
-        io.WriteString(res, GetWorkbookJson(c2sJsonInfo))
+        if(c2sJsonInfo.JsonType == "Project"){
+            if(g_workbookPath == ""){
+                if(webConfig.WorkBook.ProDir != ""){
+                    g_dirPath = webConfig.WorkBook.ProDir
+                }
+                setWorkbookPath(webConfig.WorkBook.ProName)
+                err := os.Mkdir(g_dirPath, os.ModePerm)
+                if err != nil {
+                    fmt.Println(err)
+                }             
+            }
+            io.WriteString(res, g_ProName)
+        }else{ 
+            io.WriteString(res, GetWorkbookJson(c2sJsonInfo))
+        }
     }else if strings.Contains(req.URL.Path, "&getTxt") {      
         body, _ := ioutil.ReadAll(req.Body)
         var  c2sTxtInfo  C2SGETTXT     
@@ -170,6 +180,11 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
         io.WriteString(res, "这是从后台发送的数据")
     } 
 }
+func setWorkbookDir(ProDir string){
+    pDir,_ := filepath.Split(ProDir) 
+    webConfig.WorkBook.ProDir = pDir
+    g_dirPath = webConfig.WorkBook.ProDir
+}
 func setWorkbookPath(ProName string){    
     g_ProName = ProName
     webConfig.WorkBook.ProName = g_ProName
@@ -199,9 +214,9 @@ func KeepWorkbookTxt(c2sFileInfo C2SKEEPTXT)string{
         return "open file " + dirPth + " failed.";
     }
     defer file.Close()
-    c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&gt;", ">", -1)
-    c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&lt;", "<", -1)
-    c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&amp;", "=", -1)
+  //  c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&gt;", ">", -1)
+  //  c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&lt;", "<", -1)
+  //  c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&amp;", "=", -1)
     file.WriteString(c2sFileInfo.TxtInfo);
     return "keep file " + dirPth + " Ok";
 }
@@ -210,8 +225,10 @@ func WriteWorkBookJson(c2sJsonInfo  C2SUPJSON){
     dirPath := g_workbookPath
     if(c2sJsonInfo.JsonType == "Dir"){
         dirPath += "dirNames.json"
-    }else{
+    }else if(c2sJsonInfo.JsonType == "fileName"){
         dirPath += "fileNames.json"
+    }else {
+        dirPath += "nearFiles.json"
     } 
     file, err := os.OpenFile(dirPath, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
     if err != nil {
@@ -226,8 +243,10 @@ func GetWorkbookJson(c2sJsonInfo C2SGETJSON)string{
     os.Mkdir(dirPath, os.ModePerm)
     if(c2sJsonInfo.JsonType == "Dir"){
         dirPath += "dirNames.json"
-    }else{
+    }else if(c2sJsonInfo.JsonType == "fileName"){
         dirPath += "fileNames.json"
+    }else {
+        dirPath += "nearFiles.json"
     } 
     return OpenTxt(dirPath, true)
 } 
@@ -318,6 +337,7 @@ func OpenWorkBook()string{
             return ""
         }    
         _, fileName := filepath.Split(proPath) 
+        setWorkbookDir(proPath)
         setWorkbookPath(getPathName(fileName)) 
         return proPath
     }

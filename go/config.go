@@ -8,6 +8,7 @@ import(
     _ "code.google.com/P/odbc"  
 )  
 type WORKBOOK struct{
+    ProDir string
     ProName string
 }
  //-------config.jso  ------

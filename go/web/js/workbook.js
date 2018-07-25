@@ -4,6 +4,51 @@ window.onload = main
 var serverUrl = "127.0.0.1"  
 var MyToken = ""
 var Unrecognizable = false 
+
+function Post(){
+    //导入
+    this.import = function(){
+        g_creatUl.style.visibility = "hidden"
+        var data = {"Package":"import"}  
+        AjaxInfo("post",serverUrl + '/Workbook&pakage', data, "listImport") 
+    }
+    //导出
+    this.export = function(){        
+        var data = {"Package":"export"}  
+        AjaxInfo("post",serverUrl + '/Workbook&pakage', data, "showStatu")
+    }
+    //获取文本
+    this.getTxt = function(pId, cId){
+        var data = {"parentId":pId, "fileId": cId, "unrecognizable":true}   
+        AjaxInfo("post",serverUrl + '/Workbook&getTxt', data, "showTxt")  
+    }
+    //保存文本
+    this.keepTxt = function(pId, cId, txtInfo){
+        var data = {"parentId":pId, "fileId": cId, "txtInfo":txtInfo}  
+        AjaxInfo("post",serverUrl + '/Workbook&keepTxt', data, "showStatu")
+    }
+    //删除文件
+    this.deleteFile = function(pId, cId){ 
+        var data = {"parentId":pId, "fileId": cId, "unrecognizable":false}   
+        AjaxInfo("post",serverUrl + '/Workbook&deleteFile', data, "showStatu") 
+    }
+    //获取JSON文件配置
+    this.getJson = function(jsonType, resFunc){ 
+        var data = {"JsonType":jsonType}  
+        AjaxInfo("post",serverUrl + '/Workbook&getJson', data, resFunc)   
+    }
+    //更新JSON文件配置
+    this.upJson = function(jsonType, txtInfo){
+        var data = {"JsonType":jsonType, "txtInfo":txtInfo}  
+        AjaxInfo("post",serverUrl + '/Workbook&upJson', data, "showStatu") 
+    }  
+    //更新项目名称
+    this.upPro = function(proType, proName, resFunc){
+        var data = {"ProType":proType, "proName":proName}     
+        AjaxInfo("post",serverUrl + '/Workbook&ProInfo', data, resFunc)  
+    }
+}
+
 function AjaxInfo(GOrP, URL, data, actType)
 { 
    var xhr = new XMLHttpRequest();
@@ -57,6 +102,14 @@ function AjaxInfo(GOrP, URL, data, actType)
                    {
                         loadDirJson(0)
                    }
+               }else  if(actType == "onAddNearOpen")
+               {
+                   try
+                   {
+                        onAddNearOpen(JSON.parse(xhr.responseText))
+                   }catch(err)
+                   { 
+                   }
                } 
                else if(actType == "loadProJson")
                {
@@ -65,7 +118,10 @@ function AjaxInfo(GOrP, URL, data, actType)
                else if(actType == "newPro")
                {
                     newPro(xhr.responseText)
-               } 
+               }else if(actType == "onUpProject") 
+               {
+                    onUpProject(xhr.responseText)
+               }
                else if(actType == "showStatu")
                {
                     onShowStatu(xhr.responseText)
@@ -83,6 +139,9 @@ function AjaxInfo(GOrP, URL, data, actType)
 }
     
 function main() {   
+    g_post = new Post()
+
+    InitNearOpen()
    InitGlobalParame() 
    document.onkeydown=onKeydown
    document.onmousedown=onMouseDwon 
@@ -92,6 +151,8 @@ function main() {
    // document.onkeydown=onKeyLogin     
    m_crash = document.getElementById('crash'); 
    m_crash.onclick = onDelete
+   m_nearOpen = document.getElementById('nearOpen'); 
+   m_nearOpen.onclick = onNearOpen
    m_saveTxt = document.getElementById('note-save-btn'); 
    m_saveTxt.onclick = onKeeptxt
    m_newFile = document.getElementById('new-file'); 
@@ -137,7 +198,7 @@ function InitGlobalParame()
     g_choiceDirObj = 0; 
     g_choiceDirIndex = 0;
     g_choiceFileObj = 0;
-    g_choiceFileIndex = 0;
+    g_choiceFileIndex = 0; 
     g_jsonDirInfo = 0;
     g_jsonFileInfo = 0;
 
@@ -151,6 +212,7 @@ function InitGlobalParame()
     g_dragMove = 0;
     g_isDeleteFolder  = false;
 }
+//drag---------------------------------
 function getStyle(obj, attr)
 {  
 
@@ -164,7 +226,6 @@ function getStyle(obj, attr)
     }
   
 } 
-//drag
 function onDragMid(Y)
 { 
     var widthLeft =  parseInt(getStyle(g_flexibleLeft, "width"))
@@ -195,11 +256,10 @@ function onDragLeft(Y)
         g_flexibleRight.style.width = bodyWidth - Y- widthMide
     } 
 }
-//获取项目
+//获取项目-------------------------------------
 function onGetProject()
 {    
-    var data = {"ProType":"get"}    
-    AjaxInfo("post",serverUrl + '/Workbook&ProInfo', data, "loadProJson")  
+    g_post.getJson("Project", "loadProJson") 
 }
 function loadProJson(proName)
 { 
@@ -208,23 +268,30 @@ function loadProJson(proName)
     onLoadDirJson()
 }
 function UpProject()
-{    
-    var data = {"ProType":"up", "proName":g_proName}     
-    AjaxInfo("post",serverUrl + '/Workbook&ProInfo', data, "onShowStatu")  
+{     
+    g_post.upPro("rename", g_proName, "onUpProject") 
 }
-
+function onUpProject(info)
+{
+    if(info == 'ok')
+    {
+        var span = g_loadFolder.getElementsByTagName("span")
+        span[0].title = g_proName
+    }else
+    {
+        alert(info)
+    }
+}
 function onNewPro()
 {    
     g_creatUl.style.visibility = "hidden"
     g_proName = "newPro"
-    var data = {"ProType":"new", "proName":g_proName}     
-    AjaxInfo("post",serverUrl + '/Workbook&ProInfo', data, "newPro")     
+    g_post.upPro("new", g_proName, "newPro")
 }
 function onOpenPro()
 {
     g_creatUl.style.visibility = "hidden"
-    var data = {"ProType":"open"}     
-    AjaxInfo("post",serverUrl + '/Workbook&ProInfo', data, "newPro")   
+    g_post.upPro("open", g_proName, "newPro") 
 }
 function newPro(proName)
 {
@@ -241,6 +308,13 @@ function onDelete()
     loadDeleteFolde();
     loadDeleteFile();
 }
+function onNearOpen()
+{
+    selectFolde(m_nearOpen)
+    g_choiceDirObj.thisType="unCrash"
+    initFileInfo();
+    loadNearFile();
+} 
 //获取父节点
 function getParentObj(obj)
 {
@@ -271,6 +345,24 @@ function onKeydown()
         event.returnvalue = false; 
         onKeeptxt()
     } 
+    else{ 
+        if(event.keyCode == 13)
+        {
+            if(document.activeElement.id == "top-fileName")
+            {
+                search_UpFileName(fileObj) 
+            }else if(document.activeElement.id == "search-Name")
+            {
+                if(g_choiceDirObj.par.id == "loadFolder")
+                {
+                    list_UpProject(); 
+                }else if(Math.abs(g_choiceDirObj.par.id) > 100){
+                    list_upDirName(g_choiceDirObj.id) 
+                }               
+                
+            }
+        } 
+    }
 } 
 function onMouseUp()
 {
@@ -317,6 +409,17 @@ else if(btnNum==0)
     var par = getParentObj(event.srcElement)
     if(event.srcElement.className.indexOf('editC') != -1 || event.srcElement.className.indexOf('editD') != -1)  //删除目录
     { 
+        var id =  Math.abs(g_choiceDirObj.par.id)
+        if(id >100 && id < 200)
+        {
+        }else{          
+            try{
+                par.id
+            } catch(err){
+                alert("请选择文件夹后再操作")
+                return
+            }
+        }
         if(g_choiceDirObj.id > 100)
         { 
             g_isDeleteFolder = true;
@@ -369,12 +472,19 @@ else if(btnNum==0)
     { 
         if(par.className == "slidebar-content")
         {
+            if(g_choiceDirObj.par == g_loadFolder)
+            {
+                list_UpProject()
+            }
             selectFolde(par)
         }
        return;
     } else if(par.id < -100) //文件目录
-    { 
-        selectFile(par)
+    {  
+        if(selectFile(par) && g_choiceDirObj.par == g_loadFolder)
+        { 
+            AddNearOpen(par.id,  g_choiceFileObj.id)
+        }
         return
     }
 }
@@ -424,7 +534,7 @@ function mouseleaveFileA()
     {  
          g_deleteTagI.A[2].style.visibility = "hidden"
     }
-}
+} 
 //新建------------------------
 function onCreate()
 { 
@@ -475,11 +585,11 @@ function selectDefualtFile(index)
 function selectFile(parent)
 {
     if(parent.id > 100)  //目录
-        return
+        return false
     var span = parent.getElementsByTagName("span") 
     if(g_choiceFileObj == span[0])
     {
-        return
+        return false
     } 
     if(g_choiceFileObj)
     { 
@@ -492,7 +602,7 @@ function selectFile(parent)
     g_choiceFileObj.par.className = "fileSelected"
     onShowTxt(-parent.id,  g_choiceFileObj.id)
     recodeFileIndex(parent)
-
+    return true
 } 
 function fileIndex(parent)
 {
@@ -554,7 +664,7 @@ function selectFolde(parent)
 { 
     selectFoldeStatu(parent)
     list_setOpenDir(parent)
-    onLoadFile(g_choiceDirObj.id);  
+    onLoadFile(g_choiceDirObj.id); 
     recodeFoldeIndex(parent)
 }
 
@@ -598,23 +708,22 @@ function onLoadFolders()
 function onLoadFolder()
 { 
     loadFolder(g_jsonDirInfo)
-    if(g_defaultDirKey)   
+    onNearOpen();
+ /*   if(g_defaultDirKey)   
     { 
         var bObj = document.getElementById(g_defaultDirKey);
-        selectFolde(bObj)
-    }
+        selectFolde(bObj) 
+    }*/
 }
 function onLoadDirJson()
 {
     onShowStatu("加载文件夹");
-    var data = {"JsonType":"Dir"}    
-    AjaxInfo("post",serverUrl + '/Workbook&getJson', data, "loadDirJson")   
+    g_post.getJson("Dir", "loadDirJson") 
 }
 function upDirJson()
 {
     onShowStatu("添加文件夹");
-    var data = {"JsonType":"Dir", "txtInfo":JSON.stringify(g_jsonDirInfo)}  
-    AjaxInfo("post",serverUrl + '/Workbook&upJson', data, "showStatu")  
+    g_post.upJson("Dir", JSON.stringify(g_jsonDirInfo))  
 }
 function loadDirJson(jsonInfo)
 {
@@ -757,9 +866,8 @@ function recodeChangeFolderContianer(parent)
 }
 //文件
 function onLoadFileJson()
-{
-    var data = {"JsonType":"fileName"}  
-    AjaxInfo("post",serverUrl + '/Workbook&getJson', data, "loadFileJson")    
+{ 
+    g_post.getJson("fileName", "loadFileJson")
 }
 
 function loadFileJson(jsonInfo)
@@ -770,12 +878,11 @@ function loadFileJson(jsonInfo)
     }else{
         g_jsonFileInfo = [];// JSON.parse('{"101":[{"id":1,"fName":"hello"},{"id":2,"fName":"word"}],"102":[{"id":1,"fName":"hello"},{"id":2,"fName":"word"}]}') 
     }    
-    onLoadFolder() 
+   onLoadFolder()      
 }
 function upFileJson()
 {
-    var data = {"JsonType":"fileName", "txtInfo":JSON.stringify(g_jsonFileInfo)}  
-    AjaxInfo("post",serverUrl + '/Workbook&upJson', data, "showStatu")
+    g_post.upJson("fileName", JSON.stringify(g_jsonFileInfo)) 
 }
 //显示状态
 function onShowStatu(msgInfo)
@@ -874,6 +981,16 @@ function loadFile(key, isDelete)
 }
 function onAddFile()
 {      
+     
+    var id = parseInt(g_choiceDirObj.par.id)
+    if(id > 100 && id < 200)
+    {
+
+    }else
+    {
+        alert("请选择文件夹后再操作！")
+        return 
+    }
     jsonInfo =  g_jsonFileInfo[g_choiceDirObj.id]    
     var g_newFile = 0
      if(!jsonInfo)
@@ -941,8 +1058,7 @@ function addCrashFile(divId, spanID, spanValue)
     g_searchContainer.innerHTML += Ta
 }
 function addUnCrashFolde(divId, spanID, spanValue,  deleteValue)
-{  
-    unCrashValue = "还原"
+{   
     Ta = '\
     <li>\
         <div class="search-content" id=' + divId + '>\
@@ -1052,8 +1168,7 @@ function deleteFile(parent)
         }
     }   
     recodeChangeFileContianer(parent)
-    var data = {"parentId":parseInt(parentId), "fileId": parseInt(fileId), "unrecognizable":false}   
-    AjaxInfo("post",serverUrl + '/Workbook&deleteFile', data, "showStatu")
+    g_post.deleteFile(parseInt(parentId), parseInt(fileId))  
 }
 function deleteAllFile(parentId)
 {    
@@ -1062,8 +1177,7 @@ function deleteAllFile(parentId)
     {        
         if(g_jsonFileInfo[parentId][i])
         { 
-            var data = {"parentId":parseInt(parentId), "fileId": parseInt(g_jsonFileInfo[parentId][i].id), "unrecognizable":false}   
-            AjaxInfo("post",serverUrl + '/Workbook&deleteFile', data, "showStatu") 
+            g_post.deleteFile(parseInt(parentId), parseInt(g_jsonFileInfo[parentId][i].id)) 
             g_jsonFileInfo[parentId].splice(i, 1); 
         }
     }while(g_jsonFileInfo[parentId][i])
@@ -1106,9 +1220,9 @@ function onShowTxt(parentId, fileId)
     fileObj = getJsonFileById(parentId, fileId) 
     if( fileObj)
     {    
+        g_choiceDirObj.id = Math.abs(parentId)
         g_topFileName.value = fileObj.fName
-        var data = {"parentId":parentId, "fileId": fileObj.id, "unrecognizable":true}   
-        AjaxInfo("post",serverUrl + '/Workbook&getTxt', data, "showTxt")  
+        g_post.getTxt(parentId, fileObj.id) 
     } 
 }
 
@@ -1122,21 +1236,17 @@ function showTxt(txtInfo)
         g_detailValue.focus()
     }
 }
+
+
 function onKeeptxt()
 { 
     if(g_choiceDirObj.id > 100)
     { 
         fileObj = getJsonFileById(g_choiceDirObj.id, g_choiceFileObj.id) 
         if( fileObj)
-        {
-            var data = {"parentId":g_choiceDirObj.id, "fileId": fileObj.id, "txtInfo":g_detailValue.innerHTML}   
-            list_upDirName(g_choiceDirObj.id)
-            search_UpFileName(fileObj)
-            var data = {"parentId":parseInt(g_choiceDirObj.id), "fileId": fileObj.id, "txtInfo":g_detailValue.innerHTML}  
-            AjaxInfo("post",serverUrl + '/Workbook&keepTxt', data, "showStatu")
+        { 
+            g_post.keepTxt(parseInt(g_choiceDirObj.id), parseInt(g_choiceFileObj.id), g_detailValue.innerHTML)
         }
-    }else{
-        list_UpProject();
     }
 }
 
@@ -1208,9 +1318,7 @@ function list_menus()
 
 function onListImport()
 {     
-    g_creatUl.style.visibility = "hidden"
-    var data = {"Package":"import"}  
-    AjaxInfo("post",serverUrl + '/Workbook&pakage', data, "listImport") 
+    g_post.import()
 }
 
 function listImport()
@@ -1221,7 +1329,133 @@ function listImport()
 function onListExport()
 {      
     g_creatUl.style.visibility = "hidden"
-    var data = {"Package":"export"}  
-    AjaxInfo("post",serverUrl + '/Workbook&pakage', data, "showStatu")
+    g_post.export()
 }
  
+
+
+//--------------------------------
+//nearOpen
+function Queue(size) {
+    var list = [];
+
+    //向队列中添加数据
+    this.push = function(data) {
+        if (data==null) {
+            return false;
+        }
+        var index = this.find(data);
+        if(index > -1)
+        {
+            return false;
+        }
+        //如果传递了size参数就设置了队列的大小
+        if (size != null && !isNaN(size)) {
+            if (list.length == size) {
+                this.pop();
+            }
+        }
+        list.unshift(data);
+        return true;
+    }
+
+    //从队列中取出数据
+    this.pop = function() {
+        return list.pop();
+    }
+
+    //从队列移除数据
+    this.move = function(value) { 
+        var index = this.find(value);
+        if(index > -1)
+        {
+            return list.splice(index,1);
+        }   
+    }
+    //查找队列值
+    this.find = function(value){
+        for(i = 0; i<list.length; i++)
+        {
+            if(list[i].ParentId == value.ParentId && list[i].ChileId == value.ChileId)
+            {
+                return i;
+            }  
+        } 
+        return -1;
+    }
+    //返回队列的大小
+    this.size = function() {
+        return list.length;
+    }
+
+    //返回队列的内容
+    this.quere = function() {
+        return list;
+    }
+}
+
+function InitNearOpen()
+{
+    var size = 10
+    g_queue = new Queue(size) 
+    g_post.getJson("NearFile", "onAddNearOpen")
+} 
+function onAddNearOpen(JsonInfo)
+{
+    if(JsonInfo)
+    { 
+        for(var i = JsonInfo.length-1; JsonInfo[i]; i--)
+        {
+            AddNearOpen(JsonInfo[i].ParentId, JsonInfo[i].ChileId, false)
+        }
+    }
+}
+function AddNearOpen(pId, cId, isUp = true)
+{ 
+    var value = {"ParentId":pId, "ChileId":cId}  
+    g_queue.push(value)  
+    if(isUp)
+    {
+        g_post.upJson("NearFile", JSON.stringify(g_queue.quere()))
+    }
+}
+
+function getNearFileJson(pId, cId)
+{
+    jsonInfo =  g_jsonFileInfo[Math.abs(pId)]  
+    for(var i = 0; jsonInfo[i]; i++)
+    {     
+        if(jsonInfo[i].id == cId)
+            return jsonInfo[i];
+    }
+    return null;
+}
+
+function loadNearFile()
+{  
+    var setDefault = false
+    g_defaultFileKey = 0
+    var quer = g_queue.quere() 
+    var size = g_queue.size()
+    for(i = 0; i < size; i++)
+    {
+        pId = quer[i].ParentId
+        cId = quer[i].ChileId
+        var fJson = getNearFileJson(pId, cId)
+        if(fJson)
+        {
+            if(!setDefault)
+            {
+                setDefault = true
+                g_defaultFileKey = fJson.id
+            }
+            if(fJson["isDelete"])
+            {
+               // addCrashFile(pId, cId, fJson.fName)  
+            }else
+            {
+                addFile(pId, cId, fJson.fName) 
+            }
+        }
+    }
+}

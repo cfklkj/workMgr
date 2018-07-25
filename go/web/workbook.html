@@ -40,10 +40,10 @@
                     </ul>
                 </div>
             </div>
-            <div class="slidebar-content">
+            <div class="slidebar-content" id="nearOpen">
                     <div class="sidebar-item" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">
                         <i class="icon-recent-modified"></i>
-                        <span class="sidebar-item-text">最新文档</span>                        
+                        <span class="sidebar-item-text">最近浏览</span>                        
                     </div>
             </div> 
             <div class="slidebar-content" id="loadFolder">    
@@ -51,7 +51,7 @@
                         <i class="arrow arrowB"></i>                 
                         <i class="icon-file"></i>
                         <span class="sidebar-item-text" title="newProject">我的文件夹</span>            
-                        <i title="删除目录" i class="icon_delete editC"></i>
+                        <i title="删除目录" class="icon_delete editC"></i>
                     </div>
             </div> 
             <ul class="tree-container" id='folder-Container'>
@@ -69,8 +69,8 @@
                 <div class="list-search" id="list-search">
                         <span title="返回上一级" class="icon-back"></span>
                         <span class="icon-search"></span>
-                        <input name="search" class="search-text input-search" placeholder="搜索..." autocomplete="off"></input>
                         <span class="icon-setting" id="list-menu"></span> 
+                        <input name="search" class="search-text input-search" placeholder="搜索..." autocomplete="off" id="search-Name"></input>
                         <ul class="widget-menu" style="top: 40px; right: -20px; display: block; visibility: hidden;" widget-toggle-content="right">
                             <li class="widget-menu-item can-disabled" id="list-create">
                                 新建项目
