@@ -481,7 +481,7 @@ else if(btnNum==0)
        return;
     } else if(par.id < -100) //文件目录
     {  
-        if(selectFile(par) && g_choiceDirObj.par == g_loadFolder)
+        if(selectFile(par) && g_choiceDirObj.par.parentNode.parentNode == g_folderContainer)
         { 
             AddNearOpen(par.id,  g_choiceFileObj.id)
         }
