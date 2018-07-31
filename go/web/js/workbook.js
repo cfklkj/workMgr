@@ -2,141 +2,84 @@
 window.onload = main
   
 var serverUrl = "127.0.0.1"  
-var MyToken = ""
+var MyToken = "1111"
 var Unrecognizable = false 
 
 function Post(){
+    //请求数据
+    this.request = function(GOrP, URL, jsonData, callBack){
+        var xhr = new XMLHttpRequest();
+        xhr.open(GOrP, URL, true);
+        if(MyToken != "")
+          xhr.setRequestHeader("token", MyToken); 
+        if(jsonData == "")
+        {
+            xhr.send();
+        }else
+        {
+            xhr.send(JSON.stringify(jsonData));
+        }
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) { // 读取完成
+                if (xhr.status == 200) { 
+                    return callBack(xhr.responseText)
+                }
+            } 
+            if(xhr.status == 500){
+                if(xhr.responseText == "token timeout")
+                {
+                    window.location.reload();
+                }else
+                    alert(xhr.responseText);
+            }else{
+                console.debug("request error");
+            }
+        }
+    }
     //导入
     this.import = function(){
         g_creatUl.style.visibility = "hidden"
         var data = {"Package":"import"}  
-        AjaxInfo("post",serverUrl + '/Workbook&pakage', data, "listImport") 
+        this.request("post",serverUrl + '/Workbook&pakage', data, listImport) 
     }
     //导出
     this.export = function(){        
         var data = {"Package":"export"}  
-        AjaxInfo("post",serverUrl + '/Workbook&pakage', data, "showStatu")
+        this.request("post",serverUrl + '/Workbook&pakage', data, onShowStatu)
     }
     //获取文本
     this.getTxt = function(pId, cId){
         var data = {"parentId":pId, "fileId": cId, "unrecognizable":true}   
-        AjaxInfo("post",serverUrl + '/Workbook&getTxt', data, "showTxt")  
+        this.request("post",serverUrl + '/Workbook&getTxt', data, showTxt)   
     }
     //保存文本
     this.keepTxt = function(pId, cId, txtInfo){
         var data = {"parentId":pId, "fileId": cId, "txtInfo":txtInfo}  
-        AjaxInfo("post",serverUrl + '/Workbook&keepTxt', data, "showStatu")
+        this.request("post",serverUrl + '/Workbook&keepTxt', data, onShowStatu)
     }
     //删除文件
     this.deleteFile = function(pId, cId){ 
         var data = {"parentId":pId, "fileId": cId, "unrecognizable":false}   
-        AjaxInfo("post",serverUrl + '/Workbook&deleteFile', data, "showStatu") 
+        this.request("post",serverUrl + '/Workbook&deleteFile', data, onShowStatu) 
     }
     //获取JSON文件配置
     this.getJson = function(jsonType, resFunc){ 
-        var data = {"JsonType":jsonType}  
-        AjaxInfo("post",serverUrl + '/Workbook&getJson', data, resFunc)   
+        var data = {"JsonType":jsonType}   
+        this.request("post",serverUrl + '/Workbook&getJson', data, resFunc)   
     }
     //更新JSON文件配置
     this.upJson = function(jsonType, txtInfo){
-        var data = {"JsonType":jsonType, "txtInfo":txtInfo}  
-        AjaxInfo("post",serverUrl + '/Workbook&upJson', data, "showStatu") 
+        var data = {"JsonType":jsonType, "txtInfo":txtInfo}   
+        this.request("post",serverUrl + '/Workbook&upJson', data, onShowStatu) 
     }  
     //更新项目名称
     this.upPro = function(proType, proName, resFunc){
         var data = {"ProType":proType, "proName":proName}     
-        AjaxInfo("post",serverUrl + '/Workbook&ProInfo', data, resFunc)  
-    }
+        this.request("post",serverUrl + '/Workbook&ProInfo', data, resFunc)  
+    } 
 }
-
-function AjaxInfo(GOrP, URL, data, actType)
-{ 
-   var xhr = new XMLHttpRequest();
-   xhr.open(GOrP, URL, true);
-   if(MyToken != "")
-     xhr.setRequestHeader("token", MyToken); 
-   if(data == "")
-   {
-       xhr.send();
-   }else
-   {
-       xhr.send(JSON.stringify(data));
-   }
-   xhr.onreadystatechange = function () {;
-       if (xhr.readyState == 4) { // 读取完成
-           if (xhr.status == 200) { 
-               if(actType == "listImport")
-               {
-                   if(xhr.responseText == "已执行--")
-                   {
-                        listImport()
-                   }else
-                   {
-                       onShowTxt(xhr.responseText)
-                   }
-               }
-               else if(actType == "onShowDir")
-               {
-                    onShowDir(JSON.parse(xhr.responseText))
-               } 
-               else if(actType == "showTxt")
-               {
-                    showTxt(xhr.responseText)
-               } 
-               else if(actType == "loadFileJson")
-               {
-                    try
-                    {
-                        loadFileJson(JSON.parse(xhr.responseText))
-                    }catch(err)
-                    {
-                        loadFileJson(0)
-                    }
-               } 
-               else if(actType == "loadDirJson")
-               {
-                   try
-                   {
-                        loadDirJson(JSON.parse(xhr.responseText))
-                   }catch(err)
-                   {
-                        loadDirJson(0)
-                   }
-               }else  if(actType == "onAddNearOpen")
-               {
-                   try
-                   {
-                        onAddNearOpen(JSON.parse(xhr.responseText))
-                   }catch(err)
-                   { 
-                   }
-               } 
-               else if(actType == "loadProJson")
-               {
-                    loadProJson(xhr.responseText)
-               } 
-               else if(actType == "newPro")
-               {
-                    newPro(xhr.responseText)
-               }else if(actType == "onUpProject") 
-               {
-                    onUpProject(xhr.responseText)
-               }
-               else if(actType == "showStatu")
-               {
-                    onShowStatu(xhr.responseText)
-               } 
-           }
-           if(xhr.status == 500){
-               if(xhr.responseText == "token timeout")
-               {
-                   window.location.reload();
-               }else
-                   alert(xhr.responseText);
-           }
-       }
-   }
-}
+ 
+ 
     
 function main() {   
     g_post = new Post()
@@ -258,8 +201,8 @@ function onDragLeft(Y)
 }
 //获取项目-------------------------------------
 function onGetProject()
-{    
-    g_post.getJson("Project", "loadProJson") 
+{     
+    g_post.getJson("Project", loadProJson) 
 }
 function loadProJson(proName)
 { 
@@ -269,7 +212,7 @@ function loadProJson(proName)
 }
 function UpProject()
 {     
-    g_post.upPro("rename", g_proName, "onUpProject") 
+    g_post.upPro("rename", g_proName, onUpProject) 
 }
 function onUpProject(info)
 {
@@ -286,12 +229,12 @@ function onNewPro()
 {    
     g_creatUl.style.visibility = "hidden"
     g_proName = "newPro"
-    g_post.upPro("new", g_proName, "newPro")
+    g_post.upPro("new", g_proName, newPro)
 }
 function onOpenPro()
 {
     g_creatUl.style.visibility = "hidden"
-    g_post.upPro("open", g_proName, "newPro") 
+    g_post.upPro("open", g_proName, newPro) 
 }
 function newPro(proName)
 {
@@ -589,7 +532,7 @@ function selectFile(parent)
     var span = parent.getElementsByTagName("span") 
     if(g_choiceFileObj == span[0])
     {
-        return false
+        return true
     } 
     if(g_choiceFileObj)
     { 
@@ -718,15 +661,23 @@ function onLoadFolder()
 function onLoadDirJson()
 {
     onShowStatu("加载文件夹");
-    g_post.getJson("Dir", "loadDirJson") 
+    g_post.getJson("Dir", loadDirJson) 
 }
 function upDirJson()
 {
     onShowStatu("添加文件夹");
     g_post.upJson("Dir", JSON.stringify(g_jsonDirInfo))  
 }
-function loadDirJson(jsonInfo)
+function loadDirJson(responseText)
 {
+    
+    try
+    {
+        jsonInfo = JSON.parse(responseText)
+    }catch(err)
+    {
+        jsonInfo = 0
+    }
     if(jsonInfo)
     {
         g_jsonDirInfo = jsonInfo
@@ -867,18 +818,26 @@ function recodeChangeFolderContianer(parent)
 //文件
 function onLoadFileJson()
 { 
-    g_post.getJson("fileName", "loadFileJson")
+    g_post.getJson("fileName", loadFileJson)
 }
 
-function loadFileJson(jsonInfo)
-{
+function loadFileJson(responseText)
+{    
+    try
+    {
+        jsonInfo = JSON.parse(responseText)
+    }catch(err)
+    {
+        jsonInfo = 0
+    }
     if(jsonInfo)
     {
         g_jsonFileInfo = jsonInfo
     }else{
         g_jsonFileInfo = [];// JSON.parse('{"101":[{"id":1,"fName":"hello"},{"id":2,"fName":"word"}],"102":[{"id":1,"fName":"hello"},{"id":2,"fName":"word"}]}') 
     }    
-   onLoadFolder()      
+   onLoadFolder()   
+       
 }
 function upFileJson()
 {
@@ -1316,9 +1275,16 @@ function list_menus()
     } 
 } 
 
-function onListImport()
+function onListImport(responseText)
 {     
-    g_post.import()
+    
+    if(responseText == "已执行--")
+    {
+        g_post.import()
+    }else
+    {
+        onShowTxt(responseText)
+    }
 }
 
 function listImport()
@@ -1398,10 +1364,17 @@ function InitNearOpen()
 {
     var size = 10
     g_queue = new Queue(size) 
-    g_post.getJson("NearFile", "onAddNearOpen")
+    g_post.getJson("NearFile", onAddNearOpen)
 } 
-function onAddNearOpen(JsonInfo)
+function onAddNearOpen(responseText)
 {
+    try
+    {
+        JsonInfo = JSON.parse(responseText)
+    }catch(err)
+    { 
+        JsonInfo = 0
+    }
     if(JsonInfo)
     { 
         for(var i = JsonInfo.length-1; JsonInfo[i]; i--)
