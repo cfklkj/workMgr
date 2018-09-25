@@ -63,15 +63,8 @@ function list_menus()
 } 
 
 function onListImport(responseText)
-{     
-    
-    if(responseText == "已执行--")
-    {
-        g_post.import()
-    }else
-    {
-        onShowTxt(responseText)
-    }
+{   
+    g_post.import() 
 }
 
 function listImport()
