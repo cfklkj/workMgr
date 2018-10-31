@@ -7,8 +7,18 @@ import(
 	"text/template" 
 	"errors"	
     "bytes" 
-    "strings"
+  //  "strings"
+    "io/ioutil"
+    "encoding/json" 
 )  
+type Callback func (data []byte)
+
+type SendRequest struct{
+    ResId int
+    Url string
+    Body string
+}
+var m_mapRes map[int]http.ResponseWriter = map[int]http.ResponseWriter{}
 
 func WriteTemplateToHttpResponse(res http.ResponseWriter, t *template.Template) error {
     if t == nil || res == nil {
@@ -22,6 +32,10 @@ func WriteTemplateToHttpResponse(res http.ResponseWriter, t *template.Template) 
     res.Header().Set("Content-Type", "text/html; charset=utf-8")
     _, err = res.Write(buf.Bytes())
     return err
+}
+
+func sendBackBrowser(data []byte){
+
 }
 
 func HomePage(res http.ResponseWriter, req *http.Request) {
@@ -42,14 +56,29 @@ func HomePage(res http.ResponseWriter, req *http.Request) {
             return
         }
     } else if req.Method == "POST" {
-        if strings.Contains(req.URL.Path, "/Explorer") { 
+      /*  if strings.Contains(req.URL.Path, "/Explorer") { 
             OnExplorer(res, req)
         }else if strings.Contains(req.URL.Path, "/Workbook"){
             OnWorkbook(res, req)
         }else{ 
             OnDBMgr(res,req)
+        }*/         
+        var data SendRequest
+        data.ResId = mapBuff(res)
+        data.Url = req.URL.Path
+        body, _ := ioutil.ReadAll(req.Body) 
+        data.Body = string(body)
+        jsonData, err := json.Marshal(&data) 
+        if(err != nil){
+            return
         }
+        redisSend(jsonData)
     }    
+}
+
+func mapBuff(res http.ResponseWriter) int{
+    m_mapRes[0] = res
+    return 0
 }
 
 func OnAjax(res http.ResponseWriter, req *http.Request) { 
@@ -67,4 +96,5 @@ func OnAjax(res http.ResponseWriter, req *http.Request) {
     } else if req.Method == "POST" {
         ReadMsg(res,req)
     }    
+    OnDBMgr(res,req)
 } 

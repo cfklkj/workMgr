@@ -1,1 +1,1 @@
-{"httpPort":80,"DefaultHtml":"workbook.html","WorkBook":{"ProDir":"D:\\workbook11\\","ProName":"weile2018"}}
+{"httpPort":80,"DefaultHtml":"workbook.html","WorkBook":{"ProDir":"D:\\workbook11\\","ProName":"weile2018"},"Redis":{"ipPort":"127.0.0.1:6379","auth":"test123","subscribe":"webServer","topicWin32":"cplusplus"}}
