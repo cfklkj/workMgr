@@ -30,11 +30,12 @@ func init() {
 }
 
 func main() {     
-     InitDBMgr();  
+     InitDBMgr();   
      LoadConfig("json/config.json");
      
      //连接redis
     connectRedis(sendBackBrowser)
+
 
      // 先把css和脚本服务上去 
      http.Handle(CSS_CLIENT_PATH, http.FileServer(http.Dir(CSS_SVR_PATH)))
@@ -43,7 +44,7 @@ func main() {
  
      // 网址与处理逻辑对应起来
      http.HandleFunc("/", HomePage)  
-     
+
     //绑定socket方法
   //  http.Handle("/webSocket", h_webSocket) 
     err := http.ListenAndServe("127.0.0.1:" + strconv.Itoa(webConfig.HttpPort), nil) //设置监听的端口

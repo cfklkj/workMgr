@@ -47,7 +47,13 @@
 		    <p></p>
              获取所有数据库名: SELECT Name FROM Master..SysDatabases ORDER BY Name 
              <p></p>
-               查询所有存储过程： select name from sys.procedures 
+               查询所有存储过程： select name from sys.procedures  
+             <p></p>
+                查询存储过程内容：
+                select a.name,a.[type],b.[definition] from sys.all_objects a,sys.sql_modules b 
+                where a.is_ms_shipped=0 and a.object_id = b.object_id and a.[type] in ('P','V','AF') 
+                and a.[name] = 'GSP_BY_RecordPlayerMoneyChange'
+               
                 </a>
             </div>
         </div>

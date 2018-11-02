@@ -19,10 +19,15 @@ function Post(){
         {
             xhr.send(JSON.stringify(jsonData));
         }
+        console.log("send---",JSON.stringify(jsonData))
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) { // 读取完成
                 if (xhr.status == 200) { 
-                    return callBack(xhr.responseText)
+                    if(xhr.responseText != '')
+                     {
+                         console.log("get----",xhr.responseText)
+                        return callBack(xhr.responseText)
+                     } 
                 }
             } 
             if(xhr.status == 500){
