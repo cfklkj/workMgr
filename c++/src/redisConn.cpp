@@ -1,6 +1,8 @@
 #include "redisConn.h"
 #include <stdio.h> 
-#include <malloc.h>
+#include <malloc.h>  
+#include "..\util.h"
+
 const char* ip = "127.0.0.1";
 int port = 6379;
 const char* auth = "test123";
@@ -9,6 +11,7 @@ const char* publish = "webServer";
 
 redisConn::redisConn()
 {
+	m_msgHandle.Init(this);
 }
 
 
@@ -45,6 +48,8 @@ redisContext* redisConn::getConClient(const char* ip, int port, const char* auth
 
 void redisConn::sendMsg(char* msg)
 { 
+	if (!msg)
+		return;
 	redisReply *replys = (redisReply*)redisCommand(m_conClient, "publish %s %s", publish, msg);
 	freeReplyObject(replys); 
 }
@@ -77,6 +82,7 @@ static void cliFormatReplyRaw(redisReply *r) {
 	} 
 }
 
+
 void redisConn::Init()
 {  
 	m_conServer = getConClient(ip, port, auth);
@@ -89,10 +95,16 @@ void redisConn::Init()
 	while (redisGetReply(m_conServer, &_reply) == REDIS_OK)
 	{ 
 		redisReply* reply = (redisReply*)_reply;
-		cliFormatReplyRaw(reply); 
+		//cliFormatReplyRaw(reply);
+		if (1 < reply->elements)
+		{
+			if (!strcmp(reply->element[1]->str, subscribe))
+				continue; 
+			for (int i = 2; i < reply->elements; i++) {
+				m_msgHandle.onMessage(reply->element[i]->str, reply->element[i]->len);
+			}
+		} 
 		freeReplyObject(reply); 
-
-		sendMsg("I receive");
 
 	}
 	 getchar();

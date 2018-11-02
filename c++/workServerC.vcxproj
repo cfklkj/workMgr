@@ -32,7 +32,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -168,14 +168,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\msgHandle.h" />
     <ClInclude Include="src\redisConn.h" />
+    <ClInclude Include="src\workbook.h" />
+    <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\github\redis2\redis\src\adlist.c" />
     <ClCompile Include="..\..\..\github\redis2\redis\src\ae.c" />
     <ClCompile Include="..\..\..\github\redis2\redis\src\zmalloc.c" />
+    <ClCompile Include="src\msgHandle.cpp" />
     <ClCompile Include="src\redisConn.cpp" />
+    <ClCompile Include="src\workbook.cpp" />
     <ClCompile Include="src\workServerC.cpp" />
+    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\github\redis2\redis\msvs\hiredis\hiredis.vcxproj">
