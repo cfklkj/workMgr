@@ -23,8 +23,8 @@ va_end(list); \
 retBuff = va_dataResult; \
 }
 
-bool strcmp(const char* A, const char* B);
-const char* findSub(const char* str, const char* substr, bool retPStart = true); 
+bool strcmp(const char* A, const char* B); 
+const char* findSub(const char* str, const char* substr, bool retPStart = false); 
 int getJsonValueInt(const char* str, const char* section);
 //返回字符串 需要 free释放
 char* formatStr(const char* format, ...);

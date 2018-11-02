@@ -206,17 +206,46 @@ void setJsonValueInt(char* str, const char* section, int value)
 }
 char* setJsonValueString(char* str, const char* section, const char* value)
 {
+	if (!str || !value || !section)
+	{
+		return nullptr;
+	}
+	char* ret = nullptr;
 	char* oldstr = str;
 
-	char* Jvalue = getJsonValueString(str, section);
-	if (Jvalue)
+	char* oldJvalue = getJsonValueString(str, section);
+	const char*  Jvalue = oldJvalue;
+
+	if (!Jvalue)
 	{
+		Jvalue = "{";
+		char keepChar = 0;
+		const char* formatStrInfo = *str == '"' ?   "%s\\\"%s\\\":\\\"%s\\\",%c%s" : "%s\"%s\":\"%s\",%c%s";
+		if (*value >= 0 && *value <= 9)
+		{
+			formatStrInfo = *str == '"' ? "%s\\\"%s\\\":%s,%c%s" : "%s\"%s\":%s,%c%s";
+		}
+		
+		const char* pJavalue = findSub(str, Jvalue);
+		for (;*oldstr; oldstr++)   //移动到值开头
+		{
+			if (oldstr != pJavalue)
+				continue;
+			keepChar = *(++oldstr);
+
+			*oldstr = 0;   //开头处赋值零
+			break;
+		}
+		for (;*Jvalue;Jvalue++, oldstr++);  //移动到的值末尾末尾 
+		ret = formatStr(formatStrInfo, str, section, value, keepChar, oldstr);
+	}
+	else
+	{  
 		const char* formatStrInfo = "%s\"%s\"%s";
-		if (*section >= 0 && *section <= 9)
+		if (*value >= 0 && *value <= 9 || *value == '"')
 		{
 			formatStrInfo = "%s%s%s";
 		}
-
 		const char* pJavalue = findSub(str, Jvalue, true);
 		for (;*oldstr; oldstr++)   //移动到值开头
 		{
@@ -225,18 +254,10 @@ char* setJsonValueString(char* str, const char* section, const char* value)
 			*oldstr = 0;   //开头处赋值零
 			break;
 		}
-		for (;*Jvalue;Jvalue++, oldstr++);  //移动到的值末尾末尾
-
-		return formatStr(formatStrInfo, str, value, oldstr);
+		for (;*Jvalue;Jvalue++, oldstr++);  //移动到的值末尾末尾 
+		ret = formatStr(formatStrInfo, str, value, oldstr);
+		 
+		free(oldJvalue); 
 	}
-	else
-	{
-
-		const char* formatStrInfo = "{\"%s\":\"%s\",%s";
-		if (*section >= 0 && *section <= 9)
-		{
-			formatStrInfo = "{\"%s\":%s,%s";
-		} 
-		return formatStr(formatStrInfo, section, value, ++oldstr);
-	}
+	return ret; 
 }

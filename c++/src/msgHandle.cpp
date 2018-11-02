@@ -21,8 +21,7 @@ void msgHandle::Init(redisConn *redis)
 
 void msgHandle::onMessage(char* msg, int msgLen)
 {
-	char* sendMsgstr = nullptr;
-	printf(msg, msgLen);
+	char* sendMsgstr = nullptr, *value = nullptr;
 	int resId = getJsonValueInt(msg, "ResId");
 	char* Url = getJsonValueString(msg, "Url");
 	char* Body = getJsonValueString(msg, "Body");
@@ -32,19 +31,26 @@ void msgHandle::onMessage(char* msg, int msgLen)
 	{
 		if (findSub(Body, "Project"))
 		{
-			sendMsgstr = setJsonValueString(msg, "Body", "NewProjectACBBDD");
+			value = setJsonValueString(Body, "value", "NewProjectACBBDD");
 		}
 		if (findSub(Body, "NearFile"))
 		{
-			sendMsgstr = setJsonValueString(msg, "Body", "NearFile");
+			value = setJsonValueString(Body, "value", "NearFileHHHHH");
 		}
 		if (findSub(Body, "Dir"))
 		{
-			sendMsgstr = setJsonValueString(msg, "Body", "Dir");
+			value = setJsonValueString(Body, "value", "Dir");
 		} 
+	} 
+	if (!value)
+	{
+		value = setJsonValueString(Body, "value", "error action!");
 	}
+	sendMsgstr = setJsonValueString(msg, "Body", value);
+	printf("%s\n", sendMsgstr);
 	RedisConn()->sendMsg(sendMsgstr);
 	free(Url);
 	free(Body);
+	free(value);
 	free(sendMsgstr);
 }
