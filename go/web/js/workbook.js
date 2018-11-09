@@ -209,9 +209,16 @@ function onGetProject()
 {     
     g_post.getJson("Project", loadProJson) 
 }
-function loadProJson(proName)
+function getRedisValue(valueInfo)
+{
+    jInfo = JSON.parse(valueInfo)
+    proName = jInfo["value"];
+    var tbase64 = new Base64()
+    return tbase64.decode(proName); 
+}
+function loadProJson(proNameInfo)
 { 
-    list_setProject(proName)
+    list_setProject(getRedisValue(proNameInfo))
     //加载目录
     onLoadDirJson()
 }

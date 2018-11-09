@@ -31,15 +31,15 @@ void msgHandle::onMessage(char* msg, int msgLen)
 	{
 		if (findSub(Body, "Project"))
 		{
-			value = setJsonValueString(Body, "value", "NewProjectACBBDD");
+			value = setJsonValueString(Body, "value", FLY_CRYPTO::base64Encde(Workbook()->getConfig(kProjectName), strlen(Workbook()->getConfig(kProjectName))));
 		}
 		if (findSub(Body, "NearFile"))
 		{
-			value = setJsonValueString(Body, "value", "NearFileHHHHH");
+			value = setJsonValueString(Body, "value", FLY_CRYPTO::base64Encde(Workbook()->getConfig(kProjectDirs), strlen(Workbook()->getConfig(kProjectDirs))));
 		}
 		if (findSub(Body, "Dir"))
-		{
-			value = setJsonValueString(Body, "value", "Dir");
+		{ 
+			value = setJsonValueString(Body, "value", FLY_CRYPTO::base64Encde(Workbook()->getConfig(kProjectDirs), strlen(Workbook()->getConfig(kProjectDirs))));
 		} 
 	} 
 	if (!value)

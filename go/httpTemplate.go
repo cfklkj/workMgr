@@ -22,6 +22,7 @@ type SendRequest struct{
    
 var g_redisBackStr string 
  var g_waitEvent sync.WaitGroup
+ var g_waitEventCount int
 
 func WriteTemplateToHttpResponse(res http.ResponseWriter, t *template.Template) error {
     if t == nil || res == nil {
@@ -75,6 +76,7 @@ func HomePage(res http.ResponseWriter, req *http.Request) {
         }else
         {
             g_waitEvent.Add(1)
+            g_waitEventCount += 1
             g_waitEvent.Wait()
         }  
         io.WriteString(res, g_redisBackStr) 
@@ -108,7 +110,10 @@ func sendBackBrowser(data []byte){
     } else
     { 
         g_redisBackStr = dataValue.Body;
-    } 
-    g_waitEvent.Done()
+    }  
+    if(g_waitEventCount > 0) { 
+        g_waitEventCount -= 1
+        g_waitEvent.Done()
+    }
 }
 
