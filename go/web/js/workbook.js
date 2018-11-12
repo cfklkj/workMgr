@@ -149,6 +149,7 @@ function InitGlobalParame()
     g_choiceFileIndex = 0; 
     g_jsonDirInfo = 0;
     g_jsonFileInfo = 0;
+    g_jsonFileDetailInfo = [];
 
     g_creatUl = 0;
     g_defaultDirKey = 0;
@@ -159,6 +160,45 @@ function InitGlobalParame()
     g_proName = ""
     g_dragMove = 0;
     g_isDeleteFolder  = false;
+}
+
+function addFileDetailInfo(txtInfo)
+{
+    if(txtInfo.constructor  != String)
+        return false;
+    var isFind = false;
+    try{ 
+        jsonNode = JSON.parse(txtInfo)
+    }catch (err)
+    {
+        return false
+    }
+    for(var index in g_jsonFileDetailInfo)
+    {
+        if(g_jsonFileDetailInfo[index].parentId == jsonNode.parentId && g_jsonFileDetailInfo[index].fileId == jsonNode.fileId)
+        {
+            isFind = true; 
+        }
+    }
+    if(!isFind)
+    { 
+        isFind = true; 
+        g_jsonFileDetailInfo.push(jsonNode); 
+    }
+    return isFind;
+}
+function getFileDetail(parentId, id)
+{
+    var isFind = false;
+    for(var index in g_jsonFileDetailInfo)
+    {
+        if(g_jsonFileDetailInfo[index].parentId == parentId && g_jsonFileDetailInfo[index].fileId == id)
+        {
+            isFind = true;
+            localShowTxt(g_jsonFileDetailInfo[index]);
+        }
+    }
+    return isFind;
 }
 //drag---------------------------------
 function getStyle(obj, attr)
@@ -209,12 +249,16 @@ function onGetProject()
 {     
     g_post.getJson("Project", loadProJson) 
 }
-function getRedisValue(valueInfo)
-{
-    jInfo = JSON.parse(valueInfo)
+function getJsonValue(jInfo)
+{  
     proName = jInfo["value"];
     var tbase64 = new Base64()
     return tbase64.decode(proName); 
+}
+function getRedisValue(valueInfo)
+{ 
+    jInfo = JSON.parse(valueInfo) 
+    return getJsonValue(jInfo)
 }
 function loadProJson(proNameInfo)
 { 
@@ -554,7 +598,7 @@ function selectFile(parent)
 
     g_choiceFileObj.oldClass = parent.className 
     g_choiceFileObj.par = parent 
-    g_choiceFileObj.par.className = "fileSelected"
+    g_choiceFileObj.par.className = "fileSelected" 
     onShowTxt(-parent.id,  g_choiceFileObj.id)
     recodeFileIndex(parent)
     return true
@@ -685,7 +729,7 @@ function loadDirJson(responseText)
     
     try
     {
-        jsonInfo = JSON.parse(responseText)
+        jsonInfo = JSON.parse(getRedisValue(responseText))
     }catch(err)
     {
         jsonInfo = 0
@@ -837,7 +881,7 @@ function loadFileJson(responseText)
 {    
     try
     {
-        jsonInfo = JSON.parse(responseText)
+        jsonInfo = JSON.parse(getRedisValue(responseText))
     }catch(err)
     {
         jsonInfo = 0
@@ -1193,13 +1237,32 @@ function onShowTxt(parentId, fileId)
     {    
         g_choiceDirObj.id = Math.abs(parentId)
         g_topFileName.value = fileObj.fName
-        g_post.getTxt(parentId, fileObj.id) 
+        if(!getFileDetail(parentId, fileId))
+        { 
+            g_post.getTxt(Math.abs(parentId), Math.abs(fileObj.id)) 
+        }
     } 
 }
 
 function showTxt(txtInfo)
 { 
-    g_detailValue.innerHTML = txtInfo
+    if( addFileDetailInfo(txtInfo))
+    {
+          g_detailValue.innerHTML = getRedisValue(txtInfo)
+    }else
+    {
+        g_detailValue.innerHTML  = txtInfo
+    }
+    if(g_newFile)
+    { 
+        g_newFile = 0
+        g_detailValue.select()
+        g_detailValue.focus()
+    }
+}
+function localShowTxt(jsonInfo)
+{  
+    g_detailValue.innerHTML = getJsonValue(jsonInfo)
     if(g_newFile)
     { 
         g_newFile = 0

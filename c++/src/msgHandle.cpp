@@ -41,7 +41,20 @@ void msgHandle::onMessage(char* msg, int msgLen)
 		{ 
 			value = setJsonValueString(Body, "value", FLY_CRYPTO::base64Encde(Workbook()->getConfig(kProjectDirs), strlen(Workbook()->getConfig(kProjectDirs))));
 		} 
-	} 
+		if (findSub(Body, "fileName"))
+		{ 
+			value = setJsonValueString(Body, "value", FLY_CRYPTO::base64Encde(Workbook()->getConfig(kProjectFileNames), strlen(Workbook()->getConfig(kProjectFileNames))));
+		} 
+	}
+	if (findSub(Url, "getTxt"))
+	{ 
+		char* fileText = Workbook()->getTxt(Body);
+		if (fileText)
+		{
+			value = setJsonValueString(Body, "value", FLY_CRYPTO::base64Encde(fileText, strlen(fileText)));
+			free(fileText);
+		}
+	}
 	if (!value)
 	{
 		value = setJsonValueString(Body, "value", "error action!");
