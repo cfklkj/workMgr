@@ -11,6 +11,8 @@ char* formatStr(const char* format, ...)
 
 int strlen(const char* str)
 {
+	if (!str)
+		return 0;
 	int iLen = 0;
 	for (;*str++;iLen++);
 	return iLen;
@@ -164,7 +166,13 @@ char* findJsonSectionValue(const char* str, const char* section)
 				splitCount++;
 			}
 		}
-		if ((split == ',' || split == '"') && *str == split)
+		if (split == ',' && *str == split)
+		{
+
+			pEnd = --str;
+			break;
+		}
+		if (split == '"' && *str == split)
 		{
 
 			pEnd = str;
@@ -369,7 +377,7 @@ namespace FLY_CRYPTO {
 		}
 		*encdeTemp = 0;
 
-		char* rstEncde = formatStr(encdeHead, encdeTail);
+		char* rstEncde = formatStr("%s%s",encdeHead, encdeTail);
 		delete []encdeHead;
 		delete []encdeTail;
 		return rstEncde;
