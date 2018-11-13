@@ -77,6 +77,11 @@ function Post(){
         var data = {"ProType":proType, "proName":proName}     
         this.request("post",serverUrl + '/Workbook&ProInfo', data, resFunc)  
     } 
+    //执行cmd语句
+    this.cmdAct =  function(jsonType, txtInfo){
+        var data = {"JsonType":jsonType, "txtInfo":txtInfo}     
+        this.request("post",serverUrl + '/Workbook&cmdAct', data, onShowStatu)  
+    }
 }
  
  
@@ -98,6 +103,8 @@ function main() {
    m_nearOpen.onclick = onNearOpen
    m_saveTxt = document.getElementById('note-save-btn'); 
    m_saveTxt.onclick = onKeeptxt
+   m_cmdAct = document.getElementById('note-act-btn'); 
+   m_cmdAct.onclick = onCmdAct
    m_newFile = document.getElementById('new-file'); 
    m_newFile.onclick = onAddFile
    m_newFolder = document.getElementById('new-folder'); 
@@ -1431,4 +1438,27 @@ function loadNearFile()
             }
         }
     }
+}
+
+
+ //传入要获取其中选择文本的对象
+ function getSelectedText(selectObj){ 
+    ranges = window.getSelection();
+    if(ranges.rangeCount > 0)
+    {
+        start =  selectObj.selectionStart
+        end = selectObj.selectionEnd
+       return selectObj.value.substring(start, end); 
+    }
+    return ""
+  }
+
+
+function onCmdAct()
+{
+    var actStr = getSelectedText(g_detailValue)
+    if(actStr != "")
+    { 
+       g_post.cmdAct("cmdAct", actStr)  
+    } 
 }

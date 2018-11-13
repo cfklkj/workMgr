@@ -176,6 +176,17 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
 
     }else if strings.Contains(req.URL.Path, "&showLogDir") {    
         io.WriteString(res, ExecOpenDirLog(".\\json\\explorer.json"))
+    }else if strings.Contains(req.URL.Path, "&cmdAct") {   
+        body, _ := ioutil.ReadAll(req.Body)
+        var  c2sJsonInfo  C2SUPJSON     
+        err := json.Unmarshal(body, &c2sJsonInfo)
+        if err != nil {
+            //   c.String(500, "decode json error")
+            io.WriteString(res, "decode json error")
+            return
+        }
+        cmdAct(c2sJsonInfo.TxtInfo)
+        io.WriteString(res, "已执行-"+c2sJsonInfo.TxtInfo)
     }else {
         io.WriteString(res, "这是从后台发送的数据")
     } 
@@ -293,6 +304,17 @@ func ExportWorkBook(){
         fmt.Println(err.Error())
     }  
     fmt.Println("已执行--" + out.String())
+}
+
+func cmdAct(cmdArg string){
+    cmd := exec.Command("cmd", "/c", cmdArg)  
+    var out bytes.Buffer
+	cmd.Stdout = &out
+    err := cmd.Start()
+    if err != nil {
+        fmt.Println(err.Error())
+    }  
+    fmt.Println("已执行--" + out.String()) 
 }
 
 
