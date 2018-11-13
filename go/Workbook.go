@@ -12,6 +12,7 @@ import(
     "os/exec"  
     "bytes"
     "encoding/json"    
+    "github.com/axgle/mahonia"
 )   
 
 type C2SGETTXT struct{
@@ -128,17 +129,7 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             io.WriteString(res, "decode json error")
             return
         }
-        io.WriteString(res, GetWorkbookTxt(c2sTxtInfo))
-    }else if strings.Contains(req.URL.Path, "&getDir") {      
-        body, _ := ioutil.ReadAll(req.Body)
-        var c2sDirinfo C2SDirInfo            
-        err := json.Unmarshal(body, &c2sDirinfo)
-        if err != nil {
-            //   c.String(500, "decode json error")
-            io.WriteString(res, "decode json error")
-            return
-        }
-        io.WriteString(res, ExecDir(c2sDirinfo))
+        io.WriteString(res, GetWorkbookTxt(c2sTxtInfo)) 
     }else if strings.Contains(req.URL.Path, "&keepTxt") {      
         body, _ := ioutil.ReadAll(req.Body)
         var c2sFileInfo C2SKEEPTXT            
@@ -172,10 +163,7 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             io.WriteString(res, ImportWorkBook())  
         }else{
             ExportWorkBook()
-        }   
-
-    }else if strings.Contains(req.URL.Path, "&showLogDir") {    
-        io.WriteString(res, ExecOpenDirLog(".\\json\\explorer.json"))
+        }    
     }else if strings.Contains(req.URL.Path, "&cmdAct") {   
         body, _ := ioutil.ReadAll(req.Body)
         var  c2sJsonInfo  C2SUPJSON     
@@ -202,6 +190,21 @@ func setWorkbookPath(ProName string){
     g_workbookPath =  g_dirPath + ProName + "\\"
     UpLoadConfig("json/config.json");
 }
+
+//读取文件
+func OpenTxt(filePath string, isUnrecognizable bool)string{
+    fileInfo, err := ioutil.ReadFile(filePath) 
+    if err != nil {
+        return  err.Error()
+    }  
+    if(isUnrecognizable){
+        return string(fileInfo); 
+    } else {        
+        decoder := mahonia.NewDecoder("gb18030")
+        return decoder.ConvertString(string(fileInfo));
+    } 
+}
+
 //读取文本
 func GetWorkbookTxt(C2STxtInfo C2SGETTXT)string{    
     dirPth := g_workbookPath + fmt.Sprint(C2STxtInfo.ParentId) + "_" + fmt.Sprint(C2STxtInfo.FileId);    

@@ -42,9 +42,7 @@ func HomePage(res http.ResponseWriter, req *http.Request) {
             return
         }
     } else if req.Method == "POST" {
-        if strings.Contains(req.URL.Path, "/Explorer") { 
-            OnExplorer(res, req)
-        }else if strings.Contains(req.URL.Path, "/Workbook"){
+        if strings.Contains(req.URL.Path, "/Workbook"){
             OnWorkbook(res, req)
         } 
     }    
