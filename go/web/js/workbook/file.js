@@ -326,3 +326,26 @@ function onKeeptxt()
         }
     }
 }
+
+
+ //传入要获取其中选择文本的对象
+ function getSelectedText(selectObj){ 
+    ranges = window.getSelection();
+    if(ranges.rangeCount > 0)
+    {
+        start =  selectObj.selectionStart
+        end = selectObj.selectionEnd
+       return selectObj.value.substring(start, end); 
+    }
+    return ""
+  }
+
+
+function onCmdAct()
+{
+    var actStr = getSelectedText(g_detailValue)
+    if(actStr != "")
+    { 
+       g_post.cmdAct("cmdAct", actStr)  
+    } 
+}
