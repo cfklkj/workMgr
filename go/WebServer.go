@@ -51,8 +51,7 @@ func main() {
     fmt.Printf("webServer-web服务器\nsendEmail-发送邮件")
 }
  
-func webserver(){
-    InitDBMgr();  
+func webserver(){ 
     LoadConfig("json/config.json");
     // 先把css和脚本服务上去 
     http.Handle(CSS_CLIENT_PATH, http.FileServer(http.Dir(CSS_SVR_PATH)))
@@ -60,8 +59,7 @@ func webserver(){
     http.Handle(IMAGE_CLIENT_PATH, http.FileServer(http.Dir(IMAGE_SVR_PATH)))
 
     // 网址与处理逻辑对应起来
-    http.HandleFunc("/", HomePage) 
-    http.HandleFunc("/DBMgr", OnDBMgr)
+    http.HandleFunc("/", HomePage)  
    //绑定socket方法
  //  http.Handle("/webSocket", h_webSocket) 
    err := http.ListenAndServe("127.0.0.1:" + strconv.Itoa(webConfig.HttpPort), nil) //设置监听的端口

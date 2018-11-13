@@ -43,9 +43,7 @@ type DirInfo struct{
 func OnExplorer(res http.ResponseWriter, req *http.Request) { 
     req.ParseForm()
     fmt.Println(req.URL.Path)
-    if strings.Contains(req.URL.Path, "&getDir1") {
-        io.WriteString(res, GetDBInfoOne())
-    }else if strings.Contains(req.URL.Path, "&getTxt") {      
+    if strings.Contains(req.URL.Path, "&getTxt") {      
         body, _ := ioutil.ReadAll(req.Body)
         var c2sTxtInfo C2STxtInfo            
         err := json.Unmarshal(body, &c2sTxtInfo)

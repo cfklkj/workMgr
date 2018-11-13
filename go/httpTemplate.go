@@ -46,9 +46,7 @@ func HomePage(res http.ResponseWriter, req *http.Request) {
             OnExplorer(res, req)
         }else if strings.Contains(req.URL.Path, "/Workbook"){
             OnWorkbook(res, req)
-        }else{ 
-            OnDBMgr(res,req)
-        }
+        } 
     }    
 }
 
