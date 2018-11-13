@@ -1,5 +1,7 @@
 
 //文件列表---------------------------------
+g_sortLimit = 9  //默认重新排序限制数量
+
 function onLoadFile(key)
 {
     
@@ -195,7 +197,7 @@ function sortThisFolder(parentId, fileId)  //将点击的项移动到第一位
     var jsonFile = 0
     for(i = 0; g_jsonFileInfo[parentId][i]; i++)
     {
-        if( g_jsonFileInfo[parentId][i].id == fileId && i > 2)
+        if( g_jsonFileInfo[parentId][i].id == fileId && i > g_sortLimit)
         {
             g_jsonFileInfo[parentId].unshift(g_jsonFileInfo[parentId][i])
             g_jsonFileInfo[parentId].splice(i+1,1); 
