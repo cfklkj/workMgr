@@ -47,20 +47,4 @@ func HomePage(res http.ResponseWriter, req *http.Request) {
         } 
     }    
 }
-
-func OnAjax(res http.ResponseWriter, req *http.Request) { 
-    if req.Method == "GET" {   
-        t, err := template.ParseFiles(DART_SVR_PATH + "/DBMgr.html")
-        if err != nil {
-            fmt.Println(err)
-            return
-        }
-        err = WriteTemplateToHttpResponse(res, t)
-        if err != nil {
-            fmt.Println(err)
-            return
-        }
-    } else if req.Method == "POST" {
-        ReadMsg(res,req)
-    }    
-} 
+ 
