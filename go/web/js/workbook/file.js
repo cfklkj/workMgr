@@ -312,8 +312,9 @@ function showTxt(txtInfo)
     { 
         g_newFile = 0
         g_detailValue.select()
-        g_detailValue.focus()
+        g_detailValue.focus()        
     }
+    onChangeMode()
 }
 
 
@@ -350,4 +351,30 @@ function onCmdAct()
     { 
        g_post.cmdAct("cmdAct", actStr)  
     } 
+}
+
+function onChangeMode()
+{
+    m_showWeb.innerHTML = ""
+    JsonInfo = JSON.parse(g_detailValue.innerHTML)
+    if(JsonInfo)
+    {
+        for(var chileLink in JsonInfo)
+        {    
+            showLink("webShowDetail", JsonInfo[chileLink].link, JsonInfo[chileLink].name)
+        } 
+    }
+}
+
+function showLink(Pid, link, linkName)
+{
+    chileDiv = document.getElementById(Pid)
+    if(chileDiv)
+    {
+        chileDiv.innerHTML += '&emsp;<a href="' + link + '" target="_blank">' + linkName + '</a>'
+    }else
+    { 
+        objDiv = "<div id=" + Pid + ">" + '<a href="' + link + '" target="_blank">' + linkName + '</a>'
+        m_showWeb.innerHTML += objDiv
+    }
 }
