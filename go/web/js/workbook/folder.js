@@ -1,4 +1,31 @@
 
+g_jsonDirInfo = []//JSON.parse('[{"fName":"c++","id":101},{"fName":"java","id":102}]')
+
+
+function onLoadDirJson()
+{
+    onShowStatu("加载文件夹");
+    g_post.getJson("Dir", loadDirJson) 
+}
+function loadDirJson(responseText)
+{
+    
+    try
+    {
+        jsonInfo = JSON.parse(responseText)
+    }catch(err)
+    {
+        jsonInfo = 0
+    }
+    if(jsonInfo)
+    {
+        g_jsonDirInfo = jsonInfo
+    }else{
+        onAddFolder()
+    }
+    onLoadFileJson()
+}
+
 function foldeIndex(parent)
 {
     var par = parent.parentNode
@@ -97,34 +124,10 @@ function onLoadFolder()
         selectFolde(bObj) 
     }*/
 }
-function onLoadDirJson()
-{
-    onShowStatu("加载文件夹");
-    g_post.getJson("Dir", loadDirJson) 
-}
 function upDirJson()
 {
     onShowStatu("添加文件夹");
     g_post.upJson("Dir", JSON.stringify(g_jsonDirInfo))  
-}
-function loadDirJson(responseText)
-{
-    
-    try
-    {
-        jsonInfo = JSON.parse(responseText)
-    }catch(err)
-    {
-        jsonInfo = 0
-    }
-    if(jsonInfo)
-    {
-        g_jsonDirInfo = jsonInfo
-    }else{
-        g_jsonDirInfo = []//JSON.parse('[{"fName":"c++","id":101},{"fName":"java","id":102}]')
-        onAddFolder()
-    }
-    onLoadFileJson()
 }
 function loadFolder(jsonInfo)
 {

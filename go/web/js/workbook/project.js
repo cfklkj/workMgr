@@ -1,12 +1,15 @@
 
 //获取项目-------------------------------------
+g_projectJson = {};
+
 function onGetProject()
 {     
     g_post.getJson("Project", loadProJson) 
 }
-function loadProJson(proName)
+function loadProJson(proInfo)
 { 
-    list_setProject(proName)
+    g_projectJson = JSON.parse(proInfo)
+    list_setProject(g_projectJson.ProName)
     //加载目录
     onLoadDirJson()
 }

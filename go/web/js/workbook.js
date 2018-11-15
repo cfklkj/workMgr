@@ -1,13 +1,20 @@
 
 document.write('<script type="text/javascript" src="js/lib/FlyWeb.js"></script>')  //引入js 
 document.write('<script type="text/javascript" src="js/workbook/init.js"></script>')  
-document.write('<script type="text/javascript" src="js/workbook/drag.js"></script>')  
-document.write('<script type="text/javascript" src="js/workbook/frameLeft.js"></script>')   
+document.write('<script type="text/javascript" src="js/workbook/drag.js"></script>')   
 document.write('<script type="text/javascript" src="js/workbook/folder.js"></script>')  
+document.write('<script type="text/javascript" src="js/workbook/project.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/file.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/nearOpen.js"></script>')   
 document.write('<script type="text/javascript" src="js/workbook/listSearch.js"></script>')   
 window.onload = main
+
+    
+function main() {   
+    g_post = new Post()
+    WorkBookInit()
+    onGetProject() 
+}  
 
 
 document.body.oncontextmenu = function (){
@@ -25,41 +32,49 @@ function Post(){
     this.import = function(){
         g_creatUl.style.visibility = "hidden"
         var data = {"Package":"import"}  
+        data.ProInfo = g_projectJson 
         this.request("post",serverUrl + '/Workbook&pakage', data, listImport) 
     }
     //导出
     this.export = function(){        
         var data = {"Package":"export"}  
+        data.ProInfo = g_projectJson 
         this.request("post",serverUrl + '/Workbook&pakage', data, onShowStatu)
     }
     //获取文本
     this.getTxt = function(pId, cId){
-        var data = {"parentId":pId, "fileId": cId, "unrecognizable":true}   
+        var data = {"parentId":pId, "fileId": cId, "unrecognizable":true}  
+        data.ProInfo = g_projectJson 
         this.request("post",serverUrl + '/Workbook&getTxt', data, showTxt)   
     }
     //保存文本
     this.keepTxt = function(pId, cId, txtInfo){
         var data = {"parentId":pId, "fileId": cId, "txtInfo":txtInfo}  
+        data.ProInfo = g_projectJson
         this.request("post",serverUrl + '/Workbook&keepTxt', data, onShowStatu)
     }
     //删除文件
     this.deleteFile = function(pId, cId){ 
-        var data = {"parentId":pId, "fileId": cId, "unrecognizable":false}   
+        var data = {"parentId":pId, "fileId": cId, "unrecognizable":false}  
+        data.ProInfo = g_projectJson 
         this.request("post",serverUrl + '/Workbook&deleteFile', data, onShowStatu) 
     }
     //获取JSON文件配置
     this.getJson = function(jsonType, resFunc){ 
         var data = {"JsonType":jsonType}   
+        data.ProInfo = g_projectJson
         this.request("post",serverUrl + '/Workbook&getJson', data, resFunc)   
     }
     //更新JSON文件配置
     this.upJson = function(jsonType, txtInfo){
         var data = {"JsonType":jsonType, "txtInfo":txtInfo}   
+        data.ProInfo = g_projectJson
         this.request("post",serverUrl + '/Workbook&upJson', data, onShowStatu) 
     }  
     //更新项目名称
     this.upPro = function(proType, proName, resFunc){
-        var data = {"ProType":proType, "proName":proName}     
+        var data = {"ProType":proType, "proName":proName}    
+        data.ProInfo = g_projectJson  
         this.request("post",serverUrl + '/Workbook&ProInfo', data, resFunc)  
 	}
 	//执行cmd语句
@@ -69,13 +84,6 @@ function Post(){
 	}
 }
  
-    
-function main() {   
-    g_post = new Post()
-    WorkBookInit()
-    onGetProject() 
-}  
-
 //获取父节点
 function getParentObj(obj)
 {
@@ -435,30 +443,6 @@ function recodeChangeFolderContianer(parent)
     }
     g_folderContainer.removeChild(parent.parentNode)  //parent.remove()
     upDirJson()
-}
-//文件
-function onLoadFileJson()
-{ 
-    g_post.getJson("fileName", loadFileJson)
-}
-
-function loadFileJson(responseText)
-{    
-    try
-    {
-        jsonInfo = JSON.parse(responseText)
-    }catch(err)
-    {
-        jsonInfo = 0
-    }
-    if(jsonInfo)
-    {
-        g_jsonFileInfo = jsonInfo
-    }else{
-        g_jsonFileInfo = [];// JSON.parse('{"101":[{"id":1,"fName":"hello"},{"id":2,"fName":"word"}],"102":[{"id":1,"fName":"hello"},{"id":2,"fName":"word"}]}') 
-    }    
-   onLoadFolder()   
-       
 }
 //显示状态
 function onShowStatu(msgInfo)

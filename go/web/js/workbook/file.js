@@ -2,6 +2,31 @@
 //文件列表---------------------------------
 g_sortLimit = 9  //默认重新排序限制数量
  
+//文件
+function onLoadFileJson()
+{ 
+    g_post.getJson("fileName", loadFileJson)
+}
+
+function loadFileJson(responseText)
+{    
+    try
+    {
+        jsonInfo = JSON.parse(responseText)
+    }catch(err)
+    {
+        jsonInfo = 0
+    }
+    if(jsonInfo)
+    {
+        g_jsonFileInfo = jsonInfo
+    }else{
+        g_jsonFileInfo = [];// JSON.parse('{"101":[{"id":1,"fName":"hello"},{"id":2,"fName":"word"}],"102":[{"id":1,"fName":"hello"},{"id":2,"fName":"word"}]}') 
+    }    
+   onLoadFolder()   
+       
+}
+
 function onLoadFile(key)
 {
     
@@ -355,7 +380,7 @@ function onCmdAct()
 
 function onChangeMode()
 {
-    m_showWeb.innerHTML = ""
+    m_showWeb.innerHTML = "" 
     JsonInfo = JSON.parse(g_detailValue.innerHTML)
     if(JsonInfo)
     { 
