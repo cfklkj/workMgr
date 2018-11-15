@@ -1,7 +1,7 @@
 
 //文件列表---------------------------------
 g_sortLimit = 9  //默认重新排序限制数量
-
+ 
 function onLoadFile(key)
 {
     
@@ -191,7 +191,7 @@ function addCrashFolde(divId, spanID, spanValue,  deleteValue)
     </li>'
     g_searchContainer.innerHTML += Ta
 } 
-function sortThisFolder(parentId, fileId)  //将点击的项移动到第一位
+function sortThisFileFolder(parentId, fileId)  //将点击的项移动到第一位
 { 
     parentId = -parentId
     var jsonFile = 0
@@ -358,7 +358,7 @@ function onChangeMode()
     m_showWeb.innerHTML = ""
     JsonInfo = JSON.parse(g_detailValue.innerHTML)
     if(JsonInfo)
-    {
+    { 
         for(var chileLink in JsonInfo)
         {    
             showLink("webShowDetail", JsonInfo[chileLink].link, JsonInfo[chileLink].name)

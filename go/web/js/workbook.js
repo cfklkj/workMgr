@@ -8,6 +8,11 @@ document.write('<script type="text/javascript" src="js/workbook/file.js"></scrip
 document.write('<script type="text/javascript" src="js/workbook/nearOpen.js"></script>')   
 document.write('<script type="text/javascript" src="js/workbook/listSearch.js"></script>')   
 window.onload = main
+
+
+document.body.oncontextmenu = function (){
+    return false
+} 
   
 var serverUrl = "127.0.0.1"  
 var MyToken = "1111"
@@ -63,7 +68,6 @@ function Post(){
 		this.request("post", serverUrl + '/Workbook&cmdAct', data, onShowStatu)
 	}
 }
- 
  
     
 function main() {   
@@ -149,7 +153,16 @@ function onMouseDwon(event)
 var btnNum = event.button; 
 if (btnNum==2)
 { 
-    console.log("您点击了鼠标右键！")
+    //console.log("您点击了鼠标右键！")
+    if(event.srcElement.id == "menu_moveFolder")
+    {
+       // console.log("您点击了鼠标右键！")
+        if(sortThisFolder(g_choiceDirObj.par))
+         {
+            g_folderContainer.prepend(par.parentNode)
+         }
+    }
+
 }
 else if(btnNum==0)
 {
@@ -164,6 +177,14 @@ else if(btnNum==0)
         return;
     }
     var par = getParentObj(event.srcElement)
+    if(event.srcElement.id == "menu_moveFolder")
+    { 
+        if(sortThisFolder(g_choiceDirObj.par.id))
+         { 
+            sortHttpLi(g_folderContainer, g_choiceDirObj.par.id)
+         }
+         return
+    }
     if(event.srcElement.className.indexOf('editC') != -1 || event.srcElement.className.indexOf('editD') != -1)  //删除目录
     { 
         var id =  Math.abs(g_choiceDirObj.par.id)
@@ -241,7 +262,7 @@ else if(btnNum==0)
         if(selectFile(par) && g_choiceDirObj.par.parentNode.parentNode == g_folderContainer)
         { 
             AddNearOpen(par.id,  g_choiceFileObj.id)
-            if(sortThisFolder(par.id, g_choiceFileObj.id))
+            if(sortThisFileFolder(par.id, g_choiceFileObj.id))
              {
                 g_searchContainer.prepend(par.parentNode)
              }
@@ -252,10 +273,18 @@ else if(btnNum==0)
 else if(btnNum==1)
 {
 //alert("您点击了鼠标中键！");
+    if(event.srcElement.id == "menu_moveFolder")
+    { 
+        if(sortThisFolder(g_choiceDirObj.par.id, true))
+         { 
+            sortHttpLi(g_folderContainer, g_choiceDirObj.par.id)
+         }
+         return
+    }
 }
 else
 {
-//alert("您点击了" + btnNum+ "号键，我不能确定它的名称。");
+//alert("您点击了" + btnNum+ "号键，我不能确定它的名称。"); 
 }
 }
 //显示删除图标

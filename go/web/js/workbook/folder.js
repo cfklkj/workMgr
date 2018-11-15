@@ -38,13 +38,17 @@ function selectFoldeStatu(parent)
     g_choiceDirObj.id = parent.id 
     g_choiceDirObj.style.visibility = "visible";  
 }
-function selectFolde(parent)
+function selectFolde(parent, isNoReloadFile)
 { 
     selectFoldeStatu(parent)
     list_setOpenDir(parent)
-    onLoadFile(g_choiceDirObj.id); 
+    if(!isNoReloadFile) 
+    {
+       onLoadFile(g_choiceDirObj.id); 
+    }
     recodeFoldeIndex(parent)
 }
+ 
 
 function selectDefualtFolde(index)
 {    
@@ -142,7 +146,7 @@ function loadFolder(jsonInfo)
 function addFolder(dirID, dirName)
 {
     Ta = '\
-    <li>\
+    <li value=' + dirID +'>\
         <div class="slidebar-content" id=' + dirID + '>\
             <div class="sidebar-item search-resulMove" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">\
                 <i class="arrow arrowB" style="visibility: hidden;"></i>\
@@ -235,4 +239,44 @@ function getJsonFoldeById(parentId)
         }
     }
     return 0
+}
+
+var swapItems = function(arr, index1, index2) {
+    var temp = arr[index2]
+    arr[index2] = arr[index1]
+    arr[index1] = temp
+    return arr;
+};
+
+function sortThisFolder(parentId, down)  //将点击的项移动到第一位
+{ 
+    parentId = Math.abs(parentId)
+    var jsonFile = 0 
+    var limit = g_jsonDirInfo.length -1
+    for(var index in g_jsonDirInfo)
+    {
+        if( g_jsonDirInfo[index].id == parentId && index > 0 && index < limit)
+        { 
+            if(!down)
+            { 
+              g_jsonDirInfo = swapItems(g_jsonDirInfo, index,  Math.abs(index) - 1); 
+            }else
+            {                
+              g_jsonDirInfo = swapItems(g_jsonDirInfo, index,  Math.abs(index) + 1); 
+            }
+            upDirJson()
+            return true
+        }
+    } 
+    return false
+}
+
+
+//排序li
+function sortHttpLi(parentNode, chileId, upDown)
+{     
+    g_choiceDirObj = 0
+    loadFolder(g_jsonDirInfo) 
+    var lis = document.getElementById(chileId)
+    selectFolde(lis, true) 
 }
