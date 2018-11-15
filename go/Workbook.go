@@ -67,7 +67,7 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
         }   
         if(c2sProInfo.ProType == "new"){             
             for{
-                setWorkbookPath(c2sProInfo.ProInfo.ProName, c2sProInfo.ProName)
+                setWorkbookPath(c2sProInfo.ProInfo.ProPath, c2sProInfo.ProName)
                 originalPath :=  c2sProInfo.ProInfo.ProPath + "\\" + c2sProInfo.ProName
                 err := os.Mkdir(originalPath, os.ModePerm)
                 if err != nil {
@@ -121,9 +121,14 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             return
         }
         if(c2sJsonInfo.JsonType == "Project"){ 
-            if(webConfig.WorkBook.ProDir == ""){ 
+           find,_ := exists(webConfig.WorkBook.ProDir)
+            if(!find){ 
                 setWorkbookPath("d:\\workBook", "NewFolder")
-                err := os.Mkdir(webConfig.WorkBook.ProDir + "\\" + webConfig.WorkBook.ProName, os.ModePerm)
+                err := os.Mkdir(webConfig.WorkBook.ProDir, os.ModePerm)
+                if err != nil {
+                    fmt.Println(err) 
+                }    
+                err = os.Mkdir(webConfig.WorkBook.ProDir + "\\" + webConfig.WorkBook.ProName, os.ModePerm)
                 if err != nil {
                     fmt.Println(err)
                 }    
@@ -175,11 +180,11 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             io.WriteString(res, "decode json error")
             return
         }
-        originalPath :=  c2sPackInfo.ProInfo.ProPath + "\\" + c2sPackInfo.ProInfo.ProName  + "\\" 
         if(c2sPackInfo.Package == "import"){
-            io.WriteString(res, ImportWorkBook(originalPath))  
+            io.WriteString(res, ImportWorkBook(c2sPackInfo.ProInfo.ProPath))  
         }else{
-            ExportWorkBook(originalPath)
+            originalPath :=  c2sPackInfo.ProInfo.ProPath + "\\" + c2sPackInfo.ProInfo.ProName  + "\\" 
+            ExportWorkBook(originalPath, c2sPackInfo.ProInfo.ProName)
         }    
     }else if strings.Contains(req.URL.Path, "&cmdAct") {   
         body, _ := ioutil.ReadAll(req.Body)
@@ -302,21 +307,24 @@ func ImportWorkBook(workbookPath string)string{
  
     proPath := OpenKeepDialog()
     if(proPath != ""){ 
-        cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 3 "+ workbookPath + " " + proPath)   
+         _, fileName := filepath.Split(proPath)   
+        pathName := getPathName(fileName)
+        cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 3 "+ workbookPath + "\\" + pathName + " " + proPath)   
         var out bytes.Buffer
         cmd.Stdout = &out
         err := cmd.Start()
         cmd.Wait()
         if err != nil {
             return err.Error()
-        }  
+        }   
+        setWorkbookPath(workbookPath, pathName)
         return "已执行--"
     }
     return "error--" 
 }
 
-func ExportWorkBook(workbookPath string){
-    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 1 "+ workbookPath)  
+func ExportWorkBook(workbookPath string, proName string){
+    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 1 "+ workbookPath + "\\ " + proName)  
     var out bytes.Buffer
 	cmd.Stdout = &out
     err := cmd.Start()
@@ -355,8 +363,6 @@ func OpenKeepDialog()string{
         if !ok {
             return ""
         }    
-       // _, fileName := filepath.Split(proPath)  
-        //setWorkbookPath(getPathName(fileName)) 
         return proPath
     }
     return ""

@@ -21,6 +21,7 @@ function loadDirJson(responseText)
     {
         g_jsonDirInfo = jsonInfo
     }else{
+        g_jsonDirInfo = []
         onAddFolder()
     }
     onLoadFileJson()

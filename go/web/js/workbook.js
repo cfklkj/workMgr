@@ -10,20 +10,17 @@ document.write('<script type="text/javascript" src="js/workbook/listSearch.js"><
 window.onload = main
 
     
+var serverUrl = "127.0.0.1"  
+var MyToken = "1111"
+var Unrecognizable = false 
+
 function main() {   
     g_post = new Post()
     WorkBookInit()
     onGetProject() 
 }  
 
-
-document.body.oncontextmenu = function (){
-    return false
-} 
-  
-var serverUrl = "127.0.0.1"  
-var MyToken = "1111"
-var Unrecognizable = false 
+ 
 
 function Post(){
     //请求数据
@@ -112,6 +109,7 @@ function onKeydown()
 { 
     if (event.ctrlKey == true && event.keyCode == 83) {//Ctrl+S 
         event.returnvalue = false; 
+        search_UpFileName(fileObj) 
         onKeeptxt()
     } 
     else{ 
