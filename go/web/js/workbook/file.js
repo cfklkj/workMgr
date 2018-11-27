@@ -89,6 +89,15 @@ function loadDeleteFile()
     selectDefualtFile(0) 
 }
 
+function loadFiles(parentId)
+{  
+    jsonInfo = g_jsonFileInfo[parentId] 
+    for( i = 0; jsonInfo[i]; i++)
+    {   
+        addFile(parentId, jsonInfo[i].id, jsonInfo[i].fName) 
+    }
+}
+
 function loadFile(key, isDelete)
 { 
     jsonInfo =  g_jsonFileInfo[key]
@@ -157,7 +166,7 @@ function addFile(divId, spanID, spanValue)
 { 
     deleteValue = "移到回收站"
     Ta = '\
-    <li>\
+    <li draggable="true" ondragend="FileLeave(event)" value=' + divId +'>\
         <div class="search-content" id=' + divId + '>\
             <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
                 <i class="icon-Edit editA"></i>\
@@ -168,6 +177,20 @@ function addFile(divId, spanID, spanValue)
         </div>\
     </li>'
     g_searchContainer.innerHTML += Ta
+}
+
+function InFolder(event)
+{
+    event.preventDefault(); 
+    var par = getParentObj(event.target)
+    console.log(par.id)
+    console.log(event)
+}
+function FileLeave(event)
+{
+    event.preventDefault(); 
+    //alert(event.target.getAttribute("value"));
+    event.target.remove()  //移除
 }
 function addCrashFile(divId, spanID, spanValue)
 { 

@@ -172,6 +172,20 @@ if (btnNum==2)
 }
 else if(btnNum==0)
 {
+    console.log(event)
+    if(selectFolde(event.target.id))  //选择文件夹
+    {
+        list_setOpenDir(event.target.innerText) 
+        loadFiles(g_choiceFolderId)
+        selectFoldeStatu(event.target)
+        return;
+    }
+    if(selectFile(event.target.id))  //选择文件
+    {
+        return;
+    }
+    //---old
+    return
     if(event.srcElement == g_dragMide)
     {
         g_dragMove = 1; 

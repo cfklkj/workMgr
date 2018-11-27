@@ -1,3 +1,9 @@
+//主文档类型
+var  FolderType = {};
+FolderType.document = 1;
+FolderType.recycleBin = 2;
+FolderType.nearView = 3; 
+
 
 g_jsonDirInfo = []//JSON.parse('[{"fName":"c++","id":101},{"fName":"java","id":102}]')
 
@@ -44,8 +50,30 @@ function recodeFoldeIndex(parent)
 {
     g_choiceDirIndex = foldeIndex(parent)  
 }
-function selectFoldeStatu(parent)
+
+function getParentTagLi(obj)
+{
+    if(!obj)
+        return obj
+    var par = obj.parentNode
+    if(par && par.tagName != "LI")
+    {      
+        return getParentTagLi(par)
+    }
+    return par;
+}
+
+function selectFoldeStatu(obj)
 {    
+    tagLi = getParentTagLi(obj)
+    if(tagLi.tagName != "LI")
+        return false; 
+    tagLi.className = "selected"
+    oldTagLi = g_choiceFolderLi
+    g_choiceFolderLi = tagLi
+    oldTagLi.className = "";
+    //--old
+    return;
     var tagI = parent.getElementsByTagName("i")
     if(g_choiceDirObj)
     {
@@ -66,8 +94,22 @@ function selectFoldeStatu(parent)
     g_choiceDirObj.id = parent.id 
     g_choiceDirObj.style.visibility = "visible";  
 }
-function selectFolde(parent, isNoReloadFile)
-{ 
+function selectFolde(parentId)
+{  
+    if(g_choiceFolderId == parentId)
+        return false; 
+    for(id in g_jsonDirInfo)
+    {  
+        if(g_jsonDirInfo[id].id == parentId)
+        {
+            g_choiceFolderId = parentId 
+            return true;
+        }
+    } 
+    return false;
+
+    //old
+    return
     selectFoldeStatu(parent)
     list_setOpenDir(parent)
     if(!isNoReloadFile) 
@@ -150,20 +192,19 @@ function loadFolder(jsonInfo)
 function addFolder(dirID, dirName)
 {
     Ta = '\
-    <li value=' + dirID +'>\
-        <div class="slidebar-content" id=' + dirID + '>\
+    <li draggable="true"  ondragover="InFolder(event)">\
+        <div class="slidebar-content">\
             <div class="sidebar-item search-resulMove" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">\
                 <i class="arrow arrowB" style="visibility: hidden;"></i>\
                 <i class="icon-folder folderA"></i>\
-                <span class="sidebar-item-text" >' + dirName + '</span>\
+                <span class="sidebar-item-text" id=' + dirID + '>' + dirName + '</span>\
             </div>\
         </div>\
     </li>'
     g_folderContainer.innerHTML += Ta
 }
 function onAddFolder()
-{    
-    jsonInfo =  g_jsonDirInfo[g_choiceDirObj.id]    
+{      
     //得到新ID 
     newFolder = 0
     for(j = 101; !newFolder ;j++)
@@ -180,6 +221,7 @@ function onAddFolder()
             newFolder = j;
             var newNode = {
                 "id":j,
+                "type": FolderType.document,
                 "fName":"newFolder"
             } 
             g_jsonDirInfo.push(newNode);             

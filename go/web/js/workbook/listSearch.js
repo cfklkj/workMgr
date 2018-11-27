@@ -18,12 +18,12 @@ function list_UpProject()
     g_proName =  input[0].value
     UpProject()
 }
-function list_setOpenDir(parent)
+function list_setOpenDir(innerText)
 {
     var span = g_listSearch.getElementsByTagName("span")
     var input = g_listSearch.getElementsByTagName("input")
     span[1].className = "icon-oFolde"
-    input[0].value = parent.innerText
+    input[0].value = innerText
 }
 function list_upDirName(parentId)
 { 
