@@ -1,9 +1,17 @@
 //主文档类型
 var  FolderType = {};
+FolderType.nochoice = 0;
 FolderType.document = 1;
 FolderType.recycleBin = 2;
 FolderType.nearView = 3; 
+FolderType.project = 4; 
+FolderType.file = 5; 
+FolderType.detail = 6; 
+    
 
+g_choiceFolderType = FolderType.nochoice  //选择的文档类型
+g_choiceFolderId = 0; //选择的文件夹
+g_choiceFolderLi = ""  //选择的标签
 
 g_jsonDirInfo = []//JSON.parse('[{"fName":"c++","id":101},{"fName":"java","id":102}]')
 
@@ -63,15 +71,22 @@ function getParentTagLi(obj)
     return par;
 }
 
+
 function selectFoldeStatu(obj)
-{    
+{     
     tagLi = getParentTagLi(obj)
     if(tagLi.tagName != "LI")
         return false; 
     tagLi.className = "selected"
-    oldTagLi = g_choiceFolderLi
-    g_choiceFolderLi = tagLi
-    oldTagLi.className = "";
+    if(g_choiceFolderLi != "")
+    { 
+        oldTagLi = g_choiceFolderLi
+        g_choiceFolderLi = tagLi
+        oldTagLi.className = "";
+    }else
+    {
+        g_choiceFolderLi = tagLi
+    }
     //--old
     return;
     var tagI = parent.getElementsByTagName("i")
@@ -97,11 +112,11 @@ function selectFoldeStatu(obj)
 function selectFolde(parentId)
 {  
     if(g_choiceFolderId == parentId)
-        return false; 
+        return false;  
     for(id in g_jsonDirInfo)
     {  
         if(g_jsonDirInfo[id].id == parentId)
-        {
+        { 
             g_choiceFolderId = parentId 
             return true;
         }
@@ -144,9 +159,8 @@ function onLoadFolders()
     {
         g_isDeleteFolder = false
         return 
-    }
-    selectFoldeStatu(this) 
-    
+    } 
+
     initFileInfo()
     loadFolder(g_jsonDirInfo)
     loadUnDeleteFolde()
@@ -167,10 +181,15 @@ function onLoadFolder()
         selectFolde(bObj) 
     }*/
 }
-function upDirJson()
+function upDirJson(newName)
 {
-    onShowStatu("添加文件夹");
+    dirJsonObj = getJsonFoldeById(g_choiceFolderId)
+    if(!dirJsonObj)
+        return false
+    dirJsonObj.fName = newName
+    onShowStatu("更新文件夹");
     g_post.upJson("Dir", JSON.stringify(g_jsonDirInfo))  
+    return true
 }
 function loadFolder(jsonInfo)
 {
@@ -325,4 +344,76 @@ function sortHttpLi(parentNode, chileId, upDown)
     loadFolder(g_jsonDirInfo) 
     var lis = document.getElementById(chileId)
     selectFolde(lis, true) 
+}
+
+
+//----选择文档类型
+function getFolderId(obj)
+{
+    if(!obj)
+        return obj
+    var par = obj.parentNode
+    if(par)
+    {     
+        if(par.id != "")
+            return par;
+        return getFolderId(par)
+    }
+    return par;
+}
+function setChoiceFolderType(obj)
+{
+    par = getFolderId(obj) 
+    if(!par)
+        return 0
+        console.log("g_choiceFolderType")
+        console.log(par.id)
+    switch(par.id)
+    {
+        case "loadFolder":
+        {
+            g_choiceFolderType = FolderType.project
+        }break;
+        case "nearOpen":
+        {
+            g_choiceFolderType = FolderType.nearView
+            selectFoldeTypeStatu(g_choiceFolderType) 
+        }break;
+        case "folder-Container":
+        {
+            g_choiceFolderType = FolderType.document
+            selectFoldeTypeStatu(g_choiceFolderType) 
+        }break;
+        case "search-Container":
+        {
+            g_choiceFolderType = FolderType.file
+        }break;
+        case "flexible-right":
+        {
+            g_choiceFolderType = FolderType.detail 
+        }break;
+        case "crash":
+        {
+            g_choiceFolderType = FolderType.recycleBin
+            selectFoldeTypeStatu(g_choiceFolderType) 
+        }break;
+        default:
+            return 0;
+    } 
+    console.log(g_choiceFolderType)
+    return g_choiceFolderType
+}
+
+function selectFoldeTypeStatu(obj)
+{     
+    obj.className = "selected"
+    if(g_choiceFolderLi != "")
+    { 
+        oldTagLi = g_choiceFolderLi
+        g_choiceFolderLi = obj
+        oldTagLi.className = "";
+    }else
+    {
+        g_choiceFolderLi = obj
+    }
 }

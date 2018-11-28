@@ -21,15 +21,13 @@ type ProjectInfo struct{
 }
 
 type C2SGETTXT struct{
-    ProInfo ProjectInfo
-    ParentId int 
-    FileId int 
+    ProInfo ProjectInfo 
+    FileId string 
     Unrecognizable bool
 } 
 type C2SKEEPTXT struct{
-    ProInfo ProjectInfo
-    ParentId int 
-    FileId int  
+    ProInfo ProjectInfo 
+    FileId string  
     TxtInfo string 
 } 
 type C2SGETJSON struct{
@@ -228,13 +226,15 @@ func OpenTxt(filePath string, isUnrecognizable bool)string{
 //读取文本
 func GetWorkbookTxt(c2sTxtInfo C2SGETTXT)string{    
     dirPth := c2sTxtInfo.ProInfo.ProPath + "\\" + c2sTxtInfo.ProInfo.ProName  + "\\" 
-    dirPth += fmt.Sprint(c2sTxtInfo.ParentId) + "_" + fmt.Sprint(c2sTxtInfo.FileId);    
+    //dirPth += fmt.Sprint(c2sTxtInfo.ParentId) + "_" + fmt.Sprint(c2sTxtInfo.FileId);    
+    dirPth += fmt.Sprint(c2sTxtInfo.FileId);    
     return OpenTxt(dirPth, c2sTxtInfo.Unrecognizable)
 } 
 //删除文本
 func DeleteWorkbookTxt(c2sTxtInfo C2SGETTXT)string{    
     dirPth := c2sTxtInfo.ProInfo.ProPath + "\\" + c2sTxtInfo.ProInfo.ProName  + "\\" 
-    dirPth += fmt.Sprint(c2sTxtInfo.ParentId) + "_" + fmt.Sprint(c2sTxtInfo.FileId);  
+   // dirPth += fmt.Sprint(c2sTxtInfo.ParentId) + "_" + fmt.Sprint(c2sTxtInfo.FileId);  
+    dirPth += fmt.Sprint(c2sTxtInfo.FileId);  
     err := os.Remove(dirPth) 
     if err != nil { 
         return "file remove Error!"
@@ -245,7 +245,8 @@ func DeleteWorkbookTxt(c2sTxtInfo C2SGETTXT)string{
 //写入文本
 func KeepWorkbookTxt(c2sFileInfo C2SKEEPTXT)string{
     dirPth := c2sFileInfo.ProInfo.ProPath + "\\" + c2sFileInfo.ProInfo.ProName  + "\\" 
-    dirPth += fmt.Sprint(c2sFileInfo.ParentId) + "_" + fmt.Sprint(c2sFileInfo.FileId);   
+    //dirPth += fmt.Sprint(c2sFileInfo.ParentId) + "_" + fmt.Sprint(c2sFileInfo.FileId);   
+    dirPth += fmt.Sprint(c2sFileInfo.FileId);  
     file, err := os.OpenFile(dirPth, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
     if err != nil {
         return "open file " + dirPth + " failed.";

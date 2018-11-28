@@ -11,12 +11,13 @@ function list_setProject(projectName)
     span[0].title = g_proName
 }
 function list_UpProject()
-{ 
-    if(g_choiceDirObj.par != g_loadFolder)
-        return
+{  
     var input = g_listSearch.getElementsByTagName("input") 
-    g_proName =  input[0].value
-    UpProject()
+   if(g_proName !=  input[0].value)
+   {
+        g_proName =  input[0].value 
+        UpProject()
+   }
 }
 function list_setOpenDir(innerText)
 {
@@ -25,18 +26,13 @@ function list_setOpenDir(innerText)
     span[1].className = "icon-oFolde"
     input[0].value = innerText
 }
-function list_upDirName(parentId)
+function list_upDirName()
 { 
-    dirObj = getJsonFoldeById(parentId)
-    if(!dirObj)
-        return
-    var span = g_choiceDirObj.par.getElementsByTagName("span")
+    var span = g_choiceFolderLi.getElementsByTagName("span") 
     var input = g_listSearch.getElementsByTagName("input")
-    if(g_choiceDirObj.fName != input[0].value)
-    {            
-        dirObj.fName = input[0].value 
-        span[0].innerText = input[0].value 
-        upDirJson()
+    if(span[0].innerText != input[0].value && upDirJson(input[0].value))
+    {             
+        span[0].innerText = input[0].value         
     }  
 }
 

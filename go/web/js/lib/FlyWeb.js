@@ -12,6 +12,7 @@ function FlyWeb(){
         }else
         {
             xhr.send(JSON.stringify(jsonData));
+            console.log(JSON.stringify(jsonData))
         }
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) { // 读取完成

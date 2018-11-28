@@ -1,6 +1,8 @@
 
 //文件列表---------------------------------
 g_sortLimit = 9  //默认重新排序限制数量
+g_choiceFileInfo = []   //选择的文件信息
+g_choiceFileLi = "" //选择的标签 
  
 //文件
 function onLoadFileJson()
@@ -90,45 +92,192 @@ function loadDeleteFile()
 }
 
 function loadFiles(parentId)
-{  
-    jsonInfo = g_jsonFileInfo[parentId] 
+{       
+    console.log(parentId)
+    g_searchContainer.innerHTML = ""
+    jsonInfo = getFileJson(parentId)
+    console.log(jsonInfo)
     for( i = 0; jsonInfo[i]; i++)
     {   
-        addFile(parentId, jsonInfo[i].id, jsonInfo[i].fName) 
+        addFile(jsonInfo[i].id, jsonInfo[i].name) 
+        if(i == 0) { 
+            selectFile(jsonInfo[i].id)
+        }
     }
+    return i > 0
 }
-
-function loadFile(key, isDelete)
+function getFileJson(parentId)
 { 
-    jsonInfo =  g_jsonFileInfo[key]
-    var setDefault = false
-    g_defaultFileKey = 0
+    jsonInfo = g_jsonFileInfo[parentId]     
+   if(!jsonInfo)
+   { 
+       jsonInfo = g_jsonFileInfo[parentId] = []  
+   } 
+   return  jsonInfo;
+}
+function addFileJson(parentId, newNode)
+{ 
+    jsonInfo = g_jsonFileInfo[parentId]     
+   if(!jsonInfo)
+   { 
+       jsonInfo = g_jsonFileInfo[parentId] = []  
+   } 
+   jsonInfo.push(newNode); 
+   return  jsonInfo;
+}
+function selectFileAct(choiceFileId)
+{
+    if(g_choiceFolderType != FolderType.file)
+        return false;
+    return selectFile(choiceFileId)
+}
+function selectFile(choiceFileId)
+{ 
+    if(choiceFileId == "")
+       return false;
+    if(g_choiceFileInfo.id  == choiceFileId)
+        return false;
+    jsonInfo = getFileJson(g_choiceFolderId)
     for( i = 0; jsonInfo[i]; i++)
+    {   
+        if(jsonInfo[i].id == choiceFileId)
+        {
+            g_choiceFileInfo = jsonInfo[i]
+            break;
+        }
+    } 
+    g_topFileName.value = g_choiceFileInfo.name 
+    g_post.getTxt(g_choiceFileInfo.id)  
+    return true;
+}
+
+function selectFileStatu(choiceFileId)
+{ 
+    console.log("choiceFileId")
+    console.log(choiceFileId)
+    obj = document.getElementById(choiceFileId)
+    if(!obj)
+        return false;
+    tagLi = getParentTagLi(obj)
+    if(tagLi.tagName != "LI")
+        return false;  
+    tagLi.className = "fileSelected"
+    if(g_choiceFileLi != "")
+    {  
+        g_choiceFileLi.className = ""
+        g_choiceFileLi = tagLi 
+    }else
     { 
-        if(jsonInfo[i]["isDelete"])
-        {
-            continue;
-        }
-        if(!setDefault)
-        {
-            setDefault = true
-            g_defaultFileKey = jsonInfo[i].id
-        }
-        addFile(-key, jsonInfo[i].id, jsonInfo[i].fName) 
+        g_choiceFileLi = tagLi
     }
 }
-function onAddFile()
-{      
-     
-    var id = parseInt(g_choiceDirObj.par.id)
-    if(id > 100 && id < 200)
-    {
 
-    }else
+function selectDefualtFile(index)
+{    
+    if(index < 0)  //没有文件列表
+    {
+        g_detailValue.innerHTML = ""
+        g_topFileName.value = ""
+        return
+    } 
+    var li = g_searchContainer.getElementsByTagName("li") 
+    if(!li[index])
+    { 
+        return
+    }    
+    var div = li[index].getElementsByTagName("div")
+    parent = div[0] 
+    selectFile(parent)
+}
+function selectFile1(parent)
+{
+    if(parent.id > 100)  //目录
+        return false
+    var span = parent.getElementsByTagName("span") 
+    if(g_choiceFileObj == span[0])
+    {
+        return true
+    } 
+    if(g_choiceFileObj)
+    { 
+        g_choiceFileObj.par.className = g_choiceFileObj.oldClass  
+    }
+    g_choiceFileObj = span[0] 
+
+    g_choiceFileObj.oldClass = parent.className 
+    g_choiceFileObj.par = parent 
+    g_choiceFileObj.par.className = "fileSelected"
+    onShowTxt(-parent.id,  g_choiceFileObj.id)
+    recodeFileIndex(parent)
+    return true
+} 
+ 
+function onAddFile()
+{           
+    if(g_choiceFolderType != FolderType.document)
+    {
+        alert("请选择文件夹后再操作！")
+        return false
+    } 
+    var dates=new Date();
+    newFileId = dates.getTime()
+    var newNode = {
+        "id":newFileId,
+        "name":"无标题文件"
+    }   
+    addFileJson(g_choiceFolderId, newNode)
+    jsonInfo = getFileJson(g_choiceFolderId)
+    console.log("g_choiceFolderId")
+    console.log(jsonInfo)
+    console.log(g_jsonFileInfo)
+    addFile(newNode.id, newNode.name) 
+    if(selectFile(newNode.id))
+    {
+        selectFileStatu(newNode.id)
+    } 
+    return true; 
+}
+function addFile(spanID, spanValue)
+{ 
+    deleteValue = "移到回收站"
+    Ta = '\
+    <li draggable="true" ondragend="FileLeave(event)">\
+        <div class="search-content">\
+            <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
+                <i class="icon-Edit editA"></i>\
+                <span class="search-item-text" id=' + spanID + '>' + spanValue + '</span>\
+                <spn title="' + deleteValue + '"><i class="icon_delete editB"></span>\
+                </i>\
+            </div>\
+        </div>\
+    </li>'
+    g_searchContainer.innerHTML += Ta
+}
+
+function search_UpFileName()
+{    
+    if(g_choiceFileInfo.name  != g_topFileName.value)
+    {            
+        console.log('search_UpFileName')
+        console.log(g_choiceFileInfo)
+        console.log(g_jsonFileInfo)
+        g_choiceFileInfo.name = g_topFileName.value 
+        console.log(g_choiceFileInfo)
+        console.log(g_jsonFileInfo)
+        document.getElementById(g_choiceFileInfo.id).innerText = g_topFileName.value 
+        upFileJson()
+    }  
+}
+
+//--old
+
+function onAddFile1()
+{           
+    if(g_choiceFolderType != FolderType.document)
     {
         alert("请选择文件夹后再操作！")
         return 
-    }
+    } 
     jsonInfo =  g_jsonFileInfo[g_choiceDirObj.id]    
     var g_newFile = 0
      if(!jsonInfo)
@@ -162,23 +311,6 @@ function onAddFile()
     selectFile(Par)
     g_topFileName.value = "无标题文件"
 }
-function addFile(divId, spanID, spanValue)
-{ 
-    deleteValue = "移到回收站"
-    Ta = '\
-    <li draggable="true" ondragend="FileLeave(event)" value=' + divId +'>\
-        <div class="search-content" id=' + divId + '>\
-            <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
-                <i class="icon-Edit editA"></i>\
-                <span class="search-item-text" id=' + spanID + '>' + spanValue + '</span>\
-                <spn title="' + deleteValue + '"><i class="icon_delete editB"></span>\
-                </i>\
-            </div>\
-        </div>\
-    </li>'
-    g_searchContainer.innerHTML += Ta
-}
-
 function InFolder(event)
 {
     event.preventDefault(); 
@@ -342,14 +474,17 @@ function getJsonFileById(parentId, fileId)
 
 
 //文件内容-----------------------------------
-function onShowTxt(parentId, fileId)
+function onShowTxt1(fileId, fileName)
 {         
+    g_topFileName.value = fName 
+
+    //--old
+    return 
     fileObj = getJsonFileById(parentId, fileId) 
     if( fileObj)
     {    
         g_choiceDirObj.id = Math.abs(parentId)
-        g_topFileName.value = fileObj.fName
-        g_post.getTxt(parentId, fileObj.id) 
+        g_topFileName.value = fileObj.fName 
     } 
 }
 
@@ -368,14 +503,12 @@ function showTxt(txtInfo)
 
 function onKeeptxt()
 { 
-    if(g_choiceDirObj.id > 100)
-    { 
-        fileObj = getJsonFileById(g_choiceDirObj.id, g_choiceFileObj.id) 
-        if( fileObj)
-        { 
-            g_post.keepTxt(parseInt(g_choiceDirObj.id), parseInt(g_choiceFileObj.id), g_detailValue.innerHTML)
-        }
-    }
+    console.log("onkeep")
+    console.log(g_choiceFolderType) 
+    if(g_choiceFolderType != FolderType.detail )
+        return false;      
+    g_post.keepTxt(g_choiceFileInfo.id, g_detailValue.innerHTML) 
+    return true
 }
 
 

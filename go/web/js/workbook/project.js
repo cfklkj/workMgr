@@ -14,7 +14,7 @@ function loadProJson(proInfo)
     onLoadDirJson()
 }
 function UpProject()
-{     
+{      
     g_post.upPro("rename", g_proName, onUpProject) 
 }
 function onUpProject(info)

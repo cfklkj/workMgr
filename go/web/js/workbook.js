@@ -39,14 +39,14 @@ function Post(){
         this.request("post",serverUrl + '/Workbook&pakage', data, onShowStatu)
     }
     //获取文本
-    this.getTxt = function(pId, cId){
-        var data = {"parentId":pId, "fileId": cId, "unrecognizable":true}  
+    this.getTxt = function(cId){
+        var data = {"FileId": cId.toString(), "unrecognizable":true}  
         data.ProInfo = g_projectJson 
         this.request("post",serverUrl + '/Workbook&getTxt', data, showTxt)   
     }
     //保存文本
-    this.keepTxt = function(pId, cId, txtInfo){
-        var data = {"parentId":pId, "fileId": cId, "txtInfo":txtInfo}  
+    this.keepTxt = function(cId, txtInfo){
+        var data = {"FileId": cId.toString(), "txtInfo":txtInfo}  
         data.ProInfo = g_projectJson
         this.request("post",serverUrl + '/Workbook&keepTxt', data, onShowStatu)
     }
@@ -109,23 +109,24 @@ function onKeydown()
 { 
     if (event.ctrlKey == true && event.keyCode == 83) {//Ctrl+S 
         event.returnvalue = false; 
-        search_UpFileName(fileObj) 
+        search_UpFileName() 
         onKeeptxt()
     } 
     else{ 
         if(event.keyCode == 13)
         {
+            console.log(event)
             if(document.activeElement.id == "top-fileName")
             {
-                search_UpFileName(fileObj) 
+                search_UpFileName() 
             }else if(document.activeElement.id == "search-Name")
             {
-                if(g_choiceDirObj.par.id == "loadFolder")
-                {
+                if(g_choiceFolderType == FolderType.project)
+                { 
                     list_UpProject(); 
-                }else if(Math.abs(g_choiceDirObj.par.id) > 100){
-                    list_upDirName(g_choiceDirObj.id) 
-                }               
+                }else if(g_choiceFolderType == FolderType.document){
+                    list_upDirName() 
+                }            
                 
             }
         } 
@@ -172,16 +173,28 @@ if (btnNum==2)
 }
 else if(btnNum==0)
 {
+    console.log("event")
     console.log(event)
-    if(selectFolde(event.target.id))  //选择文件夹
+    var choiceType = setChoiceFolderType(event.target)  
+    console.log(choiceType)
+    if(!choiceType || choiceType == FolderType.detail)
     {
+        return;
+    }   
+    console.log("event2")
+    if(selectFolde(event.target.id))  //选择文件夹
+    { 
         list_setOpenDir(event.target.innerText) 
-        loadFiles(g_choiceFolderId)
+        if(loadFiles(g_choiceFolderId))
+        { 
+          selectFileStatu(g_choiceFileInfo.id)
+        }
         selectFoldeStatu(event.target)
         return;
     }
-    if(selectFile(event.target.id))  //选择文件
+    if(selectFileAct(event.target.id))  //选择文件
     {
+        selectFileStatu(event.target.id)
         return;
     }
     //---old
@@ -375,45 +388,6 @@ function unselectFolder()
     }
     g_choiceDirObj = 0
 }
-function selectDefualtFile(index)
-{    
-    if(index < 0)  //没有文件列表
-    {
-        g_detailValue.innerHTML = ""
-        g_topFileName.value = ""
-        return
-    } 
-    var li = g_searchContainer.getElementsByTagName("li") 
-    if(!li[index])
-    { 
-        return
-    }    
-    var div = li[index].getElementsByTagName("div")
-    parent = div[0] 
-    selectFile(parent)
-}
-function selectFile(parent)
-{
-    if(parent.id > 100)  //目录
-        return false
-    var span = parent.getElementsByTagName("span") 
-    if(g_choiceFileObj == span[0])
-    {
-        return true
-    } 
-    if(g_choiceFileObj)
-    { 
-        g_choiceFileObj.par.className = g_choiceFileObj.oldClass  
-    }
-    g_choiceFileObj = span[0] 
-
-    g_choiceFileObj.oldClass = parent.className 
-    g_choiceFileObj.par = parent 
-    g_choiceFileObj.par.className = "fileSelected"
-    onShowTxt(-parent.id,  g_choiceFileObj.id)
-    recodeFileIndex(parent)
-    return true
-} 
 function fileIndex(parent)
 {
     var par = parent.parentNode
@@ -500,15 +474,5 @@ function recodeChangeFileContianer(parent)
     }
     g_searchContainer.removeChild(parent.parentNode)  //parent.remove()
 }
-function search_UpFileName(fileObj)
-{    
-    if(fileObj.fName != g_topFileName.value)
-    {            
-        fileObj.fName = g_topFileName.value 
-        g_choiceFileObj.innerText = g_topFileName.value 
-        upFileJson()
-    }  
-}
-
 
 

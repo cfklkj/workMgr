@@ -77,7 +77,4 @@ function InitGlobalParame()
     g_isDeleteFolder  = false;
 
     
-    //选择的文件夹
-    g_choiceFolderId = 0;
-    g_choiceFolderLi = null;
 }
