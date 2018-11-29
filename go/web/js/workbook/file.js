@@ -92,11 +92,9 @@ function loadDeleteFile()
 }
 
 function loadFiles(parentId)
-{       
-    console.log(parentId)
+{        
     g_searchContainer.innerHTML = ""
-    jsonInfo = getFileJson(parentId)
-    console.log(jsonInfo)
+    jsonInfo = getFileJson(parentId) 
     for( i = 0; jsonInfo[i]; i++)
     {   
         addFile(jsonInfo[i].id, jsonInfo[i].name) 
@@ -106,6 +104,7 @@ function loadFiles(parentId)
     }
     return i > 0
 }
+//-----------------json
 function getFileJson(parentId)
 { 
     jsonInfo = g_jsonFileInfo[parentId]     
@@ -125,10 +124,11 @@ function addFileJson(parentId, newNode)
    jsonInfo.push(newNode); 
    return  jsonInfo;
 }
+//------------------act
 function selectFileAct(choiceFileId)
 {
     if(g_choiceFolderType != FolderType.file)
-        return false;
+        return false; 
     return selectFile(choiceFileId)
 }
 function selectFile(choiceFileId)
@@ -137,6 +137,7 @@ function selectFile(choiceFileId)
        return false;
     if(g_choiceFileInfo.id  == choiceFileId)
         return false;
+    unSelectFileStatu(g_choiceFileInfo.id)  //取消选中
     jsonInfo = getFileJson(g_choiceFolderId)
     for( i = 0; jsonInfo[i]; i++)
     {   
@@ -151,25 +152,28 @@ function selectFile(choiceFileId)
     return true;
 }
 
-function selectFileStatu(choiceFileId)
-{ 
-    console.log("choiceFileId")
-    console.log(choiceFileId)
+//选中与否 在添加节点后其内存位置会变化所以要分开来
+function unSelectFileStatu(choiceFileId)
+{  
     obj = document.getElementById(choiceFileId)
     if(!obj)
         return false;
     tagLi = getParentTagLi(obj)
     if(tagLi.tagName != "LI")
-        return false;  
+        return false;   
+    tagLi.className = "" 
+    return true;
+}
+function selectFileStatu(choiceFileId)
+{ 
+    obj = document.getElementById(choiceFileId)
+    if(!obj)
+        return false;
+    tagLi = getParentTagLi(obj)
+    if(tagLi.tagName != "LI")
+        return false;   
     tagLi.className = "fileSelected"
-    if(g_choiceFileLi != "")
-    {  
-        g_choiceFileLi.className = ""
-        g_choiceFileLi = tagLi 
-    }else
-    { 
-        g_choiceFileLi = tagLi
-    }
+    return true;
 }
 
 function selectDefualtFile(index)
@@ -214,7 +218,7 @@ function selectFile1(parent)
  
 function onAddFile()
 {           
-    if(g_choiceFolderType != FolderType.document)
+    if(g_choiceFolderType < FolderType.document)
     {
         alert("请选择文件夹后再操作！")
         return false
@@ -226,15 +230,11 @@ function onAddFile()
         "name":"无标题文件"
     }   
     addFileJson(g_choiceFolderId, newNode)
-    jsonInfo = getFileJson(g_choiceFolderId)
-    console.log("g_choiceFolderId")
-    console.log(jsonInfo)
-    console.log(g_jsonFileInfo)
+    jsonInfo = getFileJson(g_choiceFolderId) 
     addFile(newNode.id, newNode.name) 
-    if(selectFile(newNode.id))
-    {
-        selectFileStatu(newNode.id)
-    } 
+    unSelectFileStatu(g_choiceFileInfo.id) 
+    selectFile(newNode.id) 
+    selectFileStatu(newNode.id) 
     return true; 
 }
 function addFile(spanID, spanValue)
@@ -257,60 +257,13 @@ function addFile(spanID, spanValue)
 function search_UpFileName()
 {    
     if(g_choiceFileInfo.name  != g_topFileName.value)
-    {            
-        console.log('search_UpFileName')
-        console.log(g_choiceFileInfo)
-        console.log(g_jsonFileInfo)
-        g_choiceFileInfo.name = g_topFileName.value 
-        console.log(g_choiceFileInfo)
-        console.log(g_jsonFileInfo)
+    {             
+        g_choiceFileInfo.name = g_topFileName.value  
         document.getElementById(g_choiceFileInfo.id).innerText = g_topFileName.value 
         upFileJson()
     }  
 }
-
-//--old
-
-function onAddFile1()
-{           
-    if(g_choiceFolderType != FolderType.document)
-    {
-        alert("请选择文件夹后再操作！")
-        return 
-    } 
-    jsonInfo =  g_jsonFileInfo[g_choiceDirObj.id]    
-    var g_newFile = 0
-     if(!jsonInfo)
-    { 
-        jsonInfo = g_jsonFileInfo[g_choiceDirObj.id] = []  
-    }
-    //得到新ID 
-    for(j = 1; !g_newFile ;j++)
-    { 
-        for( i = 0; jsonInfo[i]; i++)
-        { 
-            if(j == jsonInfo[i].id)
-            {
-                break;
-            }
-        }
-        if(!jsonInfo[i])
-        {            
-            g_newFile = j;
-            var newNode = {
-                "id":j,
-                "fName":"newFile"
-            } 
-            jsonInfo.push(newNode);
-        }
-    }
-    unselectFile()
-    addFile(-g_choiceDirObj.id, g_newFile, "无标题文件") 
-    var bObj = document.getElementById(g_newFile);
-    var Par = getParentObj(bObj)
-    selectFile(Par)
-    g_topFileName.value = "无标题文件"
-}
+ 
 function InFolder(event)
 {
     event.preventDefault(); 
@@ -502,9 +455,7 @@ function showTxt(txtInfo)
 
 
 function onKeeptxt()
-{ 
-    console.log("onkeep")
-    console.log(g_choiceFolderType) 
+{  
     if(g_choiceFolderType != FolderType.detail )
         return false;      
     g_post.keepTxt(g_choiceFileInfo.id, g_detailValue.innerHTML) 

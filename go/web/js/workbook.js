@@ -176,14 +176,14 @@ else if(btnNum==0)
     console.log("event")
     console.log(event)
     var choiceType = setChoiceFolderType(event.target)  
-    console.log(choiceType)
     if(!choiceType || choiceType == FolderType.detail)
     {
         return;
-    }   
+    }    
     console.log("event2")
     if(selectFolde(event.target.id))  //选择文件夹
     { 
+        console.log("event3")
         list_setOpenDir(event.target.innerText) 
         if(loadFiles(g_choiceFolderId))
         { 
@@ -192,6 +192,7 @@ else if(btnNum==0)
         selectFoldeStatu(event.target)
         return;
     }
+    console.log("event4")
     if(selectFileAct(event.target.id))  //选择文件
     {
         selectFileStatu(event.target.id)
@@ -379,14 +380,6 @@ function unselectFile()
         g_choiceFileObj.par.className = g_choiceFileObj.oldClass  
     }
     g_choiceFileObj = 0
-}
-function unselectFolder()
-{ 
-    if(g_choiceDirObj)
-    { 
-        g_choiceDirObj.par.className = g_choiceDirObj.oldClass  
-    }
-    g_choiceDirObj = 0
 }
 function fileIndex(parent)
 {

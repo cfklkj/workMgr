@@ -1,10 +1,10 @@
 //主文档类型
 var  FolderType = {};
 FolderType.nochoice = 0;
-FolderType.document = 1;
-FolderType.recycleBin = 2;
-FolderType.nearView = 3; 
-FolderType.project = 4; 
+FolderType.recycleBin = 1;
+FolderType.nearView = 2; 
+FolderType.project = 3; 
+FolderType.document = 4;
 FolderType.file = 5; 
 FolderType.detail = 6; 
     
@@ -72,6 +72,18 @@ function getParentTagLi(obj)
 }
 
 
+function unSelectFoldeStatu(dirId)
+{
+    var obj = document.getElementById(dirId) 
+    if(!obj)
+        return
+    tagLi = getParentTagLi(obj)
+    console.log(tagLi)
+    if(tagLi.tagName != "LI")
+        return false; 
+    tagLi.className =  ""
+    g_choiceFolderLi = ""
+}
 function selectFoldeStatu(obj)
 {     
     tagLi = getParentTagLi(obj)
@@ -108,6 +120,15 @@ function selectFoldeStatu(obj)
 
     g_choiceDirObj.id = parent.id 
     g_choiceDirObj.style.visibility = "visible";  
+}
+
+function unselectFolderStatu()
+{ 
+    if(g_choiceDirObj)
+    { 
+        g_choiceDirObj.par.className = g_choiceDirObj.oldClass  
+    }
+    g_choiceDirObj = 0
 }
 function selectFolde(parentId)
 {  
@@ -196,11 +217,7 @@ function loadFolder(jsonInfo)
     g_folderContainer.innerHTML = ""  
     for( i = 0; jsonInfo[i] && jsonInfo[i].id; i++)
     { 
-        g_dirCount ++;
-        if(jsonInfo[i]["isDelete"])
-        {
-            continue
-        }
+        g_dirCount ++; 
         if(!g_defaultDirKey)
         {
             g_defaultDirKey = jsonInfo[i].id
@@ -224,6 +241,11 @@ function addFolder(dirID, dirName)
 }
 function onAddFolder()
 {      
+    if(g_choiceFolderType < FolderType.project)
+    {
+        alert("请选中项目后重试")
+        return
+    }
     //得到新ID 
     newFolder = 0
     for(j = 101; !newFolder ;j++)
@@ -246,10 +268,11 @@ function onAddFolder()
             g_jsonDirInfo.push(newNode);             
         }
     } 
-    unselectFolder()
+    unSelectFoldeStatu(g_choiceFolderId)
     addFolder(newFolder, "新文件夹")  
+    selectFolde(newFolder)
     var bObj = document.getElementById(newFolder);
-    selectFolde(bObj)  
+    selectFoldeStatu(bObj)  
     upDirJson()
 }
 function moveFolder(parentId)
@@ -365,24 +388,22 @@ function setChoiceFolderType(obj)
 {
     par = getFolderId(obj) 
     if(!par)
-        return 0
-        console.log("g_choiceFolderType")
-        console.log(par.id)
+        return 0 
     switch(par.id)
     {
         case "loadFolder":
         {
             g_choiceFolderType = FolderType.project
+            selectFoldeTypeStatu(par) 
         }break;
         case "nearOpen":
         {
             g_choiceFolderType = FolderType.nearView
-            selectFoldeTypeStatu(g_choiceFolderType) 
+            selectFoldeTypeStatu(par) 
         }break;
         case "folder-Container":
         {
             g_choiceFolderType = FolderType.document
-            selectFoldeTypeStatu(g_choiceFolderType) 
         }break;
         case "search-Container":
         {
@@ -395,15 +416,14 @@ function setChoiceFolderType(obj)
         case "crash":
         {
             g_choiceFolderType = FolderType.recycleBin
-            selectFoldeTypeStatu(g_choiceFolderType) 
+            selectFoldeTypeStatu(par) 
         }break;
         default:
             return 0;
-    } 
-    console.log(g_choiceFolderType)
+    }  
     return g_choiceFolderType
 }
-
+ 
 function selectFoldeTypeStatu(obj)
 {     
     obj.className = "selected"
