@@ -1,161 +1,26 @@
-//主文档类型
-var  FolderType = {};
-FolderType.nochoice = 0;
-FolderType.recycleBin = 1;
-FolderType.nearView = 2; 
-FolderType.project = 3; 
-FolderType.document = 4;
-FolderType.file = 5; 
-FolderType.detail = 6; 
-    
+ 
+//刷新文件夹 
+function initFolderInfo()
+{    
+    g_choiceFolderInfo = []
+    g_searchContainer.innerHTML = "" 
+    g_detailValue.innerText = ""
+    g_topFileName.value = ""
+}
 
-g_choiceFolderType = FolderType.nochoice  //选择的文档类型
-g_choiceFolderId = 0; //选择的文件夹
-g_choiceFolderLi = ""  //选择的标签
-
-g_jsonDirInfo = []//JSON.parse('[{"fName":"c++","id":101},{"fName":"java","id":102}]')
-
+function onLoadFolder()
+{   
+    initFolderInfo()
+    loadFolder(getDocumentJson());
+    limitFolderHeigh()   
+} 
 
 function onLoadDirJson()
 {
     onShowStatu("加载文件夹");
-    g_post.getJson("Dir", loadDirJson) 
-}
-function loadDirJson(responseText)
-{
-    
-    try
-    {
-        jsonInfo = JSON.parse(responseText)
-    }catch(err)
-    {
-        jsonInfo = 0
-    }
-    if(jsonInfo)
-    {
-        g_jsonDirInfo = jsonInfo
-    }else{
-        g_jsonDirInfo = []
-        onAddFolder()
-    }
-    onLoadFileJson()
-}
-
-function foldeIndex(parent)
-{
-    var par = parent.parentNode
-    var tagLi = g_folderContainer.getElementsByTagName("li")
-    for(i = 0; tagLi[i]; i++)
-    {
-        if(tagLi[i] == par)
-        {
-            return i
-        }
-    }
-    return 0
-}
-function recodeFoldeIndex(parent)
-{
-    g_choiceDirIndex = foldeIndex(parent)  
-}
-
-function getParentTagLi(obj)
-{
-    if(!obj)
-        return obj
-    var par = obj.parentNode
-    if(par && par.tagName != "LI")
-    {      
-        return getParentTagLi(par)
-    }
-    return par;
-}
-
-
-function unSelectFoldeStatu(dirId)
-{
-    var obj = document.getElementById(dirId) 
-    if(!obj)
-        return
-    tagLi = getParentTagLi(obj)
-    console.log(tagLi)
-    if(tagLi.tagName != "LI")
-        return false; 
-    tagLi.className =  ""
-    g_choiceFolderLi = ""
-}
-function selectFoldeStatu(obj)
-{     
-    tagLi = getParentTagLi(obj)
-    if(tagLi.tagName != "LI")
-        return false; 
-    tagLi.className = "selected"
-    if(g_choiceFolderLi != "")
-    { 
-        oldTagLi = g_choiceFolderLi
-        g_choiceFolderLi = tagLi
-        oldTagLi.className = "";
-    }else
-    {
-        g_choiceFolderLi = tagLi
-    }
-    //--old
-    return;
-    var tagI = parent.getElementsByTagName("i")
-    if(g_choiceDirObj)
-    {
-        if(g_choiceDirObj == tagI[0])
-        {
-            return
-        }
-        g_choiceDirObj.par.className = g_choiceDirObj.oldClass       
-        unselectFolder()
-    }
-    g_choiceDirObj = tagI[0]
-
-    g_choiceDirObj.oldClass = parent.className 
-    g_choiceDirObj.par = parent 
-    g_choiceDirObj.par.className = "selected"
-    g_choiceDirObj.thisType="unCrash"
-
-    g_choiceDirObj.id = parent.id 
-    g_choiceDirObj.style.visibility = "visible";  
-}
-
-function unselectFolderStatu()
-{ 
-    if(g_choiceDirObj)
-    { 
-        g_choiceDirObj.par.className = g_choiceDirObj.oldClass  
-    }
-    g_choiceDirObj = 0
-}
-function selectFolde(parentId)
-{  
-    if(g_choiceFolderId == parentId)
-        return false;  
-    for(id in g_jsonDirInfo)
-    {  
-        if(g_jsonDirInfo[id].id == parentId)
-        { 
-            g_choiceFolderId = parentId 
-            return true;
-        }
-    } 
-    return false;
-
-    //old
-    return
-    selectFoldeStatu(parent)
-    list_setOpenDir(parent)
-    if(!isNoReloadFile) 
-    {
-       onLoadFile(g_choiceDirObj.id); 
-    }
-    recodeFoldeIndex(parent)
-}
+    g_post.getJson("Dir", initDirJson) 
+}    
  
-
 function selectDefualtFolde(index)
 {    
     if(index < 0)  //没有文件列表
@@ -172,72 +37,73 @@ function selectDefualtFolde(index)
     var div = li[index].getElementsByTagName("div")
     parent = div[0]
     selectFolde(parent)
-}
-//刷新文件夹 
-function onLoadFolders()
-{
-    if(g_isDeleteFolder)
-    {
-        g_isDeleteFolder = false
-        return 
-    } 
+}  
 
-    initFileInfo()
-    loadFolder(g_jsonDirInfo)
-    loadUnDeleteFolde()
-    g_choiceFileIndex = 0
-    selectDefualtFile(0)
-    g_choiceDirIndex = -1
-    mouseleaveFileA()   
-    var span = this.getElementsByTagName("span")
-    list_setProject(span[0].title)
-}
-function onLoadFolder()
-{ 
-    loadFolder(g_jsonDirInfo)
-    onNearOpen();
- /*   if(g_defaultDirKey)   
-    { 
-        var bObj = document.getElementById(g_defaultDirKey);
-        selectFolde(bObj) 
-    }*/
-}
-function upDirJson(newName)
-{
-    dirJsonObj = getJsonFoldeById(g_choiceFolderId)
-    if(!dirJsonObj)
-        return false
-    dirJsonObj.fName = newName
-    onShowStatu("更新文件夹");
-    g_post.upJson("Dir", JSON.stringify(g_jsonDirInfo))  
-    return true
-}
+//--加载到标签
 function loadFolder(jsonInfo)
 {
+    if(!jsonInfo)
+        return;
+        console.log("loadFolder")
+        console.log(jsonInfo)
     g_folderContainer.innerHTML = ""  
     for( i = 0; jsonInfo[i] && jsonInfo[i].id; i++)
-    { 
-        g_dirCount ++; 
-        if(!g_defaultDirKey)
-        {
-            g_defaultDirKey = jsonInfo[i].id
-        }
-        addFolder(jsonInfo[i].id, jsonInfo[i].fName)
+    {  
+        if(jsonInfo[i].type != FolderType.document)
+           continue;
+        addFolder(jsonInfo[i].id, jsonInfo[i].name) 
     }
+    return i > 0
 }
 function addFolder(dirID, dirName)
 {
     Ta = '\
-    <li draggable="true"  ondragover="InFolder(event)">\
+    <li draggable="true"  ondragover="InFolder(event)" id=' + dirID + ' value= ' + dirName + '>\
         <div class="slidebar-content">\
             <div class="sidebar-item search-resulMove" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">\
                 <i class="arrow arrowB" style="visibility: hidden;"></i>\
                 <i class="icon-folder folderA"></i>\
-                <span class="sidebar-item-text" id=' + dirID + '>' + dirName + '</span>\
+                <span class="sidebar-item-text">' + dirName + '</span>\
             </div>\
         </div>\
     </li>'
     g_folderContainer.innerHTML += Ta
+} 
+
+function addCrashFolde(spanID, spanValue,  deleteValue)
+{  
+    unCrashValue = "还原"
+    Ta = '\
+    <li  id=' + spanID + '>\
+        <div class="search-content">\
+            <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
+                <i class="icon-folder folderA"></i>\
+                <span class="search-item-text">' + spanValue + '</span>\
+                <i title="' + deleteValue + '" i class="icon_delete editB"></i>\
+                <i title="' + unCrashValue + '" class="icon_unCrash editB"></i>\
+            </div>\
+        </div>\
+    </li>'
+    g_searchContainer.innerHTML += Ta
+} 
+
+function loadDeleteFolder()
+{  
+    var jsonInfo = getFolderJsonObj(FolderType.document) 
+    isUpJson = false
+    for(item in jsonInfo){   
+        if (typeof(jsonInfo[item].id) != 'number')
+        {
+             isUpJson = true
+            deleteJsonNode(jsonInfo, item);
+            continue; 
+        }
+        addCrashFolde(jsonInfo[item].id, jsonInfo[item].name, "永久删除") 
+    } 
+    if(isUpJson)     
+    {
+        upDirJson()
+    }     
 }
 function onAddFolder()
 {      
@@ -246,132 +112,99 @@ function onAddFolder()
         alert("请选中项目后重试")
         return
     }
-    //得到新ID 
-    newFolder = 0
-    for(j = 101; !newFolder ;j++)
-    {  
-        for(i = 0; g_jsonDirInfo[i]; i++)
-        {             
-            if(g_jsonDirInfo[i].id == j)
-            {
-                break;
-            }    
-        }   
-        if(!g_jsonDirInfo[i])
-        {
-            newFolder = j;
-            var newNode = {
-                "id":j,
-                "type": FolderType.document,
-                "fName":"newFolder"
-            } 
-            g_jsonDirInfo.push(newNode);             
-        }
+    initFolderInfo()  
+    var newNode = {
+        "id":0,
+        "type": FolderType.document,
+        "name":"newFolder"
     } 
-    unSelectFoldeStatu(g_choiceFolderId)
-    addFolder(newFolder, "新文件夹")  
-    selectFolde(newFolder)
-    var bObj = document.getElementById(newFolder);
-    selectFoldeStatu(bObj)  
-    upDirJson()
-}
-function moveFolder(parentId)
-{    
-    for(j = 0; g_jsonDirInfo[j]; j ++)
-    {
-        if( g_jsonDirInfo[j].id == parentId)
-        {                   
-            g_jsonDirInfo[j]["isDelete"] = true  
-            break;
-        }
-    }    
-}
-function unMoveFolder(parent)
-{     
-    parentId = parent.id   
-    for(i = 0; g_jsonDirInfo[i]; i++)
-    {
-        if( g_jsonDirInfo[i].id == parentId)
-        {
-            g_jsonDirInfo[i]["isDelete"] = false
-            break;
+    for(j =  1;  ;j++)
+    {  
+        newNode.id = j; 
+        if(addFolderJson(newNode))
+        { 
+            break;            
         }
     }  
-    recodeChangeFileContianer(parent)  
-    loadFolder(g_jsonDirInfo)
+    console.log("onAddFolder")
+    console.log(newNode)
+    addFolder(newNode.id, newNode.name)   
+    limitFolderHeigh()
+    var bObj = document.getElementById(newNode.id);
+    setChoiceFolderLiType(bObj)   
+    selectFoldeJson()
 }
-function deleteFolder(parent)
-{  
-    parentId = parent.id     
-    for(j = 0; g_jsonDirInfo[j]; j ++)
-    {
-        if( g_jsonDirInfo[j].id == parentId)
-        {  
-            g_jsonDirInfo.splice(j, 1); 
-            g_dirCount -= 1; 
-
-            recodeChangeFileContianer(parent)   
-            deleteAllFile(parentId)
-            break;
-        } 
-    } 
+function moveFolder(obj)
+{    
+    console.log("moveFolder")
+    console.log(g_choiceFolderInfo.id)
+    var objLi = document.getElementById(g_choiceFolderInfo.id)
+    var tagLi = getParentTagLi(objLi)
+    if(!tagLi)
+        return 
+    if(movFolderJson(g_choiceFolderInfo.id))
+        tagLi.remove()   
 }
-
-function getJsonFoldeById(parentId)
-{
-    for(i = 0; g_jsonDirInfo[i]; i++)
+function unMoveFolder(obj)
+{     
+    par = getParentTagLi(obj)   
+    if(!par)
+        return false  
+    console.log("unMoveFolder")
+    console.log(par.id)
+    var objLi = document.getElementById(par.id)
+    var tagLi = getParentTagLi(objLi)
+    if(!tagLi)
+        return 
+    if(unMovFolderJson(par.id))
     {
-        if( g_jsonDirInfo[i].id == parentId)
-        {
-            return g_jsonDirInfo[i]
-        }
-    }
-    return 0
-}
-
-var swapItems = function(arr, index1, index2) {
-    var temp = arr[index2]
-    arr[index2] = arr[index1]
-    arr[index1] = temp
-    return arr;
-};
-
-function sortThisFolder(parentId, down)  //将点击的项移动到第一位
-{ 
-    parentId = Math.abs(parentId)
-    var jsonFile = 0 
-    var limit = g_jsonDirInfo.length -1
-    for(var index in g_jsonDirInfo)
-    {
-        if( g_jsonDirInfo[index].id == parentId && index > 0 && index < limit)
-        { 
-            if(!down)
-            { 
-              g_jsonDirInfo = swapItems(g_jsonDirInfo, index,  Math.abs(index) - 1); 
-            }else
-            {                
-              g_jsonDirInfo = swapItems(g_jsonDirInfo, index,  Math.abs(index) + 1); 
-            }
-            upDirJson()
-            return true
-        }
-    } 
+        tagLi.remove() 
+        return  true
+    }   
     return false
 }
-
-
-//排序li
-function sortHttpLi(parentNode, chileId, upDown)
-{     
-    g_choiceDirObj = 0
-    loadFolder(g_jsonDirInfo) 
-    var lis = document.getElementById(chileId)
-    selectFolde(lis, true) 
+function deleteFolder(obj)
+{  
+    par = getParentTagLi(obj)   
+    if(!par)
+        return false  
+    console.log("deleteFolder")
+    console.log(par.id)    
+    var objLi = document.getElementById(par.id)
+    var tagLi = getParentTagLi(objLi)
+    if(!tagLi)
+        return 
+    if(delFolderJson(par.id))
+    {
+        tagLi.remove() 
+        return  true
+    }   
+    return false 
 }
-
-
-//----选择文档类型
-function getFolderId(obj)
+   
+//移动html li
+function insertAfter(newEl, targetEl)
+{
+    var parentEl = targetEl.parentNode;
+            
+    if(parentEl.lastChild == targetEl)
+    {
+        parentEl.appendChild(newEl);
+    }else
+    {
+        parentEl.insertBefore(newEl,targetEl.nextSibling);
+    }            
+}
+//排序li
+function sortHttpLi(thisId, changeId)
+{       
+     A = document.getElementById(thisId);
+     B = document.getElementById(changeId); 
+    insertAfter(B, A);
+}
+ 
+//----获取选择类型
+function getParentDiv(obj)
 {
     if(!obj)
         return obj
@@ -380,60 +213,132 @@ function getFolderId(obj)
     {     
         if(par.id != "")
             return par;
-        return getFolderId(par)
+        return getParentDiv(par)
     }
     return par;
 }
-function setChoiceFolderType(obj)
+function getParentTagLi(obj)
 {
-    par = getFolderId(obj) 
+    if(!obj)
+        return obj
+    if(obj.tagName == "LI")
+        return obj
+    var par = obj.parentNode
+    if(par && par.tagName != "LI")
+    {      
+        return getParentTagLi(par)
+    } 
+    return par;
+}
+//--menu
+function setChoiceDivType(obj)
+{
+    par = getParentDiv(obj)  
     if(!par)
         return 0 
     switch(par.id)
     {
         case "loadFolder":
         {
-            g_choiceFolderType = FolderType.project
-            selectFoldeTypeStatu(par) 
+            g_choiceFolderType = FolderType.project 
+            list_setOpenDir(g_proName) 
         }break;
         case "nearOpen":
-        {
-            g_choiceFolderType = FolderType.nearView
-            selectFoldeTypeStatu(par) 
-        }break;
-        case "folder-Container":
-        {
-            g_choiceFolderType = FolderType.document
-        }break;
-        case "search-Container":
-        {
-            g_choiceFolderType = FolderType.file
-        }break;
-        case "flexible-right":
-        {
-            g_choiceFolderType = FolderType.detail 
-        }break;
+        { 
+            g_choiceFolderType = FolderType.nearView 
+            list_setOpenDir("") 
+        }break; 
         case "crash":
-        {
+        { 
             g_choiceFolderType = FolderType.recycleBin
-            selectFoldeTypeStatu(par) 
+            list_setOpenDir("") 
         }break;
         default:
             return 0;
     }  
+    //删除或还原
+    if(obj.className.indexOf('icon_delete') != -1 || obj.className.indexOf('icon_unCrash') != -1) 
+        return g_choiceFolderType;
+
+    //重选文件项
+    unSelectDivStatu(g_choiceTag.B)
+    unSelectDivStatu(g_choiceTag.A)
+    g_choiceTag.A = par.id
+    selectDivStatu(par.id)  
     return g_choiceFolderType
 }
- 
-function selectFoldeTypeStatu(obj)
-{     
-    obj.className = "selected"
-    if(g_choiceFolderLi != "")
+
+//--folder
+function setChoiceFolderLiType(obj)
+{
+    par = getParentTagLi(obj)   
+    if(!par)
+        return false  
+    console.log("setChoiceFolderLiType")
+    console.log(par.id)
+    if(getParentDiv(par).id != "folder-Container")
     { 
-        oldTagLi = g_choiceFolderLi
-        g_choiceFolderLi = obj
-        oldTagLi.className = "";
-    }else
+        return false
+    }  
+    //直接切换
+    if(g_choiceFolderType == FolderType.nearView || g_choiceFolderType == FolderType.recycleBin )
     {
-        g_choiceFolderLi = obj
+        onLoadFolder()
     }
+    g_choiceFolderType =  FolderType.document
+    unSelectDivStatu(g_choiceTag.A)
+    unSelectDivStatu(g_choiceTag.B)
+    g_choiceTag.B = par.id
+    selectDivStatu(par.id)    
+    return g_choiceFolderType
 }
+
+//--file
+function setChoiceFileLiType(obj)
+{
+    par = getParentTagLi(obj)   
+    if(!par)
+        return false  
+    if(getParentDiv(par).id != "search-Container")
+    { 
+        return false
+    }  
+    g_choiceFolderType =  FolderType.file
+    console.log("setChoiceFileLiType")
+    console.log(par.id)
+    unSelectLiStatu(g_choiceTag.C) 
+    g_choiceTag.C = par.id 
+    selectLiStatu(par.id)
+    return true
+}
+ 
+//--------------------选中菜单状态
+//选中与否 在添加节点后其内存位置会变化所以要分开来
+function unSelectDivStatu(divId)
+{
+    var obj = document.getElementById(divId) 
+    if(!obj)
+        return
+    obj.className =  "" 
+} 
+function selectDivStatu(divId)
+{      
+    var obj = document.getElementById(divId) 
+    if(!obj)
+        return
+    obj.className = "selected"
+}
+function unSelectLiStatu(divId)
+{   
+    obj = document.getElementById(divId)  
+    if(!obj)
+        return
+    obj.className = ""  
+}
+function selectLiStatu(divId)
+{ 
+    obj = document.getElementById(divId)
+    if(!obj)
+        return 
+    obj.className = "fileSelected" 
+} 

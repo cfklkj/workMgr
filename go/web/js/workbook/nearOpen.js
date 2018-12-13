@@ -103,7 +103,7 @@ function getNearFileJson(pId, cId)
     return null;
 }
 
-function loadNearFile()
+function loadNearFile1()
 {  
     var setDefault = false
     g_defaultFileKey = 0

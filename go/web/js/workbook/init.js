@@ -40,7 +40,7 @@ function WorkBookInit(){
 function InitGlobalCtrl()
 {    
     g_loadFolder = document.getElementById('loadFolder'); 
-    g_loadFolder.onclick = onLoadFolders
+    g_loadFolder.onclick = onLoadFolder
     m_create = document.getElementById('create'); 
     m_create.onclick = onCreate
     g_folderContainer = document.getElementById('folder-Container'); 

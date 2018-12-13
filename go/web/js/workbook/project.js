@@ -49,17 +49,12 @@ function newPro(proName)
 
 function onDelete()
 { 
-    selectFolde(this)
-    g_choiceDirObj.thisType="crash"
-
-    initFileInfo();
-    loadDeleteFolde();
+    initFolderInfo(); 
+    loadDeleteFolder();
     loadDeleteFile();
 }
 function onNearOpen()
-{
-    selectFolde(m_nearOpen)
-    g_choiceDirObj.thisType="unCrash"
-    initFileInfo();
+{  
+    initFolderInfo();
     loadNearFile();
 } 

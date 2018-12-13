@@ -28,11 +28,14 @@ function list_setOpenDir(innerText)
 }
 function list_upDirName()
 { 
-    var span = g_choiceFolderLi.getElementsByTagName("span") 
+    obj = document.getElementById(g_choiceFolderInfo.id)
+    var span = obj.getElementsByTagName("span") 
     var input = g_listSearch.getElementsByTagName("input")
-    if(span[0].innerText != input[0].value && upDirJson(input[0].value))
+    if(span[0].innerText != input[0].value)
     {             
-        span[0].innerText = input[0].value         
+        g_choiceFolderInfo.name = input[0].value  
+        span[0].innerText = input[0].value  
+        upDirJson()       
     }  
 }
 
@@ -75,3 +78,7 @@ function onListExport()
 }
  
 
+function setChoiceFileText(value)
+{
+    g_topFileName.value = value
+}

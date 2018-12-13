@@ -13,6 +13,14 @@ function getStyle(obj, attr)
     }
   
 } 
+function limitFolderHeigh()
+{ 
+    var height = parseInt(getStyle(g_folderContainer, "height")) 
+    if(height > document.body.clientHeight / 2)
+    { 
+        g_folderContainer.style.height =  document.body.clientHeight / 2;
+    }
+}
 function onDragMid(Y)
 { 
     var widthLeft =  parseInt(getStyle(g_flexibleLeft, "width"))

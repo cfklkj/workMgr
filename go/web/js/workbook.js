@@ -2,8 +2,10 @@
 document.write('<script type="text/javascript" src="js/lib/FlyWeb.js"></script>')  //引入js 
 document.write('<script type="text/javascript" src="js/workbook/init.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/drag.js"></script>')   
+document.write('<script type="text/javascript" src="js/workbook/folderJson.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/folder.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/project.js"></script>')  
+document.write('<script type="text/javascript" src="js/workbook/fileJson.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/file.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/nearOpen.js"></script>')   
 document.write('<script type="text/javascript" src="js/workbook/listSearch.js"></script>')   
@@ -51,8 +53,8 @@ function Post(){
         this.request("post",serverUrl + '/Workbook&keepTxt', data, onShowStatu)
     }
     //删除文件
-    this.deleteFile = function(pId, cId){ 
-        var data = {"parentId":pId, "fileId": cId, "unrecognizable":false}  
+    this.deleteFile = function(cId){ 
+        var data = {"fileId": cId, "unrecognizable":false}  
         data.ProInfo = g_projectJson 
         this.request("post",serverUrl + '/Workbook&deleteFile', data, onShowStatu) 
     }
@@ -126,6 +128,8 @@ function onKeydown()
                     list_UpProject(); 
                 }else if(g_choiceFolderType == FolderType.document){
                     list_upDirName() 
+                }else{
+                    alert("need select project or document!")
                 }            
                 
             }
@@ -163,43 +167,22 @@ if (btnNum==2)
     //console.log("您点击了鼠标右键！")
     if(event.srcElement.id == "menu_moveFolder")
     {
+        if(g_choiceFolderType = FolderType.document)
+        {
+            if(sortThisFolder(g_choiceDirObj.par))
+             {
+                g_folderContainer.prepend(par.parentNode)
+             }
+            alert("请先选择需要移动的目录!")
+            return ;
+        }
        // console.log("您点击了鼠标右键！")
-        if(sortThisFolder(g_choiceDirObj.par))
-         {
-            g_folderContainer.prepend(par.parentNode)
-         }
     }
 
 }
 else if(btnNum==0)
-{
-    console.log("event")
-    console.log(event)
-    var choiceType = setChoiceFolderType(event.target)  
-    if(!choiceType || choiceType == FolderType.detail)
-    {
-        return;
-    }    
-    console.log("event2")
-    if(selectFolde(event.target.id))  //选择文件夹
-    { 
-        console.log("event3")
-        list_setOpenDir(event.target.innerText) 
-        if(loadFiles(g_choiceFolderId))
-        { 
-          selectFileStatu(g_choiceFileInfo.id)
-        }
-        selectFoldeStatu(event.target)
-        return;
-    }
-    console.log("event4")
-    if(selectFileAct(event.target.id))  //选择文件
-    {
-        selectFileStatu(event.target.id)
-        return;
-    }
-    //---old
-    return
+{  
+    //拖拽边界
     if(event.srcElement == g_dragMide)
     {
         g_dragMove = 1; 
@@ -210,99 +193,93 @@ else if(btnNum==0)
         g_dragMove = 2; 
         return;
     }
+    //选择菜单
+    setChoiceDivType(event.target)  
+    //移动目录位置
     var par = getParentObj(event.srcElement)
     if(event.srcElement.id == "menu_moveFolder")
     { 
-        if(sortThisFolder(g_choiceDirObj.par.id))
-         { 
-            sortHttpLi(g_folderContainer, g_choiceDirObj.par.id)
-         }
-         return
-    }
-    if(event.srcElement.className.indexOf('editC') != -1 || event.srcElement.className.indexOf('editD') != -1)  //删除目录
-    { 
-        var id =  Math.abs(g_choiceDirObj.par.id)
-        if(id >100 && id < 200)
+        console.log("document:"+FolderType.document)
+        console.log("file:"+FolderType.file)
+        console.log("choice--:"+g_choiceFolderType )
+        if(g_choiceFolderType == FolderType.document)  //目录
         {
-        }else{          
-            try{
-                par.id
-            } catch(err){
-                alert("请选择文件夹后再操作")
-                return
-            }
-        }
-        if(g_choiceDirObj.id > 100)
-        { 
-            g_isDeleteFolder = true;
-            moveFolder(g_choiceDirObj.id)             
-            recodeChangeFolderContianer(g_choiceDirObj.par) 
-            selectDefualtFolde(g_choiceDirIndex) 
-        }else if(par.id > 100)
-        {
-            moveFolder(par.id)
-            recodeChangeFileContianer(par)
-            selectDefualtFile(g_choiceFileIndex)
-            loadFolder(g_jsonDirInfo)
-        }
-        return
-    }
-    //alert("您点击了鼠标左键！")
-    if(!par || !par.id)
-        return; 
-    if(event.srcElement.className.indexOf('icon_delete') != -1)
-    { 
-        if(par && par.id > 100) //目录
-        { 
-            deleteFolder(par)            
-        }else{
-            if(g_choiceDirObj.thisType == "unCrash")
-            { 
-                moveFile(par)     
-                recodeChangeFolderContianer(par) 
-                selectDefualtFolde(g_choiceDirIndex)
-            }else  //彻底删除
-            { 
-                deleteFile(par)
-            } 
-        }
-        selectDefualtFile(g_choiceFileIndex)
-        return
-    }
-    if(event.srcElement.className.indexOf('icon_unCrash') != -1) //还原
-    {
-        if(par.id > 100) //目录
-        { 
-             unMoveFolder(par)            
-        }else{
-             unMoveFile(par);
-        }
-        selectDefualtFile(g_choiceFileIndex)
-        return
-    }
-    if(par.id > 99 && par.id < 1000) //第一层目录
-    { 
-        if(par.className == "slidebar-content")
-        {
-            if(g_choiceDirObj.par == g_loadFolder)
+            var upIndex = getLiUpIndex(g_folderContainer, g_choiceFolderInfo.id)
+            if(!upIndex)
             {
-                list_UpProject()
-            }
-            selectFolde(par)
-        }
-       return;
-    } else if(par.id < -100) //文件目录
-    {  
-        if(selectFile(par) && g_choiceDirObj.par.parentNode.parentNode == g_folderContainer)
-        { 
-            AddNearOpen(par.id,  g_choiceFileObj.id)
-            if(sortThisFileFolder(par.id, g_choiceFileObj.id))
-             {
-                g_searchContainer.prepend(par.parentNode)
+                return;
+            } 
+            if(sortFolderJson(g_choiceFolderInfo.id, upIndex))
+             { 
+                sortHttpLi(g_choiceFolderInfo.id, upIndex)
              }
+            return ;
+        }
+        if(g_choiceFolderType == FolderType.file)  //文件
+        {
+            var upIndex = getLiUpIndex(g_searchContainer, g_choiceFileInfo.id)
+            if(!upIndex)
+            {
+                return;
+            } 
+            if(sortFileJson(g_choiceFileInfo.id, upIndex))
+             { 
+                sortHttpLi(g_choiceFileInfo.id, upIndex)
+             }
+            return ;
         }
         return
+    }   
+    //删除
+    if(event.target.className.indexOf('icon_delete') != -1) 
+    {
+        console.log("delete")
+        console.log(g_choiceFolderType)
+        switch(g_choiceFolderType)
+        { 
+            case FolderType.project://删除目录
+            {  
+                moveFolder(event.target)
+            }break;
+            case FolderType.recycleBin://彻底删除目录
+            {  
+               if(!deleteFolder(event.target))
+               {
+                  deleteFile(event.target) 
+               } 
+            }break;
+            default: //删除 文件
+            {
+                moveFile(event.target) 
+            }break;
+        } 
+        return;
+    } 
+    //还原
+    if(event.target.className.indexOf('icon_unCrash') != -1) //还原
+    {  
+        if(!unMoveFolder(event.target))
+        { 
+            unMoveFile(event.target); 
+        }
+        return;
+    }    
+    //选择文件夹
+    if(setChoiceFolderLiType(event.target))    
+    { 
+        if(selectFoldeJson(g_choiceTag.B) && loadFiles())  //选择文件夹
+        {    
+            g_choiceTag.C = g_choiceFileInfo.id
+            selectLiStatu(g_choiceFileInfo.id)  
+        }  
+        return;
     }
+    //选择文件
+    if(setChoiceFileLiType(event.target))  //选择文件
+    {  
+        selectFile(g_choiceTag.C) 
+        return;
+    } 
 }
 else if(btnNum==1)
 {
@@ -372,15 +349,7 @@ function onCreate()
         g_creatUl.style.visibility = "visible"
     } 
 } 
-//选择事件---------------------------------
-function unselectFile()
-{
-    if(g_choiceFileObj)
-    { 
-        g_choiceFileObj.par.className = g_choiceFileObj.oldClass  
-    }
-    g_choiceFileObj = 0
-}
+//选择事件--------------------------------- 
 function fileIndex(parent)
 {
     var par = parent.parentNode
@@ -429,13 +398,6 @@ function onShowStatu(msgInfo)
     g_searchValue.innerText = msgInfo
 }
  
-function initFileInfo()
-{    
-    g_searchContainer.innerHTML = "" 
-    g_detailValue.innerText = ""
-    g_topFileName.value = ""
-}
-
 function recodeChangeFileContianer(parent)
 {
     if(g_choiceFileIndex == 0 || (g_choiceFileIndex > 0 && g_choiceFileIndex == fileIndex(parent)))

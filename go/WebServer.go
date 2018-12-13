@@ -31,7 +31,8 @@ func init() {
     runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
-func main() {    
+func main() {     
+    webserver()
     lenth :=  len(os.Args)
     for i := 1; i < lenth; i++ { 
         if(os.Args[i] == "webServer"){
