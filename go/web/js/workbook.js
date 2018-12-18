@@ -274,9 +274,13 @@ else if(btnNum==0)
         }  
         return;
     }
+    console.log("g_choiceFolderType")
+    console.log(g_choiceFolderType)
     //选择文件
     if(setChoiceFileLiType(event.target))  //选择文件
     {  
+        if(selectNearFile(event.target))
+            return;
         selectFile(g_choiceTag.C) 
         return;
     } 

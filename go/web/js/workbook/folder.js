@@ -58,7 +58,7 @@ function loadFolder(jsonInfo)
 function addFolder(dirID, dirName)
 {
     Ta = '\
-    <li draggable="true"  ondragover="InFolder(event)" id=' + dirID + ' value= ' + dirName + '>\
+    <li draggable="true"  ondragover="InFolder(event)" ondragleave="OutFolder(event)" id=' + dirID + ' value= ' + dirName + '>\
         <div class="slidebar-content">\
             <div class="sidebar-item search-resulMove" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">\
                 <i class="arrow arrowB" style="visibility: hidden;"></i>\
@@ -92,13 +92,16 @@ function loadDeleteFolder()
     var jsonInfo = getFolderJsonObj(FolderType.document) 
     isUpJson = false
     for(item in jsonInfo){   
-        if (typeof(jsonInfo[item].id) != 'number')
+        if (!jsonInfo[item] || typeof(jsonInfo[item].id) != 'number')
         {
              isUpJson = true
             deleteJsonNode(jsonInfo, item);
             continue; 
         }
-        addCrashFolde(jsonInfo[item].id, jsonInfo[item].name, "永久删除") 
+        if(jsonInfo[item].type == FolderType.recycleBin)
+        {
+            addCrashFolde(jsonInfo[item].id, jsonInfo[item].name, "永久删除") 
+        }        
     } 
     if(isUpJson)     
     {
@@ -145,18 +148,22 @@ function moveFolder(obj)
     if(movFolderJson(g_choiceFolderInfo.id))
         tagLi.remove()   
 }
-function unMoveFolder(obj)
+function unMoveFolder(obj, fileParent)
 {     
-    par = getParentTagLi(obj)   
-    if(!par)
-        return false  
+    if(!fileParent)
+    { 
+        par = getParentTagLi(obj)   
+        if(!par)
+            return false  
+        fileParent = par.id
+    } 
     console.log("unMoveFolder")
-    console.log(par.id)
-    var objLi = document.getElementById(par.id)
+    console.log(fileParent)
+    var objLi = document.getElementById(fileParent)
     var tagLi = getParentTagLi(objLi)
     if(!tagLi)
         return 
-    if(unMovFolderJson(par.id))
+    if(unMovFolderJson(fileParent))
     {
         tagLi.remove() 
         return  true
@@ -236,6 +243,8 @@ function setChoiceDivType(obj)
     par = getParentDiv(obj)  
     if(!par)
         return 0 
+        console.log("setChoiceDivType")
+        console.log(par.id)
     switch(par.id)
     {
         case "loadFolder":
@@ -252,6 +261,11 @@ function setChoiceDivType(obj)
         { 
             g_choiceFolderType = FolderType.recycleBin
             list_setOpenDir("") 
+        }break;
+        case "flexible-right":
+        { 
+            g_choiceFolderType = FolderType.detail
+            return g_choiceFolderType;
         }break;
         default:
             return 0;
@@ -284,8 +298,9 @@ function setChoiceFolderLiType(obj)
     if(g_choiceFolderType == FolderType.nearView || g_choiceFolderType == FolderType.recycleBin )
     {
         onLoadFolder()
+    }else{ 
+        g_choiceFolderType =  FolderType.document
     }
-    g_choiceFolderType =  FolderType.document
     unSelectDivStatu(g_choiceTag.A)
     unSelectDivStatu(g_choiceTag.B)
     g_choiceTag.B = par.id
@@ -302,7 +317,14 @@ function setChoiceFileLiType(obj)
     if(getParentDiv(par).id != "search-Container")
     { 
         return false
-    }  
+    }   
+    if(g_choiceFolderType == FolderType.nearView)
+    {
+        return true;
+    }
+    else{ 
+        g_choiceFolderType =  FolderType.document
+    }
     g_choiceFolderType =  FolderType.file
     console.log("setChoiceFileLiType")
     console.log(par.id)

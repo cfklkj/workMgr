@@ -7,6 +7,7 @@ g_choiceFileLi = "" //选择的标签
 g_isChoiceFile = false  //是否处于选择中
 g_moveInFolder = -1;
  
+g_nearFileLimit = 10
 //--del g_choiceFolderId
 //文件
 function onLoadFileJson()
@@ -53,35 +54,33 @@ function loadFiles()
 //--最近浏览
 function loadNearFile()
 {     
-    jsonObj = getFileJsonObj(FolderType.nearView) 
+    jsonObj = getFileJsonObj() 
     isUpJson = false
-    for(item in jsonObj){   
+    var dates=new Date(); 
+    viewTime = dates.getTime();
+    var viewItem = [] 
+    for(var item = 0 ; item < jsonObj.length; item ++){   
         if (typeof(jsonObj[item].id) != 'number')
         {
              isUpJson = true
             deleteJsonNode(jsonObj, item);
             continue; 
+        } 
+        if(jsonObj[item].viewTime)
+        {
+            viewItem[viewItem.length] = jsonObj[item]  
         }
-        addNearViewFile(jsonObj[item].id, jsonObj[item].name)   
     } 
+    viewItem.sort()
+    for(item  = 0; item < g_nearFileLimit; item ++)
+    {
+        addNearViewFile(viewItem[item].id, viewItem[item].name)  
+    }
     if(isUpJson)     
     {
         upFileJson()
     }
-}
-function addNearFile(jsonInfo)
-{ 
-    addFileJson(FolderType.nearView, jsonInfo)
-}
-function addCrashFile(jsonInfo)
-{     
-    addFileJson(FolderType.recycleBin, jsonInfo)
 } 
-function addNewFile(id, jsonInfo, isUp)
-{
-    addFileJson(id, jsonInfo)
-} 
-  
 //回收站
 function loadDeleteFile()
 { 
@@ -105,8 +104,31 @@ function loadDeleteFile()
     }      
 }
     
+function selectNearFile(obj)
+{
+    console.log("selectNearFile")
+    if(g_choiceFolderType != FolderType.nearView)
+        return false 
+    par = getParentDiv(obj) 
+    console.log(par.id)
+    jsonInfo = getFileJsonObj(g_choiceFolderInfo.id)
+    for( i = 0; jsonInfo[i]; i++)
+    {   
+        if(jsonInfo[i].id == par.id)
+        {
+            g_choiceFileInfo = jsonInfo[i]  
+            break;
+        }
+    }  
+    setChoiceFileText(g_choiceFileInfo.name) 
+    g_post.getTxt(g_choiceFileInfo.id)  
+    return true;
+
+}
 function selectFile(choiceFileId)
 {  
+    console.log("selectFile")
+    console.log(choiceFileId)
     if(choiceFileId == "")
        return false;
     if(g_choiceFileInfo.id  == choiceFileId)
@@ -116,8 +138,9 @@ function selectFile(choiceFileId)
     {   
         if(jsonInfo[i].id == choiceFileId)
         {
-            g_choiceFileInfo = jsonInfo[i]
-            addNearFile(g_choiceFileInfo)
+            g_choiceFileInfo = jsonInfo[i] 
+            var dates=new Date(); 
+            jsonInfo[i].viewTime = dates.getTime()
             break;
         }
     } 
@@ -194,22 +217,40 @@ function search_UpFileName()
 
 function InFolder(event)
 {
-    event.preventDefault(); 
-    var par = getParentObj(event.target)
-    g_moveInFolder = par.id 
+    parId = getParentDiv(event.target).id; 
+    if(g_choiceFolderInfo.id == parId)
+     {
+        g_moveInFolder = 0
+        return;
+     }   
+    event.preventDefault();  
+    if(g_moveInFolder != parId)
+    {
+        console.log(parId)
+        g_moveInFolder = parId
+        console.log("InFolder")
+        console.log(g_moveInFolder)
+    }
+}
+function OutFolder(event)
+{  
+    g_moveInFolder = 0
 }
 function FileLeave(event)
 {
     event.preventDefault();   
-    if(g_moveInFolder == g_choiceFolderInfo.id)
+    if(g_moveInFolder < 1 || g_moveInFolder == g_choiceFolderInfo.id)
         return;
+    moveIn = g_moveInFolder
+    g_moveInFolder = 0;
+    console.log("FileLeave--:"+moveIn);
         console.log(event.target.id)
     jsonInfo = getFileJsonObj()
     for(var index = 0; index < jsonInfo.length; index ++)
     {
         if(jsonInfo[index] && jsonInfo[index].id == event.target.id)
         {
-            jsonInfo[index].folderId = g_moveInFolder
+            jsonInfo[index].folderId = moveIn
             break;
         }
     }
@@ -286,7 +327,10 @@ function unMoveFile(obj)
     {
         if(fileJson[item].id == tagLi.id)
         {       
+            console.log("unMoveFile")
+            console.log(fileJson[item])
             fileJson[item].type = FolderType.file
+            unMoveFolder(null, fileJson[item].folderId)
             upFileJson()
             tagLi.remove()
             break;
