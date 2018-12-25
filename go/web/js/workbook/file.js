@@ -8,6 +8,9 @@ g_isChoiceFile = false  //是否处于选择中
 g_moveInFolder = -1;
  
 g_nearFileLimit = 10
+
+g_isFirstLoad = true
+g_isChange = false
 //--del g_choiceFolderId
 //文件
 function onLoadFileJson()
@@ -21,18 +24,17 @@ function upFileJson()
 
 //--文档
 function loadFiles()
-{     
+{      
+    g_isChange = false
     parentId =  g_choiceFolderInfo.id
     g_searchContainer.innerHTML = ""
     jsonInfo = getFileJsonObj() 
-    g_choiceFileInfo = []
-    console.log("loadFiles：lenth="+jsonInfo.length)
-    console.log(jsonInfo) 
-    var isUpJson = false
-    for(var item =0 ; item < jsonInfo.length; item ++)
-    {    
-        console.log(jsonInfo[item])
-        if(!jsonInfo[item] ||  typeof(jsonInfo[item].id) != 'number' || jsonInfo[item].folderId != parentId || jsonInfo[item].type != FolderType.file)
+    g_choiceFileInfo = [] 
+    var isUpJson = false 
+    g_isChange = true
+    for(var item =0 ; g_isChange && item < jsonInfo.length; item ++)
+    {     
+        if(!jsonInfo[item] || jsonInfo[item].folderId != parentId || jsonInfo[item].type != FolderType.file)
        {
            if (typeof(jsonInfo[item].id) != 'number')
            {
@@ -40,14 +42,13 @@ function loadFiles()
                deleteJsonNode(jsonInfo, item);
            }
            continue;
-       }    
-            console.log("add")
+       }     
         addFile(jsonInfo[item].id, jsonInfo[item].name)    
     } 
     if(isUpJson)
     {
         upFileJson()
-    }
+    } 
     return i > 0
 } 
 
@@ -105,12 +106,10 @@ function loadDeleteFile()
 }
     
 function selectNearFile(obj)
-{
-    console.log("selectNearFile")
+{ 
     if(g_choiceFolderType != FolderType.nearView)
         return false 
-    par = getParentDiv(obj) 
-    console.log(par.id)
+    par = getParentDiv(obj)  
     jsonInfo = getFileJsonObj(g_choiceFolderInfo.id)
     for( i = 0; jsonInfo[i]; i++)
     {   
@@ -126,9 +125,7 @@ function selectNearFile(obj)
 
 }
 function selectFile(choiceFileId)
-{  
-    console.log("selectFile")
-    console.log(choiceFileId)
+{   
     if(choiceFileId == "")
        return false;
     if(g_choiceFileInfo.id  == choiceFileId)
@@ -170,8 +167,7 @@ function selectDefualtFile(index)
 } 
  
 function onAddFile()
-{    
-    console.log(g_choiceFolderType)
+{     
     if(g_choiceFolderType != FolderType.document && g_choiceFolderType != FolderType.file)
     {
         alert("请选择文件夹后再操作！")
@@ -225,11 +221,8 @@ function InFolder(event)
      }   
     event.preventDefault();  
     if(g_moveInFolder != parId)
-    {
-        console.log(parId)
-        g_moveInFolder = parId
-        console.log("InFolder")
-        console.log(g_moveInFolder)
+    { 
+        g_moveInFolder = parId 
     }
 }
 function OutFolder(event)
@@ -242,9 +235,7 @@ function FileLeave(event)
     if(g_moveInFolder < 1 || g_moveInFolder == g_choiceFolderInfo.id)
         return;
     moveIn = g_moveInFolder
-    g_moveInFolder = 0;
-    console.log("FileLeave--:"+moveIn);
-        console.log(event.target.id)
+    g_moveInFolder = 0; 
     jsonInfo = getFileJsonObj()
     for(var index = 0; index < jsonInfo.length; index ++)
     {
@@ -258,16 +249,7 @@ function FileLeave(event)
 }
 function addNearViewFile(spanID, spanValue)
 {  
-    Ta = '\
-    <li>\
-        <div class="search-content" id=' + spanID + ' value = ' + spanValue + '>\
-            <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
-                <i class="icon-Edit editA"></i>\
-                <span class="search-item-text">' + spanValue + '</span>\
-            </div>\
-        </div>\
-    </li>'
-    g_searchContainer.innerHTML += Ta
+    addFile(spanID, spanValue) 
 }
 function addCrashFileLi(spanID, spanValue)
 { 
@@ -303,10 +285,8 @@ function sortThisFileFolder(parentId, fileId)  //将点击的项移动到第一�
     return false
 }
 function moveFile(obj)
-{
-    console.log("moveFile")
-    var tagLi = getParentTagLi(obj) 
-    console.log(tagLi.id)
+{ 
+    var tagLi = getParentTagLi(obj)  
     var fileJson = getFileJsonObj(g_choiceFolderInfo.id)  
     for(item in fileJson)
     {
@@ -326,9 +306,7 @@ function unMoveFile(obj)
     for(item in fileJson)
     {
         if(fileJson[item].id == tagLi.id)
-        {       
-            console.log("unMoveFile")
-            console.log(fileJson[item])
+        {        
             fileJson[item].type = FolderType.file
             unMoveFolder(null, fileJson[item].folderId)
             upFileJson()
@@ -339,8 +317,7 @@ function unMoveFile(obj)
 } 
 
 function deleteFile(obj)
-{
-    console.log("deleteFile")
+{ 
     var tagLi = getParentTagLi(obj) 
     var jsonInfo = getFileJsonObj(FolderType.recycleBin) 
     for(item in jsonInfo)
@@ -385,10 +362,7 @@ function showTxt(txtInfo)
 
 
 function onKeeptxt()
-{  
-    console.log("onKeepTxt")
-    console.log(g_choiceFolderType)
-    console.log(FolderType.detail)
+{   
     if(g_choiceFolderType != FolderType.detail )
         return false;      
     g_post.keepTxt(g_choiceFileInfo.id, g_detailValue.innerHTML) 

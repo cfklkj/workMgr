@@ -116,8 +116,7 @@ function onKeydown()
     } 
     else{ 
         if(event.keyCode == 13)
-        {
-            console.log(event)
+        { 
             if(document.activeElement.id == "top-fileName")
             {
                 search_UpFileName() 
@@ -138,8 +137,7 @@ function onKeydown()
 } 
 function onMouseUp()
 {
-    var btnNum = event.button;
-   // console.log("eventUp %d", btnNum)
+    var btnNum = event.button; 
    if(btnNum==0)
    { 
         g_dragMove = 0; 
@@ -175,8 +173,7 @@ if (btnNum==2)
              }
             alert("请先选择需要移动的目录!")
             return ;
-        }
-       // console.log("您点击了鼠标右键！")
+        } 
     }
 
 }
@@ -198,10 +195,7 @@ else if(btnNum==0)
     //移动目录位置
     var par = getParentObj(event.srcElement)
     if(event.srcElement.id == "menu_moveFolder")
-    { 
-        console.log("document:"+FolderType.document)
-        console.log("file:"+FolderType.file)
-        console.log("choice--:"+g_choiceFolderType )
+    {  
         if(g_choiceFolderType == FolderType.document)  //目录
         {
             var upIndex = getLiUpIndex(g_folderContainer, g_choiceFolderInfo.id)
@@ -232,9 +226,7 @@ else if(btnNum==0)
     }   
     //删除
     if(event.target.className.indexOf('icon_delete') != -1) 
-    {
-        console.log("delete")
-        console.log(g_choiceFolderType)
+    { 
         switch(g_choiceFolderType)
         { 
             case FolderType.project://删除目录
@@ -273,9 +265,7 @@ else if(btnNum==0)
             selectLiStatu(g_choiceFileInfo.id)  
         }  
         return;
-    }
-    console.log("g_choiceFolderType")
-    console.log(g_choiceFolderType)
+    } 
     //选择文件
     if(setChoiceFileLiType(event.target))  //选择文件
     {  
@@ -304,7 +294,7 @@ else
 }
 //显示删除图标
 function mouseenterFile(obj)
-{ 
+{  
     var tagI = obj.getElementsByTagName("i") 
     mouseleaveFile()
     g_deleteTagI.B = tagI

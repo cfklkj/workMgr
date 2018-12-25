@@ -43,9 +43,7 @@ function selectDefualtFolde(index)
 function loadFolder(jsonInfo)
 {
     if(!jsonInfo)
-        return;
-        console.log("loadFolder")
-        console.log(jsonInfo)
+        return; 
     g_folderContainer.innerHTML = ""  
     for( i = 0; jsonInfo[i] && jsonInfo[i].id; i++)
     {  
@@ -128,9 +126,7 @@ function onAddFolder()
         { 
             break;            
         }
-    }  
-    console.log("onAddFolder")
-    console.log(newNode)
+    }   
     addFolder(newNode.id, newNode.name)   
     limitFolderHeigh()
     var bObj = document.getElementById(newNode.id);
@@ -138,9 +134,7 @@ function onAddFolder()
     selectFoldeJson()
 }
 function moveFolder(obj)
-{    
-    console.log("moveFolder")
-    console.log(g_choiceFolderInfo.id)
+{     
     var objLi = document.getElementById(g_choiceFolderInfo.id)
     var tagLi = getParentTagLi(objLi)
     if(!tagLi)
@@ -156,9 +150,7 @@ function unMoveFolder(obj, fileParent)
         if(!par)
             return false  
         fileParent = par.id
-    } 
-    console.log("unMoveFolder")
-    console.log(fileParent)
+    }  
     var objLi = document.getElementById(fileParent)
     var tagLi = getParentTagLi(objLi)
     if(!tagLi)
@@ -174,9 +166,7 @@ function deleteFolder(obj)
 {  
     par = getParentTagLi(obj)   
     if(!par)
-        return false  
-    console.log("deleteFolder")
-    console.log(par.id)    
+        return false   
     var objLi = document.getElementById(par.id)
     var tagLi = getParentTagLi(objLi)
     if(!tagLi)
@@ -242,9 +232,7 @@ function setChoiceDivType(obj)
 {
     par = getParentDiv(obj)  
     if(!par)
-        return 0 
-        console.log("setChoiceDivType")
-        console.log(par.id)
+        return 0  
     switch(par.id)
     {
         case "loadFolder":
@@ -287,9 +275,7 @@ function setChoiceFolderLiType(obj)
 {
     par = getParentTagLi(obj)   
     if(!par)
-        return false  
-    console.log("setChoiceFolderLiType")
-    console.log(par.id)
+        return false   
     if(getParentDiv(par).id != "folder-Container")
     { 
         return false
@@ -320,14 +306,11 @@ function setChoiceFileLiType(obj)
     }   
     if(g_choiceFolderType == FolderType.nearView)
     {
-        return true;
+    //    return true;
     }
-    else{ 
-        g_choiceFolderType =  FolderType.document
-    }
-    g_choiceFolderType =  FolderType.file
-    console.log("setChoiceFileLiType")
-    console.log(par.id)
+    else{  
+        g_choiceFolderType =  FolderType.file
+    } 
     unSelectLiStatu(g_choiceTag.C) 
     g_choiceTag.C = par.id 
     selectLiStatu(par.id)
