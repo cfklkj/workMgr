@@ -278,6 +278,7 @@ function setChoiceFolderLiType(obj)
         return false   
     if(getParentDiv(par).id != "folder-Container")
     { 
+        g_choiceFolderType =  FolderType.document
         return false
     }  
     //直接切换

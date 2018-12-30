@@ -11,6 +11,7 @@ g_nearFileLimit = 10
 
 g_isFirstLoad = true
 g_isChange = false
+g_nearOpen = []  //最近打开
 //--del g_choiceFolderId
 //文件
 function onLoadFileJson()
@@ -33,7 +34,7 @@ function loadFiles()
     var isUpJson = false 
     g_isChange = true
     for(var item =0 ; g_isChange && item < jsonInfo.length; item ++)
-    {     
+    {      
         if(!jsonInfo[item] || jsonInfo[item].folderId != parentId || jsonInfo[item].type != FolderType.file)
        {
            if (typeof(jsonInfo[item].id) != 'number')
@@ -48,38 +49,28 @@ function loadFiles()
     if(isUpJson)
     {
         upFileJson()
-    } 
+    }  
+    g_isFirstLoad = false
     return i > 0
 } 
 
 //--最近浏览
-function loadNearFile()
-{     
-    jsonObj = getFileJsonObj() 
-    isUpJson = false
-    var dates=new Date(); 
-    viewTime = dates.getTime();
-    var viewItem = [] 
-    for(var item = 0 ; item < jsonObj.length; item ++){   
-        if (typeof(jsonObj[item].id) != 'number')
-        {
-             isUpJson = true
-            deleteJsonNode(jsonObj, item);
-            continue; 
-        } 
-        if(jsonObj[item].viewTime)
-        {
-            viewItem[viewItem.length] = jsonObj[item]  
-        }
+function sequence(a,b){    //排序
+            if (a.viewTime>b.viewTime) {
+                 return -1
+          }else if(a.viewTime<b.viewTime){
+                return 1
+            }else{
+                return 0
+           }
     } 
-    viewItem.sort()
-    for(item  = 0; item < g_nearFileLimit; item ++)
+function loadNearFile()
+{      
+    var viewItem = g_nearOpen 
+    viewItem = g_nearOpen.sort(sequence) 
+    for(item  = 0; item < viewItem.length &&  item < g_nearFileLimit; item ++)
     {
         addNearViewFile(viewItem[item].id, viewItem[item].name)  
-    }
-    if(isUpJson)     
-    {
-        upFileJson()
     }
 } 
 //回收站
@@ -135,9 +126,8 @@ function selectFile(choiceFileId)
     {   
         if(jsonInfo[i].id == choiceFileId)
         {
-            g_choiceFileInfo = jsonInfo[i] 
-            var dates=new Date(); 
-            jsonInfo[i].viewTime = dates.getTime()
+             g_choiceFileInfo = jsonInfo[i] 
+             addNearFile(g_choiceFileInfo)
             break;
         }
     } 
@@ -147,6 +137,26 @@ function selectFile(choiceFileId)
     return true;
 }
 
+function addNearFile(jsonInfo)
+{
+    var timestamp =Math.round(new Date() / 1000) 
+    for(var index = 0; index < g_nearOpen.length; index ++)
+    {
+        if(g_nearOpen[index].id == jsonInfo.id)
+        { 
+            g_nearOpen[index].viewTime = timestamp 
+            return;
+        }
+    } 
+    g_nearOpen.push(jsonInfo) 
+    try{ 
+         g_nearOpen[g_nearOpen.length ].viewTime = timestamp
+    }catch(err)
+    {
+        addNearFile(jsonInfo)
+    }
+
+}
 
 function selectDefualtFile(index)
 {    
@@ -396,7 +406,11 @@ function onCmdAct()
 function onChangeMode()
 {
     m_showWeb.innerHTML = "" 
+    try{ 
     JsonInfo = JSON.parse(g_detailValue.innerHTML)
+    }catch(err){
+        return
+    }
     if(JsonInfo)
     { 
         for(var chileLink in JsonInfo)
