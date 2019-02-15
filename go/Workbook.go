@@ -18,6 +18,12 @@ import(
 type ProjectInfo struct{
     ProName string
     ProPath string
+    Id      int
+}
+
+type ProHistory struct{
+   NearProp   ProjectInfo
+   ProInfos[] ProjectInfo
 }
 
 type C2SGETTXT struct{
@@ -53,51 +59,11 @@ type C2SPACKAGE struct{
 
 func OnWorkbook(res http.ResponseWriter, req *http.Request) { 
     req.ParseForm()
-    fmt.Println(req.URL.Path) 
+    fmt.Println(req.URL.Path)   
     if strings.Contains(req.URL.Path, "&ProInfo") { 
-        body, _ := ioutil.ReadAll(req.Body)
-        var  c2sProInfo  C2SPROINFO     
-        err := json.Unmarshal(body, &c2sProInfo)
-        if err != nil {
-            //   c.String(500, "decode json error")
-            io.WriteString(res, "decode json error")
-            return
-        }   
-        if(c2sProInfo.ProType == "new"){             
-            for{
-                setWorkbookPath(c2sProInfo.ProInfo.ProPath, c2sProInfo.ProName)
-                originalPath :=  c2sProInfo.ProInfo.ProPath + "\\" + c2sProInfo.ProName
-                err := os.Mkdir(originalPath, os.ModePerm)
-                if err != nil {
-                    fmt.Println(err)
-                }else{ 
-                   break;   
-                }              
-                c2sProInfo.ProName += "1"
-             }
-             var proInfo ProjectInfo
-             proInfo.ProPath = webConfig.WorkBook.ProDir
-             proInfo.ProName = webConfig.WorkBook.ProName
-             data, _ := json.Marshal(&proInfo) 
-             io.WriteString(res, string(data))
-            return
-        }else if(c2sProInfo.ProType == "open"){ 
-            io.WriteString(res, OpenWorkBook())
-            return
-        }else if(c2sProInfo.ProType == "rename"){ 
-            //重命名文件夹
-            originalPath :=  c2sProInfo.ProInfo.ProPath + "\\" + c2sProInfo.ProInfo.ProName  + "\\" 
-            newPath := c2sProInfo.ProInfo.ProPath + "\\"  + c2sProInfo.ProName
-            err := os.Rename(originalPath, newPath) 
-            if err != nil {
-                io.WriteString(res, "重命名失败--可能存在同命项目")
-                return
-            } 
-            setWorkbookPath(c2sProInfo.ProInfo.ProPath, c2sProInfo.ProName)
-            io.WriteString(res, "ok")
-        }else{ 
-            io.WriteString(res, "error command")
-        }
+        body, _ := ioutil.ReadAll(req.Body) 
+        rst :=projectAct(body); 
+        io.WriteString(res, rst) 
     }else if strings.Contains(req.URL.Path, "&upJson") { 
         body, _ := ioutil.ReadAll(req.Body)
         var  c2sJsonInfo  C2SUPJSON     
@@ -111,34 +77,8 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
         io.WriteString(res, "act success")
     }else if strings.Contains(req.URL.Path, "&getJson") {      
         body, _ := ioutil.ReadAll(req.Body)
-        var  c2sJsonInfo  C2SGETJSON     
-        err := json.Unmarshal(body, &c2sJsonInfo)
-        if err != nil {
-            //   c.String(500, "decode json error")
-            io.WriteString(res, "decode json error -- "+ string(body))
-            return
-        }
-        if(c2sJsonInfo.JsonType == "Project"){ 
-           find,_ := exists(webConfig.WorkBook.ProDir)
-            if(!find){ 
-                setWorkbookPath("d:\\workBook", "NewFolder")
-                err := os.Mkdir(webConfig.WorkBook.ProDir, os.ModePerm)
-                if err != nil {
-                    fmt.Println(err) 
-                }    
-                err = os.Mkdir(webConfig.WorkBook.ProDir + "\\" + webConfig.WorkBook.ProName, os.ModePerm)
-                if err != nil {
-                    fmt.Println(err)
-                }    
-            }  
-            var proInfo ProjectInfo
-            proInfo.ProPath = webConfig.WorkBook.ProDir
-            proInfo.ProName = webConfig.WorkBook.ProName
-            data, _ := json.Marshal(&proInfo) 
-            io.WriteString(res, string(data))
-        }else{ 
-            io.WriteString(res, GetWorkbookJson(c2sJsonInfo))
-        }
+        rst := projectInfo(body);
+        io.WriteString(res, rst)
     }else if strings.Contains(req.URL.Path, "&getTxt") {      
         body, _ := ioutil.ReadAll(req.Body)
         var  c2sTxtInfo  C2SGETTXT     
@@ -199,13 +139,102 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
         io.WriteString(res, "这是从后台发送的数据")
     } 
 }
+//------projectInfo
+func projectAct(body []byte)string{ 
+    
+    var  c2sProInfo  C2SPROINFO     
+    err := json.Unmarshal(body, &c2sProInfo)
+    if err != nil { 
+        return "decode json error"; 
+    }  
+    if(c2sProInfo.ProType == "new"){     
+        if (c2sProInfo.ProInfo.ProPath == ""){
+            c2sProInfo.ProInfo.ProPath = "d:\\Doc_workBook";
+            os.Mkdir(c2sProInfo.ProInfo.ProPath, os.ModePerm)
+        }         
+        for{
+            originalPath :=  c2sProInfo.ProInfo.ProPath + "\\" + c2sProInfo.ProName
+            err := os.Mkdir(originalPath, os.ModePerm)
+            if err != nil {
+                fmt.Println(err)
+            }else{ 
+               break;   
+            }              
+            c2sProInfo.ProName += "1"
+         }  
+         setWorkbookPath(c2sProInfo.ProInfo.ProPath, c2sProInfo.ProName) 
+         data, _ := json.Marshal(&webConfig.ProInfo) 
+         return string(data);
+    }else if(c2sProInfo.ProType == "open"){ 
+        return OpenWorkBook();
+    }else if(c2sProInfo.ProType == "rename"){ 
+        //重命名文件夹
+        originalPath :=  c2sProInfo.ProInfo.ProPath + "\\" + c2sProInfo.ProInfo.ProName  + "\\" 
+        newPath := c2sProInfo.ProInfo.ProPath + "\\"  + c2sProInfo.ProName
+        err := os.Rename(originalPath, newPath) 
+        if err != nil { 
+            return "重命名失败--可能存在同命项目";
+        } 
+        reSetWorkbookPath(c2sProInfo.ProInfo, c2sProInfo.ProName)
+        return "ok";
+    }else if(c2sProInfo.ProType == "choice"){  
+        setWorkbookPath(c2sProInfo.ProInfo.ProPath, c2sProInfo.ProName)
+        return "ok";
+    }else{ 
+        return  "error command";
+    }
+}
+func projectInfo(body [] byte)string{    
+    var  c2sJsonInfo  C2SGETJSON     
+    err := json.Unmarshal(body, &c2sJsonInfo)
+    if err != nil { 
+        return "decode json error -- "+ string(body)
+    }
+    if(c2sJsonInfo.JsonType == "proHistory"){ 
+        data, _ := json.Marshal(&webConfig.ProInfo) 
+        return string(data); 
+    }
+    if(c2sJsonInfo.JsonType == "nearProject"){   
+        data, _ := json.Marshal(&webConfig.ProInfo.NearProp) 
+        return string(data);
+    }else{ 
+        return GetWorkbookJson(c2sJsonInfo);
+    }
+}
+
+//--end
 func getDir(filePath string)string{
     pDir,_ := filepath.Split(filePath) 
     return pDir 
 }
 func setWorkbookPath(ProDir string, ProName string){    
-    webConfig.WorkBook.ProName = ProName
-    webConfig.WorkBook.ProDir = ProDir 
+    isFind := false;
+    index := 0
+    for _, proHistory := range webConfig.ProInfo.ProInfos {
+        if(strings.Compare(proHistory.ProPath,ProDir) == 0  &&  strings.Compare(proHistory.ProName,ProName) == 0) {
+            isFind = true;
+            break;
+        }
+        index ++
+    }
+    webConfig.ProInfo.NearProp.Id = index
+    webConfig.ProInfo.NearProp.ProName = ProName
+    webConfig.ProInfo.NearProp.ProPath = ProDir 
+    if(!isFind){
+        webConfig.ProInfo.ProInfos = append(webConfig.ProInfo.ProInfos, webConfig.ProInfo.NearProp)
+    }
+    UpLoadConfig("json/config.json");
+}
+func reSetWorkbookPath(proInfo ProjectInfo,  newProName string){   
+    for _, proHistory := range webConfig.ProInfo.ProInfos {
+        if(proInfo.Id == proHistory.Id) {
+            webConfig.ProInfo.ProInfos[proHistory.Id].ProName = newProName
+            webConfig.ProInfo.NearProp = webConfig.ProInfo.ProInfos[proHistory.Id]  
+            break;
+        }
+
+    } 
+    printfConfig();
     UpLoadConfig("json/config.json");
 }
 

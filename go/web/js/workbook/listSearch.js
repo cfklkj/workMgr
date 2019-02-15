@@ -1,14 +1,15 @@
 
 //list-search
-function list_setProject(projectName)
-{
+function list_setProject(projectPath, projectName)
+{    
     g_proName = projectName
     var span = g_listSearch.getElementsByTagName("span")
     var input = g_listSearch.getElementsByTagName("input")
     span[1].className = "icon-oFolde"
     input[0].value = g_proName
     var span = g_loadFolder.getElementsByTagName("span")
-    span[0].title = g_proName
+    span[0].title = projectPath
+    span[0].innerText = g_proName
 }
 function list_UpProject()
 {  

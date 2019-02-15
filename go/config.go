@@ -4,18 +4,13 @@ import(
     "io/ioutil" 
     "encoding/json" 
     "fmt" 
-    "os"
-    _ "code.google.com/P/odbc"  
-)  
-type WORKBOOK struct{
-    ProDir string
-    ProName string
-}
+    "os" 
+)   
  //-------config.jso  ------
 type WEB_config struct {  
     HttpPort int `json:"httpPort"`
     DefaultHtml string `json:"DefaultHtml"` 
-    WorkBook WORKBOOK
+    ProInfo ProHistory
 } 
 var webConfig WEB_config
 func LoadConfig (filename string) {
@@ -40,6 +35,9 @@ func UpLoadConfig(fileName string){
         return
     }
     ioutil.WriteFile(fileName, data, os.ModeAppend)
+}
+func printfConfig(){
+    data, _ := json.Marshal(&webConfig) 
     fmt.Println("config Upload suceess:", string(data))  
 }
 //-------config.jso  ------

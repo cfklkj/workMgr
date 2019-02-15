@@ -6,6 +6,7 @@ function initFolderInfo()
     g_searchContainer.innerHTML = "" 
     g_detailValue.innerText = ""
     g_topFileName.value = ""
+    g_folderContainer.innerText = ""
 }
 
 function onLoadFolder()
@@ -79,6 +80,21 @@ function addCrashFolde(spanID, spanValue,  deleteValue)
                 <span class="search-item-text">' + spanValue + '</span>\
                 <i title="' + deleteValue + '" i class="icon_delete editB"></i>\
                 <i title="' + unCrashValue + '" class="icon_unCrash editB"></i>\
+            </div>\
+        </div>\
+    </li>'
+    g_searchContainer.innerHTML += Ta
+} 
+
+function addProHistory(spanID, proName,  proPath)
+{   
+    Ta = '\
+    <li id=' + spanID + '>\
+        <div class="search-content">\
+            <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
+                <i class="icon-folder folderA"></i>\
+                <span class="search-item-text">' + proName + '</span>\
+                <i title="' + proPath + '" i class="icon_delete editB"></i>\
             </div>\
         </div>\
     </li>'
@@ -214,6 +230,13 @@ function getParentDiv(obj)
     }
     return par;
 }
+function divCompare(obj, divId)
+{
+    if(getParentDiv(obj).id == divId)
+        return true;
+    return false;
+}
+
 function getParentTagLi(obj)
 {
     if(!obj)
@@ -228,9 +251,9 @@ function getParentTagLi(obj)
     return par;
 }
 //--menu
-function setChoiceDivType(obj)
+function setChoiceDivType(obj, isThisObj = false)
 {
-    par = getParentDiv(obj)  
+    par = isThisObj ? obj :getParentDiv(obj)  
     if(!par)
         return 0  
     switch(par.id)
@@ -239,6 +262,11 @@ function setChoiceDivType(obj)
         {
             g_choiceFolderType = FolderType.project 
             list_setOpenDir(g_proName) 
+        }break;
+        case "projectHistory":
+        {
+            g_choiceFolderType = FolderType.projectHistory 
+            list_setOpenDir("")  
         }break;
         case "nearOpen":
         { 

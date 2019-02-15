@@ -19,7 +19,8 @@ var Unrecognizable = false
 function main() {   
     g_post = new Post()
     WorkBookInit()
-    onGetProject() 
+    onGetProHistory() 
+    onGetProject()
 }  
 
  
@@ -74,6 +75,15 @@ function Post(){
     this.upPro = function(proType, proName, resFunc){
         var data = {"ProType":proType, "proName":proName}    
         data.ProInfo = g_projectJson  
+        this.request("post",serverUrl + '/Workbook&ProInfo', data, resFunc)  
+	}
+    //选择项目
+    this.choice = function(proType,id, proPath, proName, resFunc){
+        var data = {"ProType":proType, "proName":proName}   
+        data.ProInfo = g_projectJson  
+        data.ProInfo.Id = id
+        data.ProInfo.ProPath = proPath
+        data.ProInfo.proName = proName
         this.request("post",serverUrl + '/Workbook&ProInfo', data, resFunc)  
 	}
 	//执行cmd语句
@@ -256,6 +266,21 @@ else if(btnNum==0)
         }
         return;
     }    
+    //最近打开的项目
+    if(g_choiceFolderType == FolderType.projectHistory)
+    {        
+        if(divCompare(event.target, "projectHistory"))
+        {
+            initFolderInfo();
+            loadProHistory(); 
+        }else 
+        {
+            var id = getParentDiv(event.target).id 
+            initFolderInfo();
+            choiceHistroryPro(id)
+        }
+        return;
+    }
     //选择文件夹
     if(setChoiceFolderLiType(event.target))    
     { 
