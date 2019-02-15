@@ -68,8 +68,7 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
         body, _ := ioutil.ReadAll(req.Body)
         var  c2sJsonInfo  C2SUPJSON     
         err := json.Unmarshal(body, &c2sJsonInfo)
-        if err != nil {
-            //   c.String(500, "decode json error")
+        if err != nil { 
             io.WriteString(res, "decode json error")
             return
         }
@@ -190,7 +189,8 @@ func projectInfo(body [] byte)string{
     if err != nil { 
         return "decode json error -- "+ string(body)
     }
-    if(c2sJsonInfo.JsonType == "proHistory"){ 
+    if(c2sJsonInfo.JsonType == "proHistory"){  
+        checkConfigPro() 
         data, _ := json.Marshal(&webConfig.ProInfo) 
         return string(data); 
     }

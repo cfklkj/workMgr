@@ -32,6 +32,7 @@ function loadFiles()
     jsonInfo = getFileJsonObj() 
     g_choiceFileInfo = [] 
     var isUpJson = false 
+    var isAdd = false
     g_isChange = true
     for(var item =0 ; g_isChange && item < jsonInfo.length; item ++)
     {      
@@ -44,14 +45,15 @@ function loadFiles()
            }
            continue;
        }     
-        addFile(jsonInfo[item].id, jsonInfo[item].name)    
+        addFile(jsonInfo[item].id, jsonInfo[item].name)   
+        isAdd = true; 
     } 
     if(isUpJson)
     {
         upFileJson()
     }  
     g_isFirstLoad = false
-    return i > 0
+    return isAdd
 } 
 
 //--最近浏览

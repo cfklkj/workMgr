@@ -161,7 +161,7 @@ html, body {
 
 .icon-Edit {
     background: url(/image/sprite-268ba431f9.svg) no-repeat;
-    background-position: 32.39% 94.18%;
+    background-position: 32.39% 94.28%;
     width: 24px;
     height: 24px;
     display: inline-block;
@@ -271,6 +271,12 @@ html, body {
 .icon-folder {
     background: url(/image/sprite-268ba431f9.svg) no-repeat;
     background-position: 46.02739726027397% 82%;
+    width: 24px;
+    height: 24px; 
+}
+.icon-project {
+    background: url(/image/sprite-268ba431f9.svg) no-repeat;
+    background-position: 85% 64.87%;
     width: 24px;
     height: 24px; 
 }

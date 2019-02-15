@@ -24,8 +24,21 @@ func LoadConfig (filename string) {
         return
     }  
     data2, _ := json.Marshal(&webConfig) 
-    fmt.Println("config load suceess:", string(data2)) 
+    fmt.Println("config load suceess:", string(data2))  
 	return 
+}
+
+func checkConfigPro(){
+    for index, proInfo := range webConfig.ProInfo.ProInfos{ 
+        ok, _ := exists(proInfo.ProPath + "\\" + proInfo.ProName)
+        if !ok {
+            webConfig.ProInfo.ProInfos = append(webConfig.ProInfo.ProInfos[:index], webConfig.ProInfo.ProInfos[index+1:]...)
+            
+            UpLoadConfig("json/config.json");
+            checkConfigPro()
+            break;
+        }  
+    }
 }
 
 func UpLoadConfig(fileName string){ 

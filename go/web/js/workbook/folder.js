@@ -92,9 +92,9 @@ function addProHistory(spanID, proName,  proPath)
     <li id=' + spanID + '>\
         <div class="search-content">\
             <div class="search-item search_resulMoveB" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="" onmouseenter=mouseenterFile(this) onmouseleave=mouseleaveFile() >\
-                <i class="icon-folder folderA"></i>\
+                <i class="icon-project folderA"></i>\
                 <span class="search-item-text">' + proName + '</span>\
-                <i title="' + proPath + '" i class="icon_delete editB"></i>\
+                <i title="' + proPath + '"></i>\
             </div>\
         </div>\
     </li>'
