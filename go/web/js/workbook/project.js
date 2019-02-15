@@ -62,6 +62,11 @@ function onOpenPro()
     g_creatUl.style.visibility = "hidden"
     g_post.upPro("open", g_proName, newPro) 
 }
+function onOpenProExp()
+{
+    g_creatUl.style.visibility = "hidden"
+    g_post.upPro("openExp", g_proName, onShowStatu) 
+}
 function newPro(proName)
 {
     if(proName != ""){ 

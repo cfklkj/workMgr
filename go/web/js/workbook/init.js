@@ -30,6 +30,8 @@ function WorkBookInit(){
         m_listCreate.onclick = onNewPro
         m_listOpen = document.getElementById('list-open'); 
         m_listOpen.onclick = onOpenPro
+        m_listOpenExp = document.getElementById('list-openExp'); 
+        m_listOpenExp.onclick = onOpenProExp
         g_listMenu = document.getElementById('list-menu'); 
         g_listMenu.onclick = list_menus 
 

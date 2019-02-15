@@ -166,6 +166,13 @@ func projectAct(body []byte)string{
          return string(data);
     }else if(c2sProInfo.ProType == "open"){ 
         return OpenWorkBook();
+    }else if(c2sProInfo.ProType == "openExp"){ 
+        s := c2sProInfo.ProInfo.ProPath
+        if(string(s[len(s)-1:]) != "\\"){
+            c2sProInfo.ProInfo.ProPath  += "\\"
+        }
+        originalPath :=  "explorer " + c2sProInfo.ProInfo.ProPath + c2sProInfo.ProInfo.ProName
+        return cmdAct(originalPath)
     }else if(c2sProInfo.ProType == "rename"){ 
         //重命名文件夹
         originalPath :=  c2sProInfo.ProInfo.ProPath + "\\" + c2sProInfo.ProInfo.ProName  + "\\" 
@@ -364,7 +371,7 @@ func ExportWorkBook(workbookPath string, proName string){
     fmt.Println("已执行--" + out.String())
 }
 
-func cmdAct(cmdArg string){
+func cmdAct(cmdArg string) string{
     cmd := exec.Command("cmd", "/c", cmdArg)  
     var out bytes.Buffer
 	cmd.Stdout = &out
@@ -373,6 +380,7 @@ func cmdAct(cmdArg string){
         fmt.Println(err.Error())
     }  
     fmt.Println("已执行--" + out.String()) 
+    return out.String()
 }
 
 
