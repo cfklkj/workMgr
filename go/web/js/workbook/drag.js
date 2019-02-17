@@ -14,16 +14,16 @@ function getStyle(obj, attr)
   
 } 
 function resetFolderHeigh()
-{
-    g_folderContainer.style.height =  0
+{ 
+     g_folderContainer.style.height =  "auto"
 }
 function limitFolderHeigh()
 { 
     var height = parseInt(getStyle(g_folderContainer, "height")) 
-    if(height < 1 || height > document.body.clientHeight / 2)
+    if(height > document.body.clientHeight / 2)
     { 
         g_folderContainer.style.height =  document.body.clientHeight / 2;
-    }
+    } 
 }
 function onDragMid(Y)
 { 

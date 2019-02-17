@@ -3,11 +3,16 @@
 function initFolderInfo()
 {    
     g_choiceFolderInfo = []
+    g_folderContainer.innerText = "" 
+    clearText()
+}
+function clearText()
+{     
     g_searchContainer.innerHTML = "" 
     g_detailValue.innerText = ""
-    g_topFileName.value = ""
-    g_folderContainer.innerText = "" 
+    g_topFileName.value = "" 
 }
+
 
 function onLoadFolder()
 {   
@@ -123,13 +128,13 @@ function loadDeleteFolder()
     }     
 }
 function onAddFolder()
-{      
+{        
     if(g_choiceFolderType < FolderType.project)
     {
         alert("请选中项目后重试")
         return
     }
-    initFolderInfo()  
+    clearText()  
     var newNode = {
         "id":0,
         "type": FolderType.document,
@@ -266,19 +271,20 @@ function setChoiceDivType(obj, isThisObj = false)
         case "projectHistory":
         {
             g_choiceFolderType = FolderType.projectHistory 
-            list_setOpenDir("")  
+            list_setOpenDir("")   
             resetFolderHeigh()
         }break;
         case "nearOpen":
         { 
             g_choiceFolderType = FolderType.nearView 
             list_setOpenDir("") 
-            resetFolderHeigh()
+            resetFolderHeigh() 
         }break; 
         case "crash":
         { 
             g_choiceFolderType = FolderType.recycleBin
             list_setOpenDir("") 
+            resetFolderHeigh()
         }break;
         case "flexible-right":
         { 
@@ -293,7 +299,6 @@ function setChoiceDivType(obj, isThisObj = false)
         return g_choiceFolderType;
 
     //重选文件项
-    resetFolderHeigh()
     unSelectDivStatu(g_choiceTag.B)
     unSelectDivStatu(g_choiceTag.A)
     g_choiceTag.A = par.id

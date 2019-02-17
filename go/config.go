@@ -19,7 +19,8 @@ var g_proPath string
 func LoadConfig (filename string) {
     data, err := ioutil.ReadFile(filename)
     if err != nil{
-    return 
+        checkWebConfig()
+        return 
     }       
     err = json.Unmarshal(data, &webConfig)
     if err != nil{
@@ -34,6 +35,18 @@ func LoadConfig (filename string) {
 func checkConfig(){
     checkConfigPro()
     checkProPath()
+}
+func checkWebConfig(){
+    if(webConfig.HttpPort == 0){
+        dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+        if err != nil {
+            return 
+        }
+        dir +=  "\\json" 
+        os.Mkdir(dir, os.ModePerm) 
+        webConfig.HttpPort = 80
+        webConfig.DefaultHtml = "workbook.html"
+    }
 }
 func checkConfigPro(){
     for index, proInfo := range webConfig.ProInfo.ProInfos{ 

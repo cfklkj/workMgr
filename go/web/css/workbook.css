@@ -632,7 +632,8 @@ h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cit, code, del, df
 }
 
 .tree-container{ 
-    overflow: auto;
+    overflow: auto; 
+    height:auto;
 }
 
 #showWeb div{
