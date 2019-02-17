@@ -42,6 +42,9 @@ func HomePage(res http.ResponseWriter, req *http.Request) {
             return
         }
     } else if req.Method == "POST" {
+      //  if(uploadHandle(res, req)){
+      //      return
+      //  } 
         if strings.Contains(req.URL.Path, "/Workbook"){
             OnWorkbook(res, req)
         } 

@@ -118,6 +118,13 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             return
         }
         if(c2sPackInfo.Package == "import"){
+           
+           _, _, err := req.FormFile("fileTag")
+            
+                if err != nil {
+                    panic(err)
+                }
+            
             io.WriteString(res, ImportWorkBook(c2sPackInfo.ProInfo.ProPath))  
         }else{
             originalPath :=  c2sPackInfo.ProInfo.ProPath + "\\" + c2sPackInfo.ProInfo.ProName  + "\\" 
@@ -147,9 +154,9 @@ func projectAct(body []byte)string{
         return "decode json error"; 
     }  
     if(c2sProInfo.ProType == "new"){     
-        if (c2sProInfo.ProInfo.ProPath == ""){
-            c2sProInfo.ProInfo.ProPath = "d:\\Doc_workBook";
-            os.Mkdir(c2sProInfo.ProInfo.ProPath, os.ModePerm)
+        if (c2sProInfo.ProInfo.ProPath == ""){ 
+            c2sProInfo.ProInfo.ProPath = g_proPath; 
+            c2sProInfo.ProName = "NewPro"
         }         
         for{
             originalPath :=  c2sProInfo.ProInfo.ProPath + "\\" + c2sProInfo.ProName
@@ -158,8 +165,8 @@ func projectAct(body []byte)string{
                 fmt.Println(err)
             }else{ 
                break;   
-            }              
-            c2sProInfo.ProName += "1"
+            }     
+            c2sProInfo.ProName += "1"         
          }  
          setWorkbookPath(c2sProInfo.ProInfo.ProPath, c2sProInfo.ProName) 
          data, _ := json.Marshal(&webConfig.ProInfo) 
@@ -197,7 +204,7 @@ func projectInfo(body [] byte)string{
         return "decode json error -- "+ string(body)
     }
     if(c2sJsonInfo.JsonType == "proHistory"){  
-        checkConfigPro() 
+        checkConfig() 
         data, _ := json.Marshal(&webConfig.ProInfo) 
         return string(data); 
     }
@@ -429,3 +436,35 @@ func OpenWorkBook()string{
     return ""
 }
 
+
+
+//上传
+func uploadHandle(w http.ResponseWriter, r *http.Request)bool {
+	//从请求当中判断方法
+	if r.Method == "GET" {
+        return false
+	} else {
+		//获取文件内容 要这样获取
+		file, head, err := r.FormFile("file")
+		if err != nil {
+			fmt.Println(err)
+			return false
+		}
+		defer file.Close()
+		//创建文件
+		fW, err := os.Create(".\\" + head.Filename)
+		if err != nil {
+			fmt.Println("文件创建失败")
+			return true
+		}
+		defer fW.Close()
+		_, err = io.Copy(fW, file)
+		if err != nil {
+			fmt.Println("文件保存失败")
+            return true
+        }
+		//io.WriteString(w, head.Filename+" 保存成功") 
+		http.Redirect(w, r, "/", http.StatusFound)
+        return true
+	}
+} 

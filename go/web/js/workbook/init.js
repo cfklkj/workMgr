@@ -22,18 +22,14 @@ function WorkBookInit(){
         m_newFile.onclick = onAddFile
         m_newFolder = document.getElementById('new-folder'); 
         m_newFolder.onclick = onAddFolder
-        m_listImport = document.getElementById('list-import'); 
-        m_listImport.onclick = onListImport
-        m_listExport = document.getElementById('list-export'); 
-        m_listExport.onclick = onListExport
+      //  m_listImport = document.getElementById('list-import'); 
+      //  m_listImport.onclick = onListImport
+      //  m_listExport = document.getElementById('list-export'); 
+     //   m_listExport.onclick = onListExport
         m_listCreate = document.getElementById('list-create'); 
-        m_listCreate.onclick = onNewPro
-        m_listOpen = document.getElementById('list-open'); 
-        m_listOpen.onclick = onOpenPro
-        m_listOpenExp = document.getElementById('list-openExp'); 
-        m_listOpenExp.onclick = onOpenProExp
+        m_listCreate.onclick = onNewPro 
         g_listMenu = document.getElementById('list-menu'); 
-        g_listMenu.onclick = list_menus 
+        g_listMenu.onclick = list_menus  
 
         InitGlobalCtrl()
 }
