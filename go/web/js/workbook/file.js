@@ -362,7 +362,12 @@ function deleteAllFile(parentId)
 
 function showTxt(txtInfo)
 { 
-    g_detailValue.innerHTML = txtInfo
+    try{
+        g_detailValue.innerHTML =  unzip(txtInfo) 
+    }catch(err){ 
+         console.log(err)
+         g_detailValue.innerHTML = txtInfo
+    }
     if(g_newFile)
     { 
         g_newFile = 0

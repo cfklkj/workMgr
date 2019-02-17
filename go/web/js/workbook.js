@@ -1,5 +1,8 @@
 
 document.write('<script type="text/javascript" src="js/lib/FlyWeb.js"></script>')  //引入js 
+//document.write('<script type="text/javascript" src="js/lib/jquery.js"></script>')  
+document.write('<script type="text/javascript" src="js/lib/pako.min.js"></script>')  
+document.write('<script type="text/javascript" src="js/workbook/zip.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/init.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/drag.js"></script>')   
 document.write('<script type="text/javascript" src="js/workbook/folderJson.js"></script>')  
