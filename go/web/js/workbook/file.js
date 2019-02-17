@@ -100,7 +100,7 @@ function loadDeleteFile()
     
 function selectNearFile(obj)
 { 
-    if(g_choiceFolderType != FolderType.nearView)
+    if(g_choiceFolderType != FolderType.nearView && g_choiceFolderType != FolderType.Nearfile)
         return false 
     par = getParentDiv(obj)  
     jsonInfo = getFileJsonObj(g_choiceFolderInfo.id)

@@ -87,7 +87,7 @@ function choiceHistroryPro(index)
     var jsonInfo = g_proHistory.ProInfos  
     for(item in jsonInfo){    
         if(item == index) 
-        {
+        { 
             choicePro(jsonInfo[index].id, jsonInfo[index].ProPath, jsonInfo[index].ProName);
             onGetProject();  
             break;
@@ -95,6 +95,11 @@ function choiceHistroryPro(index)
     } 
 }
 
+ //清理浏览历史
+function clearNearInfo()
+{
+    g_nearOpen = []   
+}
 
 function onDelete()
 { 

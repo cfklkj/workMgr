@@ -6,7 +6,7 @@ function initFolderInfo()
     g_searchContainer.innerHTML = "" 
     g_detailValue.innerText = ""
     g_topFileName.value = ""
-    g_folderContainer.innerText = ""
+    g_folderContainer.innerText = "" 
 }
 
 function onLoadFolder()
@@ -267,11 +267,13 @@ function setChoiceDivType(obj, isThisObj = false)
         {
             g_choiceFolderType = FolderType.projectHistory 
             list_setOpenDir("")  
+            resetFolderHeigh()
         }break;
         case "nearOpen":
         { 
             g_choiceFolderType = FolderType.nearView 
             list_setOpenDir("") 
+            resetFolderHeigh()
         }break; 
         case "crash":
         { 
@@ -291,6 +293,7 @@ function setChoiceDivType(obj, isThisObj = false)
         return g_choiceFolderType;
 
     //重选文件项
+    resetFolderHeigh()
     unSelectDivStatu(g_choiceTag.B)
     unSelectDivStatu(g_choiceTag.A)
     g_choiceTag.A = par.id
@@ -333,9 +336,9 @@ function setChoiceFileLiType(obj)
     { 
         return false
     }   
-    if(g_choiceFolderType == FolderType.nearView)
+    if(g_choiceFolderType == FolderType.nearView || g_choiceFolderType ==  FolderType.Nearfile)
     {
-    //    return true;
+        g_choiceFolderType =  FolderType.Nearfile
     }
     else{  
         g_choiceFolderType =  FolderType.file

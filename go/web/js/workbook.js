@@ -229,9 +229,10 @@ else if(btnNum==0)
             initFolderInfo();
             loadProHistory(); 
         }else 
-        {
+        { 
             var id = getParentDiv(event.target).id 
             initFolderInfo();
+            clearNearInfo()
             choiceHistroryPro(id)
         }
         return;

@@ -3,6 +3,7 @@ var  FolderType = {};
 FolderType.nochoice = 0;
 FolderType.recycleBin = 1;
 FolderType.nearView = 2; 
+FolderType.Nearfile = 9; 
 FolderType.project = 3; 
 FolderType.projectHistory = 8;
 FolderType.document = 4;
