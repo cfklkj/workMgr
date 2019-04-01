@@ -399,16 +399,7 @@ function onKeeptxt()
     return ""
   }
 
-
-function onCmdAct()
-{
-    var actStr = getSelectedText(g_detailValue)
-    if(actStr != "")
-    { 
-       g_post.cmdAct("cmdAct", actStr)  
-    } 
-}
-
+ 
 //--other func
 function onChangeMode()
 {

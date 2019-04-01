@@ -127,20 +127,9 @@ func OnWorkbook(res http.ResponseWriter, req *http.Request) {
             
             io.WriteString(res, ImportWorkBook(c2sPackInfo.ProInfo.ProPath))  
         }else{
-            originalPath :=  c2sPackInfo.ProInfo.ProPath + "\\" + c2sPackInfo.ProInfo.ProName  + "\\" 
+            originalPath :=  c2sPackInfo.ProInfo.ProPath + "/" + c2sPackInfo.ProInfo.ProName  + "/" 
             ExportWorkBook(originalPath, c2sPackInfo.ProInfo.ProName)
-        }    
-    }else if strings.Contains(req.URL.Path, "&cmdAct") {   
-        body, _ := ioutil.ReadAll(req.Body)
-        var  c2sJsonInfo  C2SUPJSON     
-        err := json.Unmarshal(body, &c2sJsonInfo)
-        if err != nil {
-            //   c.String(500, "decode json error")
-            io.WriteString(res, "decode json error")
-            return
-        }
-        cmdAct(c2sJsonInfo.TxtInfo)
-        io.WriteString(res, "已执行-"+c2sJsonInfo.TxtInfo)
+        }     
     }else {
         io.WriteString(res, "这是从后台发送的数据")
     } 
@@ -159,7 +148,7 @@ func projectAct(body []byte)string{
             c2sProInfo.ProName = "NewPro"
         }         
         for{
-            originalPath :=  c2sProInfo.ProInfo.ProPath + "\\" + c2sProInfo.ProName
+            originalPath :=  c2sProInfo.ProInfo.ProPath + "/" + c2sProInfo.ProName
             err := os.Mkdir(originalPath, os.ModePerm)
             if err != nil {
                 fmt.Println(err)
@@ -172,18 +161,11 @@ func projectAct(body []byte)string{
          data, _ := json.Marshal(&webConfig.ProInfo) 
          return string(data);
     }else if(c2sProInfo.ProType == "open"){ 
-        return OpenWorkBook();
-    }else if(c2sProInfo.ProType == "openExp"){ 
-        s := c2sProInfo.ProInfo.ProPath
-        if(string(s[len(s)-1:]) != "\\"){
-            c2sProInfo.ProInfo.ProPath  += "\\"
-        }
-        originalPath :=  "explorer " + c2sProInfo.ProInfo.ProPath + c2sProInfo.ProInfo.ProName
-        return cmdAct(originalPath)
+        return OpenWorkBook(); 
     }else if(c2sProInfo.ProType == "rename"){ 
         //重命名文件夹
-        originalPath :=  c2sProInfo.ProInfo.ProPath + "\\" + c2sProInfo.ProInfo.ProName  + "\\" 
-        newPath := c2sProInfo.ProInfo.ProPath + "\\"  + c2sProInfo.ProName
+        originalPath :=  c2sProInfo.ProInfo.ProPath + "/" + c2sProInfo.ProInfo.ProName  + "/" 
+        newPath := c2sProInfo.ProInfo.ProPath + "/"  + c2sProInfo.ProName
         err := os.Rename(originalPath, newPath) 
         if err != nil { 
             return "重命名失败--可能存在同命项目";
@@ -268,14 +250,14 @@ func OpenTxt(filePath string, isUnrecognizable bool)string{
 
 //读取文本
 func GetWorkbookTxt(c2sTxtInfo C2SGETTXT)string{    
-    dirPth := c2sTxtInfo.ProInfo.ProPath + "\\" + c2sTxtInfo.ProInfo.ProName  + "\\" 
+    dirPth := c2sTxtInfo.ProInfo.ProPath + "/" + c2sTxtInfo.ProInfo.ProName  + "/" 
     //dirPth += fmt.Sprint(c2sTxtInfo.ParentId) + "_" + fmt.Sprint(c2sTxtInfo.FileId);    
     dirPth += fmt.Sprint(c2sTxtInfo.FileId);    
     return OpenTxt(dirPth, c2sTxtInfo.Unrecognizable)
 } 
 //删除文本
 func DeleteWorkbookTxt(c2sTxtInfo C2SGETTXT)string{    
-    dirPth := c2sTxtInfo.ProInfo.ProPath + "\\" + c2sTxtInfo.ProInfo.ProName  + "\\" 
+    dirPth := c2sTxtInfo.ProInfo.ProPath + "/" + c2sTxtInfo.ProInfo.ProName  + "/" 
    // dirPth += fmt.Sprint(c2sTxtInfo.ParentId) + "_" + fmt.Sprint(c2sTxtInfo.FileId);  
     dirPth += fmt.Sprint(c2sTxtInfo.FileId);  
     err := os.Remove(dirPth) 
@@ -287,9 +269,13 @@ func DeleteWorkbookTxt(c2sTxtInfo C2SGETTXT)string{
 } 
 //写入文本
 func KeepWorkbookTxt(c2sFileInfo C2SKEEPTXT)string{
-    dirPth := c2sFileInfo.ProInfo.ProPath + "\\" + c2sFileInfo.ProInfo.ProName  + "\\" 
+    dirPth := c2sFileInfo.ProInfo.ProPath + "/" + c2sFileInfo.ProInfo.ProName  + "/" 
     //dirPth += fmt.Sprint(c2sFileInfo.ParentId) + "_" + fmt.Sprint(c2sFileInfo.FileId);   
-    dirPth += fmt.Sprint(c2sFileInfo.FileId);  
+    dirPth += fmt.Sprint(c2sFileInfo.FileId); 
+    return writeFile(dirPth, c2sFileInfo.TxtInfo); 
+}
+
+func writeFile(dirPth string, value string)string{
     file, err := os.OpenFile(dirPth, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
     if err != nil {
         return "open file " + dirPth + " failed.";
@@ -298,12 +284,13 @@ func KeepWorkbookTxt(c2sFileInfo C2SKEEPTXT)string{
   //  c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&gt;", ">", -1)
   //  c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&lt;", "<", -1)
   //  c2sFileInfo.TxtInfo = strings.Replace(c2sFileInfo.TxtInfo , "&amp;", "=", -1)
-    file.WriteString(c2sFileInfo.TxtInfo);
+    file.WriteString(value);
     return "keep file " + dirPth + " Ok";
+
 }
 //更新json文件列表
 func WriteWorkBookJson(c2sJsonInfo  C2SUPJSON){ 
-    dirPath := c2sJsonInfo.ProInfo.ProPath + "\\" + c2sJsonInfo.ProInfo.ProName  + "\\" 
+    dirPath := c2sJsonInfo.ProInfo.ProPath + "/" + c2sJsonInfo.ProInfo.ProName  + "/" 
     if(c2sJsonInfo.JsonType == "Dir"){
         dirPath += "dirNames.json"
     }else if(c2sJsonInfo.JsonType == "fileName"){
@@ -320,7 +307,7 @@ func WriteWorkBookJson(c2sJsonInfo  C2SUPJSON){
 }
 //读取JSON文本
 func GetWorkbookJson(c2sJsonInfo C2SGETJSON)string{   
-    dirPath := c2sJsonInfo.ProInfo.ProPath + "\\" + c2sJsonInfo.ProInfo.ProName  + "\\" 
+    dirPath := c2sJsonInfo.ProInfo.ProPath + "/" + c2sJsonInfo.ProInfo.ProName  + "/" 
     os.Mkdir(dirPath, os.ModePerm)
     if(c2sJsonInfo.JsonType == "Dir"){
         dirPath += "dirNames.json"
@@ -353,7 +340,7 @@ func ImportWorkBook(workbookPath string)string{
     if(proPath != ""){ 
          _, fileName := filepath.Split(proPath)   
         pathName := getPathName(fileName)
-        cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 3 "+ workbookPath + "\\" + pathName + " " + proPath)   
+        cmd := exec.Command("cmd", "/c", "workbook/WorkbookExport.bat 3 "+ workbookPath + "/" + pathName + " " + proPath)   
         var out bytes.Buffer
         cmd.Stdout = &out
         err := cmd.Start()
@@ -368,7 +355,7 @@ func ImportWorkBook(workbookPath string)string{
 }
 
 func ExportWorkBook(workbookPath string, proName string){
-    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 1 "+ workbookPath + "\\ " + proName)  
+    cmd := exec.Command("cmd", "/c", "workbook/WorkbookExport.bat 1 "+ workbookPath + "/ " + proName)  
     var out bytes.Buffer
 	cmd.Stdout = &out
     err := cmd.Start()
@@ -377,23 +364,11 @@ func ExportWorkBook(workbookPath string, proName string){
     }  
     fmt.Println("已执行--" + out.String())
 }
-
-func cmdAct(cmdArg string) string{
-    cmd := exec.Command("cmd", "/c", cmdArg)  
-    var out bytes.Buffer
-	cmd.Stdout = &out
-    err := cmd.Start()
-    if err != nil {
-        fmt.Println(err.Error())
-    }  
-    fmt.Println("已执行--" + out.String()) 
-    return out.String()
-}
-
+ 
 
 func OpenKeepDialog()string{ 
 
-    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 2 ")   
+    cmd := exec.Command("cmd", "/c", "workbook/WorkbookExport.bat 2 ")   
     var out bytes.Buffer
 	cmd.Stdout = &out
     err := cmd.Start()
@@ -414,7 +389,7 @@ func OpenKeepDialog()string{
 }
 func OpenWorkBook()string{ 
 
-    cmd := exec.Command("cmd", "/c", "workbook\\WorkbookExport.bat 4")   
+    cmd := exec.Command("cmd", "/c", "workbook/WorkbookExport.bat 4")   
     var out bytes.Buffer
 	cmd.Stdout = &out
     err := cmd.Start()
@@ -425,7 +400,7 @@ func OpenWorkBook()string{
     outStr := strings.Split(out.String(), "\r\n");
     if(outStr[2] != ""){  
         proPath := outStr[2] 
-        ok, _ := exists(proPath + "\\dirNames.json")
+        ok, _ := exists(proPath + "/dirNames.json")
         if !ok {
             return ""
         }    
@@ -452,7 +427,7 @@ func uploadHandle(w http.ResponseWriter, r *http.Request)bool {
 		}
 		defer file.Close()
 		//创建文件
-		fW, err := os.Create(".\\" + head.Filename)
+		fW, err := os.Create("./" + head.Filename)
 		if err != nil {
 			fmt.Println("文件创建失败")
 			return true

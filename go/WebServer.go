@@ -31,7 +31,7 @@ func init() {
     runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
-func main() {     
+func main() {  
     webserver()
     lenth :=  len(os.Args)
     for i := 1; i < lenth; i++ { 
@@ -52,8 +52,10 @@ func main() {
     fmt.Printf("webServer-web服务器\nsendEmail-发送邮件")
 }
  
-func webserver(){ 
+func webserver(){  
+    fmt.Println("load config");
     LoadConfig("json/config.json");
+   
     // 先把css和脚本服务上去 
     http.Handle(CSS_CLIENT_PATH, http.FileServer(http.Dir(CSS_SVR_PATH)))
     http.Handle(DART_CLIENT_PATH, http.FileServer(http.Dir(DART_SVR_PATH)))
@@ -63,7 +65,9 @@ func webserver(){
     http.HandleFunc("/", HomePage)  
    //绑定socket方法
  //  http.Handle("/webSocket", h_webSocket) 
-   err := http.ListenAndServe("127.0.0.1:" + strconv.Itoa(webConfig.HttpPort), nil) //设置监听的端口
+    fmt.Println("start listen web:");
+    err := http.ListenAndServe(webConfig.Ip + ":" + strconv.Itoa(webConfig.HttpPort), nil) //设置监听的端口
+//err := http.ListenAndServe("127.0.0.1:"+strconv.Itoa(webConfig.HttpPort), nil) //设置监听的端口
    if err != nil {
        log.Fatal("ListenAndServe: ", err)
    } 

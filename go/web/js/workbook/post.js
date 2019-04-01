@@ -25,12 +25,10 @@ function Post(){
     this.keepTxt = function(cId, txtInfo){
         var data = {}
         if(txtInfo.length > 1024) 
-        {
-            console.log("zip")
+        { 
             data = {"FileId": cId.toString(), "txtInfo":zip(txtInfo)}  
         }else
-        {
-            console.log("no zip")
+        { 
             data = {"FileId": cId.toString(), "txtInfo":txtInfo}  
         }
         data.ProInfo = g_projectJson

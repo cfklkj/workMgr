@@ -10,6 +10,7 @@ import(
 
  //-------config.jso  ------
 type WEB_config struct {  
+    Ip string `json:"IP"`
     HttpPort int `json:"httpPort"`
     DefaultHtml string `json:"DefaultHtml"` 
     ProInfo ProHistory
@@ -17,6 +18,8 @@ type WEB_config struct {
 var webConfig WEB_config
 var g_proPath string
 func LoadConfig (filename string) {
+    webConfig.HttpPort=0        
+    webConfig.DefaultHtml=""
     data, err := ioutil.ReadFile(filename)
     if err != nil{
         checkWebConfig()
@@ -24,7 +27,7 @@ func LoadConfig (filename string) {
     }       
     err = json.Unmarshal(data, &webConfig)
     if err != nil{
-		fmt.Println("LoadDBlist config decode failed")
+		fmt.Println("LoadJson config decode failed")
         return
     }  
     data2, _ := json.Marshal(&webConfig) 
@@ -33,24 +36,29 @@ func LoadConfig (filename string) {
 }
 //check---------------
 func checkConfig(){
+    checkProPath() 
     checkConfigPro()
-    checkProPath()
 }
-func checkWebConfig(){
+func checkWebConfig(){ 
+    fmt.Println("check jsonPath:")
     if(webConfig.HttpPort == 0){
         dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
         if err != nil {
+            fmt.Println("path eroo:"+dir)
             return 
         }
-        dir +=  "\\json" 
-        os.Mkdir(dir, os.ModePerm) 
+        dir +=  "/json" 
+        os.Mkdir(dir, os.ModePerm)  
+        fmt.Println("mkdir json:"+dir)
+        webConfig.Ip=""
         webConfig.HttpPort = 80
         webConfig.DefaultHtml = "workbook.html"
+        checkConfig()
     }
 }
 func checkConfigPro(){
     for index, proInfo := range webConfig.ProInfo.ProInfos{ 
-        ok, _ := exists(proInfo.ProPath + "\\" + proInfo.ProName)
+        ok, _ := exists(proInfo.ProPath + "/" + proInfo.ProName)
         if !ok {
             //删除
             webConfig.ProInfo.ProInfos = append(webConfig.ProInfo.ProInfos[:index], webConfig.ProInfo.ProInfos[index+1:]...)
@@ -63,11 +71,13 @@ func checkConfigPro(){
 } 
 
 func checkProPath(){
+    fmt.Println("check documentPath:")
     dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
     if err != nil {
+        fmt.Println("path eroo:"+dir)
         return 
     }
-    dir +=  "\\Document" 
+    dir +=  "/Document" 
     os.Mkdir(dir, os.ModePerm) 
     g_proPath = dir
     list, err := getDirList(dir)
@@ -88,6 +98,7 @@ func checkProPath(){
             setWorkbookPath(g_proPath, foldName) 
         }
 	}
+    fmt.Println("document path:"+dir)
 
 }
 
