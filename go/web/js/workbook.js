@@ -16,18 +16,21 @@ document.write('<script type="text/javascript" src="js/workbook/post.js"></scrip
 window.onload = main
 
     
-var serverUrl = "127.0.0.1"  
-var MyToken = "1111"
 var Unrecognizable = false 
 var g_isSetTime = false
 var g_setTime
 
 function main() {   
     g_post = new Post()
+    linkServer()
+}   
+function linkServer()
+{  
     WorkBookInit()
     onGetProHistory() 
-    onGetProject()
-}   
+    onGetProject() 
+}
+ 
 //获取父节点
 function getParentObj(obj)
 {

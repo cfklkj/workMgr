@@ -53,8 +53,7 @@ func main() {
 }
  
 func webserver(){  
-    fmt.Println("load config");
-    LoadConfig("json/config.json");
+    initWorkBook();
    
     // 先把css和脚本服务上去 
     http.Handle(CSS_CLIENT_PATH, http.FileServer(http.Dir(CSS_SVR_PATH)))
@@ -62,7 +61,7 @@ func webserver(){
     http.Handle(IMAGE_CLIENT_PATH, http.FileServer(http.Dir(IMAGE_SVR_PATH)))
 
     // 网址与处理逻辑对应起来
-    http.HandleFunc("/", HomePage)  
+    http.HandleFunc("/", HomePage)   
    //绑定socket方法
  //  http.Handle("/webSocket", h_webSocket) 
     fmt.Println("start listen web:");

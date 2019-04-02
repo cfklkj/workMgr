@@ -8,6 +8,7 @@ import(
 	"errors"	
     "bytes" 
     "strings"
+    "io"
 )  
 
 func WriteTemplateToHttpResponse(res http.ResponseWriter, t *template.Template) error {
@@ -24,12 +25,13 @@ func WriteTemplateToHttpResponse(res http.ResponseWriter, t *template.Template) 
     return err
 }
 
-func HomePage(res http.ResponseWriter, req *http.Request) {
+func gotoHtml(res http.ResponseWriter, req *http.Request, htmlFile string){
+    
     if req.Method == "GET" { 
         fmt.Println("homepage")
         path := req.URL.Path
         if req.URL.Path == "/" {
-            path = "/" + webConfig.DefaultHtml
+            path = "/" + htmlFile
         }
         t, err := template.ParseFiles(DART_SVR_PATH + path)
         if err != nil {
@@ -41,12 +43,26 @@ func HomePage(res http.ResponseWriter, req *http.Request) {
             fmt.Println(err)
             return
         }
+    }else
+    {        
+		io.WriteString(res, "login") 
+    }
+}
+
+func HomePage(res http.ResponseWriter, req *http.Request) {    
+    var userName = test_session_valid(res, req);
+    if userName == "" {
+        return;
+    }
+    if req.Method == "GET" { 
+        fmt.Println("homepage")
+        gotoHtml(res, req, webConfig.DefaultHtml); 
     } else if req.Method == "POST" {
       //  if(uploadHandle(res, req)){
       //      return
       //  } 
         if strings.Contains(req.URL.Path, "/Workbook"){
-            OnWorkbook(res, req)
+            OnWorkbook(userName, res, req)
         } 
     }    
 }

@@ -1,4 +1,6 @@
 
+var serverUrl = "127.0.0.1"   
+var MyToken = "1111"
 function Post(){
     //请求数据
     this.request =  FlyWeb  //-----------调用Flyweb里的request
@@ -71,6 +73,14 @@ function Post(){
 	this.cmdAct = function (jsonType, txtInfo) {
 		var data = { "JsonType": jsonType, "txtInfo": txtInfo }
 		this.request("post", serverUrl + '/Workbook&cmdAct', data, onShowStatu)
-	}
+    }
+    //登入
+    this.Login = function(userName, pwd, resFunc){
+		var data = { "UserName": userName, "Password": pwd }
+		this.request("post", serverUrl + '/Workbook&Login', data, resFunc)
+    }
+    this.LoginStatu = function(resFunc){
+		this.request("post", serverUrl + '/Workbook&LoginStatu', "", resFunc) 
+    }
 }
  

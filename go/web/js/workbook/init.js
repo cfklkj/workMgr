@@ -14,9 +14,7 @@ function WorkBookInit(){
         m_showWeb = document.getElementById('showWeb');  
 
         m_saveTxt = document.getElementById('note-save-btn'); 
-        m_saveTxt.onclick = onKeeptxt
-        m_cmdAct = document.getElementById('note-act-btn'); 
-        m_cmdAct.onclick = onCmdAct
+        m_saveTxt.onclick = onKeeptxt 
       
         m_newFile = document.getElementById('new-file'); 
         m_newFile.onclick = onAddFile
