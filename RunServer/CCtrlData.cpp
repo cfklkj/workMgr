@@ -32,7 +32,7 @@ bool CCtrlData::initTreeCtrl(CTreeCtrl *treeHwnd)
 	m_img.SetBkColor(GetSysColor(COLOR_WINDOW));
 	const wchar_t* path = L"shell32.dll ";
 	m_img.Add(ExtractIcon(AfxGetApp()->m_hInstance, path, 19));
-	m_img.Add(ExtractIcon(AfxGetApp()->m_hInstance, path, 50));
+	m_img.Add(ExtractIcon(AfxGetApp()->m_hInstance, path, 20));
 	m_img.Add(ExtractIcon(AfxGetApp()->m_hInstance, path, 15));
 	m_img.Add(ExtractIcon(AfxGetApp()->m_hInstance, path, 4));
 	treeHwnd->SetImageList(&m_img, TVSIL_NORMAL);

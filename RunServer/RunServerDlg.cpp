@@ -304,10 +304,8 @@ BOOL CRunServerDlg::PreTranslateMessage(MSG* pMsg)
 		{
 			if (dlg.isTokenUp(token))
 			{ 
-				m_runCmd.selectItem = InsertTreeItem(m_tree, dlg.getServerName(), dlg.getToken());
-				m_runCmd.status = btn_STOP;
-				btnNormal(m_run);
-				m_edit->SetWindowText(L"");
+				m_runCmd.selectItem = InsertTreeItem(m_tree, dlg.getServerName(), dlg.getToken()); 
+				btnNormal(m_run); 
 			} 
 		} 
 		return 1;
@@ -315,11 +313,14 @@ BOOL CRunServerDlg::PreTranslateMessage(MSG* pMsg)
 	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU_ALT) //修改服务节点
 	{
 		HTREEITEM item = m_runCmd.selectItem;
-		int imgIndex = m_tree->GetItemData(item);
-		if (imgIndex == ico_START)
+		if (item)
 		{
-			MessageBox(L"请关闭推流服务后重试！", L"错误提示！");
-			return 1;
+			int imgIndex = m_tree->GetItemData(item);
+			if (imgIndex == ico_START)
+			{
+				MessageBox(L"请关闭推流服务后重试！", L"错误提示！");
+				return 1;
+			}
 		}
 
 		CAddServerDlg dlg;
@@ -329,10 +330,8 @@ BOOL CRunServerDlg::PreTranslateMessage(MSG* pMsg)
 		{
 			if (dlg.isTokenUp(token))
 			{
-				m_runCmd.selectItem = InsertTreeItem(m_tree, dlg.getServerName(), dlg.getToken());
-				m_runCmd.status = btn_STOP;
-				btnNormal(m_run);
-				m_edit->SetWindowText(L"");
+				m_runCmd.selectItem = InsertTreeItem(m_tree, dlg.getServerName(), dlg.getToken()); 
+				btnNormal(m_run); 
 			}
 			else
 			{
