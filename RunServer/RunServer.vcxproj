@@ -23,7 +23,8 @@
     <ProjectGuid>{B66C77AB-A23D-4952-A32A-A4012BC1F2F1}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
     <RootNamespace>RunServer</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>RunPush</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -187,6 +188,7 @@
     <ClInclude Include="CServer.h" />
     <ClInclude Include="CCtrlData.h" />
     <ClInclude Include="Dump.h" />
+    <ClInclude Include="proInc.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RunServer.h" />
     <ClInclude Include="RunServerDlg.h" />

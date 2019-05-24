@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "CServer.h"
 
-extern CString g_configPath = L".\\config.ini";
+
+extern CString g_configPath;
+
 CServer::CServer()
 {
 	m_serverBuff = { 0 }; 
@@ -22,18 +24,13 @@ void CServer::DelServer(CString serverName)
 	WritePrivateProfileString(serverName, NULL, NULL, g_configPath);
 }
 
-bool CServer::RunServer(CString serverName)
+bool CServer::RunServer(CString serverName, CString lpCmd, CString lpDirectory)
 {
 	if (m_serverBuff.isRun)
-		return true;
-	WCHAR Rcbuff[MAX_PATH] = { 0 };
-	if (!GetPrivateProfileString(serverName, L"path", L"", Rcbuff, MAX_PATH, g_configPath))
-		return false;
-	CString lpCmd = Rcbuff;
-	CString lpDirectory = getDirFromFullPath(lpCmd);
+		return true;  
 	m_serverBuff.serverName = serverName;
 	m_serverBuff.fileDir = lpDirectory;
-	bool nShow = FALSE;
+	bool nShow = TRUE;
 	bool isWait = TRUE;
 
 	LPPROCESS_INFORMATION lppi;
@@ -60,6 +57,7 @@ bool CServer::RunServer(CString serverName)
 	if (lpDirectory.IsEmpty() ? !CreateProcess(NULL, (LPWSTR)(LPCWSTR)lpCmd, NULL, NULL, true, CREATE_NEW_CONSOLE, NULL, NULL, &myStartup, lppi) :
 		!CreateProcess(NULL, (LPWSTR)(LPCWSTR)lpCmd, NULL, NULL, true, CREATE_NEW_CONSOLE, NULL, lpDirectory, &myStartup, lppi)) {
 		int a = GetLastError();
+		printf("create process error!");
 		return false;
 	}
 	m_serverBuff.isRun = true;
@@ -143,4 +141,4 @@ char* CServer::getPrintInfo(CString serverName)
 		return m_readBuff;
 	}
 	return NULL; 
-} 
+}

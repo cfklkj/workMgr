@@ -16,11 +16,12 @@ public:
 	//服务是否在运行
 	bool IsServerRun(CString serverName);
 	//运行
-	bool RunServer(CString serverName);
+	bool RunServer(CString serverName, CString lpCmd, CString lpDirector);
 	//停止-清理
 	void StopServer(CString serverName);
 	//获取日志
 	char* getPrintInfo(CString serverName);
+
 private:
 	struct STR_RUNSERVERINFO
 	{

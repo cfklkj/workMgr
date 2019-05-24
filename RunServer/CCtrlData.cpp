@@ -38,34 +38,34 @@ bool CCtrlData::initTreeCtrl(CTreeCtrl *treeHwnd)
 	treeHwnd->SetImageList(&m_img, TVSIL_NORMAL);
 	//内容
 	WCHAR Rbuff[MAX_PATH] = { 0 };
-	HTREEITEM rootItem = treeHwnd->InsertItem(L"服务列表:", TVI_ROOT);
+	HTREEITEM rootItem = treeHwnd->InsertItem(L"推流列表:", TVI_ROOT);
 	int lenth = GetPrivateProfileSectionNames(Rbuff, MAX_PATH, g_configPath);
 	for (int i = 0; i < lenth; i++)
 	{
-		CString serverName = L"";
+		CString token = L"";
 		if (i == 0)
 		{
-			serverName = &Rbuff[i];
+			token = &Rbuff[i];
 		}
 		else if (Rbuff[i] == '\0')
 		{
-			serverName = &Rbuff[i + 1];
+			token = &Rbuff[i + 1];
 		}
 
-		WCHAR Rcbuff[MAX_PATH] = { 0 };
-		if (GetPrivateProfileString(serverName, L"path", L"", Rcbuff, MAX_PATH, g_configPath))
-		{
-			CString filePath = Rcbuff;
-			InsertTreeItem(treeHwnd, serverName, filePath); 
-		}
+		WCHAR name[MAX_PATH] = { 0 };
+		if (GetPrivateProfileString(token, L"name", L"", name, MAX_PATH, g_configPath))
+		{ 
+			i += lstrlen(name);
+			InsertTreeItem(treeHwnd, name, token);
+		} 
 	}
 	treeHwnd->Expand(rootItem, TVE_EXPAND);
 	return lenth;
 }
-HTREEITEM CCtrlData::InsertTreeItem(CTreeCtrl *treeHwnd, CString serverName, CString filePath)
+HTREEITEM CCtrlData::InsertTreeItem(CTreeCtrl *treeHwnd, CString serverName, CString token)
 { 
 	HTREEITEM item = treeHwnd->InsertItem((LPCTSTR)serverName, treeHwnd->GetRootItem());
-	HTREEITEM tItem = treeHwnd->InsertItem((LPCTSTR)getDirFromFullPath(filePath), item);
+	HTREEITEM tItem = treeHwnd->InsertItem((LPCTSTR)token, item);
 	treeHwnd->SetItemImage(tItem, 3, 3);
 	treeHwnd->SetItemData(tItem, 3);
 	changeTreeIcon(treeHwnd, item, false);
@@ -83,6 +83,7 @@ HTREEITEM CCtrlData::GetSelectTree(CTreeCtrl *treeHwnd)
 	GetCursorPos(&pt);//得到当前鼠标的位置
 	treeHwnd->ScreenToClient(&pt);//将屏幕坐标转换为客户区坐标
 	HTREEITEM tree_Item = treeHwnd->HitTest(pt);//调用HitTest找到对应点击的树节点
+	setSelectItem(tree_Item);
 	return tree_Item;
 }
 
@@ -111,8 +112,8 @@ void CCtrlData::TreePopMenu(CTreeCtrl *treeHwnd)
 		}
 		else
 		{
-			CMenu* pPopup = menu.GetSubMenu(2);
-			pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent());
+		//	CMenu* pPopup = menu.GetSubMenu(2);
+		//	pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent());
 		}
 
 	}
@@ -121,6 +122,16 @@ void CCtrlData::TreePopMenu(CTreeCtrl *treeHwnd)
 		CMenu* pPopup = menu.GetSubMenu(1);
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent());
 	}
+}
+CString CCtrlData::getSelectItemChileName(CTreeCtrl * treeHwnd, HTREEITEM item)
+{ 
+	HTREEITEM chileItem = item ? treeHwnd->GetChildItem(item) : treeHwnd->GetChildItem(getSelectItem());
+	return treeHwnd->GetItemText(chileItem);
+}
+void CCtrlData::upSelectItemName(CTreeCtrl *treeHwnd, CString name)
+{
+	HTREEITEM curItem = getSelectItem();
+	treeHwnd->SetItemText(curItem, name);
 }
 //---------------------------------------btn
 void CCtrlData::btnDisable(CButton *btnHwnd)
