@@ -2,7 +2,7 @@
 #include "CCtrlData.h"
 #include "resource.h"
 
-
+static CCtrlData g_ctrlData;
 extern CString g_configPath;
 CCtrlData::CCtrlData()
 {   
@@ -15,6 +15,18 @@ CCtrlData::~CCtrlData()
 {
 }
 
+CCtrlData * CCtrlData::instance()
+{
+	return &g_ctrlData;
+}
+
+bool CCtrlData::initCtrl(CTreeCtrl * treeHwnd, CEdit * editHwnd)
+{
+	setTreeCtrl(treeHwnd);
+	setEditCtrl(editHwnd);
+	return false;
+}
+
 //修改风格
 /*DWORD dwOriginalStyle = m_actions->GetStyle();
 m_actions->ModifyStyle(m_actions->m_hWnd, dwOriginalStyle,
@@ -22,7 +34,7 @@ dwOriginalStyle | TVS_HASLINES, 0);*/
 bool CCtrlData::initTreeCtrl(CTreeCtrl *treeHwnd)
 {
 	if (!treeHwnd)
-		return false;
+		return false; 
 	//https://blog.csdn.net/veryhehe2011/article/details/7964558
 	//图标
 	static CImageList m_img;
@@ -38,7 +50,7 @@ bool CCtrlData::initTreeCtrl(CTreeCtrl *treeHwnd)
 	treeHwnd->SetImageList(&m_img, TVSIL_NORMAL);
 	//内容
 	WCHAR Rbuff[MAX_PATH] = { 0 };
-	HTREEITEM rootItem = treeHwnd->InsertItem(L"推流列表:", TVI_ROOT);
+	HTREEITEM rootItem = treeHwnd->InsertItem(L"房间列表:", TVI_ROOT);
 	int lenth = GetPrivateProfileSectionNames(Rbuff, MAX_PATH, g_configPath);
 	for (int i = 0; i < lenth; i++)
 	{
@@ -56,26 +68,39 @@ bool CCtrlData::initTreeCtrl(CTreeCtrl *treeHwnd)
 		if (GetPrivateProfileString(token, L"name", L"", name, MAX_PATH, g_configPath))
 		{ 
 			i += lstrlen(name);
-			InsertTreeItem(treeHwnd, name, token);
+			InsertTreeItem(name, token);
 		} 
 	}
 	treeHwnd->Expand(rootItem, TVE_EXPAND);
 	return lenth;
 }
-HTREEITEM CCtrlData::InsertTreeItem(CTreeCtrl *treeHwnd, CString serverName, CString token)
-{ 
-	HTREEITEM item = treeHwnd->InsertItem((LPCTSTR)serverName, treeHwnd->GetRootItem());
-	HTREEITEM tItem = treeHwnd->InsertItem((LPCTSTR)token, item);
-	treeHwnd->SetItemImage(tItem, 3, 3);
-	treeHwnd->SetItemData(tItem, 3);
-	changeTreeIcon(treeHwnd, item, false);
-	return item;
-} 
-bool CCtrlData::changeTreeIcon(CTreeCtrl *treeHwnd, HTREEITEM treeItem, bool isIconRun )
+bool CCtrlData::changeTreeItemIcon(HTREEITEM item, bool isIconRun)
 {
 	int iconIndex = isIconRun ? ico_START : ico_STOP;
-	treeHwnd->SetItemImage(treeItem, iconIndex, iconIndex);
-	return treeHwnd->SetItemData(treeItem, iconIndex);
+	getTreeCtrl()->SetItemImage(item, iconIndex, iconIndex);
+	return getTreeCtrl()->SetItemData(item, iconIndex);
+}
+HTREEITEM CCtrlData::InsertTreeItem(CString serverName, CString token)
+{
+	HTREEITEM item = getTreeCtrl()->InsertItem((LPCTSTR)serverName, getTreeCtrl()->GetRootItem());
+
+	m_tokenMap[item] = token; 
+
+	changeTreeItemIcon(item, false);
+	setSelectItem(item); 
+	return item;
+}
+CString CCtrlData::getSelectItemData()
+{
+	HTREEITEM item = getSelectItem();
+	if (!item)
+		return L""; 
+	return m_tokenMap[item]; 
+}
+
+bool CCtrlData::changeSelectItemIcon(bool isIconRun )
+{
+	return changeTreeItemIcon(getSelectItem(), isIconRun); 
 }
 HTREEITEM CCtrlData::GetSelectTree(CTreeCtrl *treeHwnd)
 {
@@ -123,21 +148,40 @@ void CCtrlData::TreePopMenu(CTreeCtrl *treeHwnd)
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent());
 	}
 }
-CString CCtrlData::getSelectItemChileName(CTreeCtrl * treeHwnd, HTREEITEM item)
+CString CCtrlData::getSelectItemChileName(HTREEITEM item)
 { 
+	CTreeCtrl * treeHwnd = getTreeCtrl();
 	HTREEITEM chileItem = item ? treeHwnd->GetChildItem(item) : treeHwnd->GetChildItem(getSelectItem());
 	return treeHwnd->GetItemText(chileItem);
 }
-void CCtrlData::upSelectItemName(CTreeCtrl *treeHwnd, CString name)
+void CCtrlData::upSelectItemName(CString name)
 {
 	HTREEITEM curItem = getSelectItem();
-	treeHwnd->SetItemText(curItem, name);
+	getTreeCtrl()->SetItemText(curItem, name);
 }
 //---------------------------------------btn
 void CCtrlData::btnDisable(CButton *btnHwnd)
 {
 	btnHwnd->EnableWindow(false);
 	btnHwnd->SetWindowText(L"Run");
+}
+bool CCtrlData::isPushStatu()
+{
+	if (getSelectItem())
+	{
+		int imgIndex = m_tree->GetItemData(getSelectItem());
+		if (imgIndex == ico_START)
+			return true;
+	}
+	return false;
+}
+void CCtrlData::delSelectItem()
+{
+	if (getSelectItem())
+	{
+		 m_tree->DeleteItem(getSelectItem()); 
+		 setSelectItem(NULL);
+	}
 }
 void CCtrlData::btnNormal(CButton *btnHwnd)
 {
@@ -152,11 +196,14 @@ void CCtrlData::btnDown(CButton *btnHwnd)
 
 
 //---------------------------------------edit  
-void CCtrlData::updateEditCtrlData(CEdit *editHwnd, CString msg, bool autoScroll, bool isScrollBake)
+void CCtrlData::updateEditCtrlData(CString msg)
 { 
 	if (msg.IsEmpty())
 		return;
+	CEdit *editHwnd = getEditCtrl();
 	int line = editHwnd->GetLineCount();  
+	bool autoScroll = getisScroll();
+	bool isScrollBake = false; 
 	if (autoScroll) //自动滚动
 	{
 		if (isScrollBake)

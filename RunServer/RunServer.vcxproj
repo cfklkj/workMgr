@@ -188,6 +188,8 @@
     <ClInclude Include="CServer.h" />
     <ClInclude Include="CCtrlData.h" />
     <ClInclude Include="Dump.h" />
+    <ClInclude Include="ffmpegMgr.h" />
+    <ClInclude Include="MenuAct.h" />
     <ClInclude Include="proInc.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RunServer.h" />
@@ -200,6 +202,8 @@
     <ClCompile Include="CAddServerDlg.cpp" />
     <ClCompile Include="CServer.cpp" />
     <ClCompile Include="CCtrlData.cpp" />
+    <ClCompile Include="ffmpegMgr.cpp" />
+    <ClCompile Include="MenuAct.cpp" />
     <ClCompile Include="RunServer.cpp" />
     <ClCompile Include="RunServerDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

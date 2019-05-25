@@ -15,3 +15,14 @@
 
 
 //本地项目头文件 
+
+enum ActBtn {
+	CREATEROOM,
+	DROPROOM,
+	PUSH,
+	STOP,
+	ALLRUN,
+	ALLSTOP,
+	HEART,
+	FREE,
+};
