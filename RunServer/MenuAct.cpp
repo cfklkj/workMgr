@@ -44,6 +44,33 @@ void MenuAct::explorerThis()
 	ShellExecute(NULL, L"open", path, NULL, NULL, SW_SHOW);
 }
 
+void MenuAct::allPush()
+{
+	HTREEITEM hCurItem = CCtrlData::instance()->getTreeCtrl()->GetChildItem(CCtrlData::instance()->getTreeCtrl()->GetRootItem());
+	while (hCurItem)
+	{
+		if (!CCtrlData::instance()->isPushStatu(hCurItem))
+		{
+			CCtrlData::instance()->getTreeCtrl()->SelectItem(hCurItem); 
+			ffmpegMgr::instance()->readyPush(hCurItem); 
+		}
+		hCurItem = CCtrlData::instance()->getTreeCtrl()->GetNextSiblingItem(hCurItem);
+	}
+}
+
+void MenuAct::allPushStop()
+{
+	HTREEITEM hCurItem = CCtrlData::instance()->getTreeCtrl()->GetChildItem(CCtrlData::instance()->getTreeCtrl()->GetRootItem());
+	while (hCurItem)
+	{
+		if (CCtrlData::instance()->isPushStatu(hCurItem))
+		{ 
+			ffmpegMgr::instance()->dropPush(hCurItem);
+		}
+		hCurItem = CCtrlData::instance()->getTreeCtrl()->GetNextSiblingItem(hCurItem);
+	}
+}
+
 void MenuAct::delRoomInfo(CRunServerDlg * dlg)
 {
 	if (CCtrlData::instance()->isPushStatu())
@@ -51,9 +78,10 @@ void MenuAct::delRoomInfo(CRunServerDlg * dlg)
 		dlg->MessageBox(L"请关闭推流服务后重试！", L"错误提示！");
 		return;
 	} 
-	
+
+	HTREEITEM item = CCtrlData::instance()->getSelectItem();
 	CString token = CCtrlData::instance()->getSelectItemData();
-	ffmpegMgr::instance()->dropPush(token); 
+	ffmpegMgr::instance()->dropPush(item);
 	WritePrivateProfileString(token, NULL, NULL, g_configPath); 
 	CCtrlData::instance()->delSelectItem();
 }
@@ -106,18 +134,9 @@ void MenuAct::startPush(CRunServerDlg * dlg)
 	}
 	ffmpegMgr::instance()->startPush();
 }
-
-void MenuAct::stopPush(CRunServerDlg * dlg)
-{
-	ffmpegMgr::instance()->stopPush();
-}
+ 
 
 void MenuAct::dropPush(CRunServerDlg * dlg)
-{
-	if (CCtrlData::instance()->isPushStatu())
-	{
-		dlg->MessageBox(L"请关闭推流服务后重试！", L"错误提示！");
-		return;
-	}
+{  
 	ffmpegMgr::instance()->dropPush();
 }

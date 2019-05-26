@@ -17,6 +17,14 @@ enum  enum_RUNSTATUS
 	btn_SelectItem,
 	btn_LRBtnDown,
 };
+struct ItemRecord {
+	HTREEITEM item;
+	ActBtn act;
+	CString token;
+	bool isPush() {
+		return act == PUSH;
+	};
+};
 
 class CCtrlData
 {
@@ -30,8 +38,10 @@ public:
 	bool initCtrl(CTreeCtrl *treeHwnd, CEdit *edtiHwnd);
 
 	CString getSelectItemData();
+	CString getSelectItemData(HTREEITEM item);
 	HTREEITEM InsertTreeItem(CString serverName, CString token);
 	bool changeSelectItemIcon(bool isIconRun);
+	bool changeTreeItemIcon(HTREEITEM item, bool isIconRun);
 	HTREEITEM CCtrlData::GetSelectTree(CTreeCtrl *treeHwnd);
 	void TreePopMenu(CTreeCtrl *treeHwnd);
 	CString getSelectItemChileName(HTREEITEM item = NULL);
@@ -48,6 +58,7 @@ public:
 	void btnDisable(CButton *btnHwnd);
 	//判断节点是否在推流状态
 	bool isPushStatu();
+	bool isPushStatu(HTREEITEM item);
 	//删除选中节点
 	void delSelectItem();
 	//选择节点
@@ -79,10 +90,16 @@ public:
 	void setIsScroll(bool isScroll) {
 		m_isScroll = isScroll;
 	};
+
 private:
 	bool initTreeCtrl(CTreeCtrl *treeHwnd);
-	bool changeTreeItemIcon(HTREEITEM item, bool isIconRun);
 
+public: 
+	 
+	void setItemRecord(HTREEITEM item, ActBtn act);
+	ItemRecord *getItemRecord(HTREEITEM item) {
+		return &m_tokenMap[item];
+	};
 private:  
 	int m_maxScrollLine;
 	int m_dropLine; 
@@ -90,7 +107,7 @@ private:
 	CTreeCtrl *m_tree;
 	CEdit *m_edit;
 	bool m_isScroll = true; 
-	std::map<HTREEITEM, CString> m_tokenMap;
+	std::map<HTREEITEM, ItemRecord> m_tokenMap;
 	 
 };
 

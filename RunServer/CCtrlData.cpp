@@ -73,6 +73,12 @@ bool CCtrlData::initTreeCtrl(CTreeCtrl *treeHwnd)
 	}
 	treeHwnd->Expand(rootItem, TVE_EXPAND);
 	return lenth;
+} 
+void CCtrlData::setItemRecord(HTREEITEM item, ActBtn act)
+{
+	m_tokenMap[item].act = act;
+	m_tokenMap[item].item = item;
+	m_tokenMap[item].token = getSelectItemData(item);
 }
 bool CCtrlData::changeTreeItemIcon(HTREEITEM item, bool isIconRun)
 {
@@ -84,7 +90,7 @@ HTREEITEM CCtrlData::InsertTreeItem(CString serverName, CString token)
 {
 	HTREEITEM item = getTreeCtrl()->InsertItem((LPCTSTR)serverName, getTreeCtrl()->GetRootItem());
 
-	m_tokenMap[item] = token; 
+	m_tokenMap[item].token = token;  
 
 	changeTreeItemIcon(item, false);
 	setSelectItem(item); 
@@ -95,9 +101,13 @@ CString CCtrlData::getSelectItemData()
 	HTREEITEM item = getSelectItem();
 	if (!item)
 		return L""; 
-	return m_tokenMap[item]; 
+	return m_tokenMap[item].token; 
 }
 
+CString CCtrlData::getSelectItemData(HTREEITEM item)
+{
+	return m_tokenMap[item].token;
+}
 bool CCtrlData::changeSelectItemIcon(bool isIconRun )
 {
 	return changeTreeItemIcon(getSelectItem(), isIconRun); 
@@ -127,18 +137,17 @@ void CCtrlData::TreePopMenu(CTreeCtrl *treeHwnd)
 		return;
 	}
 	if (curItem != NULL)
-	{  
+	{
 		treeHwnd->SelectItem(curItem); //使右键单击的树节点被选中
-		int imgIndex = treeHwnd->GetItemData(curItem);
-		if (imgIndex != 3)
+		if (CCtrlData::instance()->isPushStatu(curItem)) 
 		{
-			CMenu* pPopup = menu.GetSubMenu(0); 
+			CMenu* pPopup = menu.GetSubMenu(2); 
 			pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent()); 
 		}
 		else
 		{
-		//	CMenu* pPopup = menu.GetSubMenu(2);
-		//	pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent());
+		 	CMenu* pPopup = menu.GetSubMenu(0);
+		 	pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent());
 		}
 
 	}
@@ -167,9 +176,13 @@ void CCtrlData::btnDisable(CButton *btnHwnd)
 }
 bool CCtrlData::isPushStatu()
 {
-	if (getSelectItem())
+	return isPushStatu(getSelectItem()); 
+}
+bool CCtrlData::isPushStatu(HTREEITEM item)
+{
+	if (item)
 	{
-		int imgIndex = m_tree->GetItemData(getSelectItem());
+		int imgIndex = m_tree->GetItemData(item);
 		if (imgIndex == ico_START)
 			return true;
 	}
@@ -238,7 +251,7 @@ void CCtrlData::updateEditCtrlData(CString msg)
 			editHwnd->LineScroll(tnVertPos - m_dropLine - 10);
 		}
 		editHwnd->SetRedraw(true);
-	} 
+	}  
 }
 int CCtrlData::updateEditStack(CString* oldData, CString* newData, int& oldDataLine)
 {

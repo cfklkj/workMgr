@@ -49,7 +49,7 @@ BEGIN_MESSAGE_MAP(CRunServerDlg, CDialogEx)
 	ON_NOTIFY(NM_RCLICK, IDC_TREE1, &CRunServerDlg::OnRclickTree)  
 	ON_WM_CTLCOLOR()
 	ON_BN_CLICKED(IDC_RUN2, &CRunServerDlg::OnBnClickedClear)
-	ON_BN_CLICKED(IDC_CHECK1, &CRunServerDlg::OnClickedCheck1)   
+	ON_BN_CLICKED(IDC_CHECK1, &CRunServerDlg::OnClickedCheck1)    
 END_MESSAGE_MAP()
 
 
@@ -71,6 +71,7 @@ BOOL CRunServerDlg::OnInitDialog()
 	m_check->SetCheck(m_isLineScroll);
 	CCtrlData::instance()->initCtrl(m_tree, m_edit);
 	m_edit->SetLimitText(-1); 
+	 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -110,7 +111,7 @@ HBRUSH CRunServerDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
 
 	if (pWnd->GetDlgCtrlID() == IDC_LOG)
-	{
+	{ 
 		pDC->SetBkColor(RGB(255, 255, 255));
 		return  m_editHbrEdit;
 	}
@@ -140,12 +141,13 @@ void CRunServerDlg::OnEnChangeEdit1()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	// TODO:  在此添加控件通知处理程序代码 
+	 
 }
 
 //---------------------------------------------------------tree  
 void CRunServerDlg::OnRclickTree(NMHDR *pNMHDR, LRESULT *pResult)
-{
+{ 
 	// TODO: 在此添加控件通知处理程序代码 	 
 	//临时鼠标的屏幕坐标，用来弹出menu
 	CCtrlData::instance()->TreePopMenu(m_tree);
@@ -183,24 +185,24 @@ BOOL CRunServerDlg::PreTranslateMessage(MSG* pMsg)
 		MenuAct::instance()->lookRoomInfo(this);
 		return 1;
 	}
-	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU_create)  //准备开播
+	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU_create)  //准备-开播
 	{
 		MenuAct::instance()->readyPush(this);
 		return 1;
 	}
-	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU_start)  //开始推流
-	{
-		MenuAct::instance()->startPush(this);
-		return 1;
-	}
-	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU_stop)  //结束推流
-	{
-		MenuAct::instance()->stopPush(this);
-		return 1;
-	}
-	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU_drop)  //销毁
-	{
+	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU_drop)  //停止-销毁
+	{ 
 		MenuAct::instance()->dropPush(this);
+		return 1;
+	}
+	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU2_allPush)  //停止-销毁
+	{
+		MenuAct::instance()->allPush();
+		return 1;
+	}
+	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU2_allPushStop)  //停止-销毁
+	{
+		MenuAct::instance()->allPushStop();
 		return 1;
 	}
 	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU_EXEPATH) //打开程序目录
@@ -216,9 +218,8 @@ void CRunServerDlg::OnCancel()
 	HTREEITEM hCurItem = m_tree->GetChildItem(m_tree->GetRootItem());
 	int sleepCount = 0; 
 	while (hCurItem)
-	{
-		int imgIndex = m_tree->GetItemData(hCurItem);
-		if (imgIndex == ico_START)
+	{ 
+		if (CCtrlData::instance()->isPushStatu(hCurItem))
 		{ 
 			sleepCount++;
 		}
@@ -229,18 +230,17 @@ void CRunServerDlg::OnCancel()
 		CDialogEx::OnCancel();
 
 	}
-	else if(MessageBox(_T("确定关闭服务程序?"), _T("警告"), MB_OKCANCEL) == IDOK) { 
+	else if(MessageBox(_T("有房间正在开播，确定关闭?"), _T("警告"), MB_OKCANCEL) == IDOK) {
+		ffmpegMgr::instance()->setCloseWindowValue();
 		hCurItem = m_tree->GetChildItem(m_tree->GetRootItem());
 		while (hCurItem)
 		{
-			int imgIndex = m_tree->GetItemData(hCurItem);
-			if (imgIndex == ico_START)
-			{
-				CString token = CCtrlData::instance()->getSelectItemChileName(hCurItem);
-				ffmpegMgr::instance()->dropPush(token);
+			if (CCtrlData::instance()->isPushStatu(hCurItem))
+			{ 
+				ffmpegMgr::instance()->dropPush(hCurItem);
 			}
 			hCurItem = m_tree->GetNextSiblingItem(hCurItem);
-		} 
+		}  
 		CDialogEx::OnCancel();
 	} 
 } 
@@ -337,4 +337,4 @@ void CRunServerDlg::showIniSection(CString token)
 
 	MessageBox(showMsg, L"房间信息...");
 }
-	
+ 
