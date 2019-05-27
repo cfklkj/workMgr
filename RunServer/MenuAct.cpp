@@ -30,7 +30,7 @@ void MenuAct::AddRoomInfo(CRunServerDlg * dlg)
 	{
 		if (adddlg.isTokenUp(token))
 		{
-			CCtrlData::instance()->InsertTreeItem(adddlg.getServerName(), adddlg.getToken());
+			CCtrlData::instance()->InsertTreeItem(adddlg.getRoomName(), adddlg.getToken());
 		}
 	}
 }
@@ -65,7 +65,7 @@ void MenuAct::allPushStop()
 	{
 		if (CCtrlData::instance()->isPushStatu(hCurItem))
 		{ 
-			ffmpegMgr::instance()->dropPush(hCurItem);
+			ffmpegMgr::instance()->dropPush(hCurItem, STOP_TOKEN);
 		}
 		hCurItem = CCtrlData::instance()->getTreeCtrl()->GetNextSiblingItem(hCurItem);
 	}
@@ -81,7 +81,7 @@ void MenuAct::delRoomInfo(CRunServerDlg * dlg)
 
 	HTREEITEM item = CCtrlData::instance()->getSelectItem();
 	CString token = CCtrlData::instance()->getSelectItemData();
-	ffmpegMgr::instance()->dropPush(item);
+	ffmpegMgr::instance()->dropPush(item, STOP_TOKEN);
 	WritePrivateProfileString(token, NULL, NULL, g_configPath); 
 	CCtrlData::instance()->delSelectItem();
 }
@@ -101,11 +101,11 @@ void MenuAct::alterRoomInfo(CRunServerDlg *dlg)
 		return; 
 	if (adddlg.isTokenUp(token))
 	{
-		CCtrlData::instance()->InsertTreeItem(adddlg.getServerName(), adddlg.getToken());
+		CCtrlData::instance()->InsertTreeItem(adddlg.getRoomName(), adddlg.getToken());
 	}
 	else
 	{
-		CCtrlData::instance()->upSelectItemName(adddlg.getServerName());
+		CCtrlData::instance()->upSelectItemName(adddlg.getRoomName());
 	} 
 }
 
@@ -124,18 +124,7 @@ void MenuAct::readyPush(CRunServerDlg * dlg)
 	}
 	ffmpegMgr::instance()->readyPush();
 }
-
-void MenuAct::startPush(CRunServerDlg * dlg)
-{
-	if (CCtrlData::instance()->isPushStatu())
-	{
-		dlg->MessageBox(L"已经在推流了！", L"温馨提示！");
-		return;
-	}
-	ffmpegMgr::instance()->startPush();
-}
  
-
 void MenuAct::dropPush(CRunServerDlg * dlg)
 {  
 	ffmpegMgr::instance()->dropPush();

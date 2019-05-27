@@ -17,8 +17,7 @@ public:
 	void delRoomInfo(CRunServerDlg* dlg);
 	void alterRoomInfo(CRunServerDlg *dlg);
 	void lookRoomInfo(CRunServerDlg *dlg);
-	void readyPush(CRunServerDlg *dlg);
-	void startPush(CRunServerDlg *dlg);
+	void readyPush(CRunServerDlg *dlg); 
 	void dropPush(CRunServerDlg *dlg);
 	 
 

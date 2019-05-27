@@ -80,7 +80,7 @@ void CCtrlData::setItemRecord(HTREEITEM item, ActBtn act)
 	m_tokenMap[item].item = item;
 	m_tokenMap[item].token = getSelectItemData(item);
 }
-bool CCtrlData::changeTreeItemIcon(HTREEITEM item, bool isIconRun)
+bool CCtrlData::changeSelectItemIcon(HTREEITEM item, bool isIconRun)
 {
 	int iconIndex = isIconRun ? ico_START : ico_STOP;
 	getTreeCtrl()->SetItemImage(item, iconIndex, iconIndex);
@@ -92,7 +92,7 @@ HTREEITEM CCtrlData::InsertTreeItem(CString serverName, CString token)
 
 	m_tokenMap[item].token = token;  
 
-	changeTreeItemIcon(item, false);
+	changeSelectItemIcon(item, false);
 	setSelectItem(item); 
 	return item;
 }
@@ -107,25 +107,22 @@ CString CCtrlData::getSelectItemData()
 CString CCtrlData::getSelectItemData(HTREEITEM item)
 {
 	return m_tokenMap[item].token;
-}
-bool CCtrlData::changeSelectItemIcon(bool isIconRun )
-{
-	return changeTreeItemIcon(getSelectItem(), isIconRun); 
-}
-HTREEITEM CCtrlData::GetSelectTree(CTreeCtrl *treeHwnd)
-{
+}  
+
+void CCtrlData::setSelectItem()
+{ 
 	CPoint pt;
 	GetCursorPos(&pt);//得到当前鼠标的位置
-	treeHwnd->ScreenToClient(&pt);//将屏幕坐标转换为客户区坐标
-	HTREEITEM tree_Item = treeHwnd->HitTest(pt);//调用HitTest找到对应点击的树节点
-	setSelectItem(tree_Item);
-	return tree_Item;
+	getTreeCtrl()->ScreenToClient(&pt);//将屏幕坐标转换为客户区坐标
+	HTREEITEM tree_Item = getTreeCtrl()->HitTest(pt);//调用HitTest找到对应点击的树节点
+	setSelectItem(tree_Item); 
 }
 
-void CCtrlData::TreePopMenu(CTreeCtrl *treeHwnd)
+void CCtrlData::TreePopMenu()
 {
 	//获取到当前鼠标选择的树节点
-	HTREEITEM curItem = GetSelectTree(treeHwnd);
+	HTREEITEM curItem = getSelectItem();
+	CTreeCtrl * treeHwnd = getTreeCtrl();
 	CMenu menu;
 	menu.LoadMenuW(IDR_MENU1);
 	CPoint ScreenPt;
@@ -133,25 +130,25 @@ void CCtrlData::TreePopMenu(CTreeCtrl *treeHwnd)
 	if (curItem == treeHwnd->GetRootItem())
 	{
 		CMenu* pPopup = menu.GetSubMenu(1);//装载第一个子菜单，即我们菜单的第一列
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent());//弹出菜单
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, getTreeCtrl()->GetParent());//弹出菜单
 		return;
 	}
 	if (curItem != NULL)
 	{
 		treeHwnd->SelectItem(curItem); //使右键单击的树节点被选中
-		if (CCtrlData::instance()->isPushStatu(curItem)) 
+		if (CCtrlData::instance()->isPushStatu(curItem)) //STOP
 		{
 			CMenu* pPopup = menu.GetSubMenu(2); 
 			pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent()); 
 		}
-		else
+		else  //START
 		{
 		 	CMenu* pPopup = menu.GetSubMenu(0);
 		 	pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent());
 		}
 
 	}
-	else
+	else  //ADD
 	{
 		CMenu* pPopup = menu.GetSubMenu(1);
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN, ScreenPt.x, ScreenPt.y, treeHwnd->GetParent());
@@ -167,13 +164,7 @@ void CCtrlData::upSelectItemName(CString name)
 {
 	HTREEITEM curItem = getSelectItem();
 	getTreeCtrl()->SetItemText(curItem, name);
-}
-//---------------------------------------btn
-void CCtrlData::btnDisable(CButton *btnHwnd)
-{
-	btnHwnd->EnableWindow(false);
-	btnHwnd->SetWindowText(L"Run");
-}
+} 
 bool CCtrlData::isPushStatu()
 {
 	return isPushStatu(getSelectItem()); 
@@ -195,17 +186,7 @@ void CCtrlData::delSelectItem()
 		 m_tree->DeleteItem(getSelectItem()); 
 		 setSelectItem(NULL);
 	}
-}
-void CCtrlData::btnNormal(CButton *btnHwnd)
-{
-	btnHwnd->EnableWindow(true);
-	btnHwnd->SetWindowText(L"Run");
-}
-void CCtrlData::btnDown(CButton *btnHwnd)
-{
-	btnHwnd->EnableWindow(true);
-	btnHwnd->SetWindowText(L"stop");
-}
+} 
 
 
 //---------------------------------------edit  
@@ -215,7 +196,7 @@ void CCtrlData::updateEditCtrlData(CString msg)
 		return;
 	CEdit *editHwnd = getEditCtrl();
 	int line = editHwnd->GetLineCount();  
-	bool autoScroll = getisScroll();
+	bool autoScroll = getIsScroll();
 	bool isScrollBake = false; 
 	if (autoScroll) //自动滚动
 	{
@@ -252,40 +233,11 @@ void CCtrlData::updateEditCtrlData(CString msg)
 		}
 		editHwnd->SetRedraw(true);
 	}  
-}
-int CCtrlData::updateEditStack(CString* oldData, CString* newData, int& oldDataLine)
-{
-	if (!oldData || !newData)
-		return false; 					  
-	if (oldDataLine < m_maxScrollLine)
-	{
-		*oldData += *newData;
-		return false;
-	}
-	else
-	{
-		//数据内存回滚
-		//在临时内存处理数据
-		CString tempRead = L"";
-		tempRead = *oldData + *newData;
-		const wchar_t* tempLog = tempRead;  
-		oldDataLine -= m_dropLine; 
-		int i = 0;
-		while (*tempLog && i < m_dropLine)
-		{
-			if (*tempLog == '\n')
-				i++;
-			tempLog++;
-		}
-		//更新显示数据
-		oldData->Empty();   //处理内存泄漏
-		*oldData = tempLog;
-		return true;
-	}
-}
+} 
 //---//PostMessage(pRun->m_hWnd, WM_USER + 101, 0, keepReadBuff->GetLength()); //让主线程执行数据刷新
-void CCtrlData::scrollEdit(CEdit *editHwnd, bool isAuto)
+void CCtrlData::scrollEdit(bool isAuto)
 {
+	CEdit * editHwnd = getEditCtrl();
 	if (!isAuto) //取消自动滚动
 	{ 
 		int tnVertPos = editHwnd->GetScrollPos(SB_VERT);

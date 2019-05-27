@@ -5,6 +5,7 @@ enum TOKENStatu {
 	STOP_TOKEN=0,
 	RUN_TOKEN,
 	WAIT_TOKEN,
+	PROCESSEXIT_TOKEN,  //½ø³ÌÍË³ö
 };
 
 class ffmpegMgr
@@ -16,15 +17,15 @@ public:
 
 public:
 	void readyPush();
-	void readyPush(HTREEITEM oldItem);
-	void startPush();
+	void readyPush(HTREEITEM oldItem); 
 	void startPush(HTREEITEM oldItem); 
 	void dropPush();
-	void dropPush(HTREEITEM item);
+	void dropPush(HTREEITEM item, TOKENStatu statu);
 	void sendHeart(HTREEITEM item, bool isThread);
+	void sendCmd(HTREEITEM oldItem, CString token, ActBtn oldBtn);
+private:
 	CString getCmdStr(CString token, ActBtn oldBtn);
 	CString getBtnActTip(HTREEITEM item, ActBtn oldBtn,bool isStart);
-	void sendCmd(HTREEITEM oldItem, CString token, ActBtn oldBtn);
 
 private: 
 	bool isNeedCreateRoom(HTREEITEM item);
@@ -32,7 +33,7 @@ private:
 	CString getStopPushCmdStr(CString token);
 	CString getDropRoomCmdStr(CString token);
 	CString getHeartBeatCmdStr(CString token);
-	CString createRoom(CString token);
+	CString getCreateRoomCmdStr(CString token);
 	void stopPush(HTREEITEM item);
 
 public: 
@@ -45,6 +46,9 @@ public:
 	};
 	bool isHeartTokenForceStop(CString token) {
 		return m_heartToken[token] == STOP_TOKEN;
+	};
+	bool isProcessExit(CString token) {
+		return m_heartToken[token] == PROCESSEXIT_TOKEN;
 	};
 	void setCloseWindowValue() { m_isCloseWindow = true; };
 	bool isCloseWindow() { return m_isCloseWindow; };

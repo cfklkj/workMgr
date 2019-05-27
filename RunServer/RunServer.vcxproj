@@ -185,7 +185,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CAddServerDlg.h" />
-    <ClInclude Include="CServer.h" />
     <ClInclude Include="CCtrlData.h" />
     <ClInclude Include="Dump.h" />
     <ClInclude Include="ffmpegMgr.h" />
@@ -200,7 +199,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CAddServerDlg.cpp" />
-    <ClCompile Include="CServer.cpp" />
     <ClCompile Include="CCtrlData.cpp" />
     <ClCompile Include="ffmpegMgr.cpp" />
     <ClCompile Include="MenuAct.cpp" />

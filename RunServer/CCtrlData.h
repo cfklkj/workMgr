@@ -39,32 +39,27 @@ public:
 
 	CString getSelectItemData();
 	CString getSelectItemData(HTREEITEM item);
-	HTREEITEM InsertTreeItem(CString serverName, CString token);
-	bool changeSelectItemIcon(bool isIconRun);
-	bool changeTreeItemIcon(HTREEITEM item, bool isIconRun);
-	HTREEITEM CCtrlData::GetSelectTree(CTreeCtrl *treeHwnd);
-	void TreePopMenu(CTreeCtrl *treeHwnd);
+	HTREEITEM InsertTreeItem(CString serverName, CString token); 
+	bool changeSelectItemIcon(HTREEITEM item, bool isIconRun);
+	
+	void TreePopMenu();
 	CString getSelectItemChileName(HTREEITEM item = NULL);
 	void upSelectItemName(CString name);
 	//--edit 
 	//显示数据更新
 	void updateEditCtrlData(CString msg);
-	//回滚返回true
-	int updateEditStack(CString* oldData,CString* newData, int& oldDataLine);
-	void scrollEdit(CEdit *editHwnd,  bool isAuto);
-	//button
-	void btnNormal(CButton *btnHwnd);
-	void btnDown(CButton *btnHwnd);
-	void btnDisable(CButton *btnHwnd);
+	//回滚返回true 
+	void scrollEdit(bool isAuto); 
 	//判断节点是否在推流状态
 	bool isPushStatu();
 	bool isPushStatu(HTREEITEM item);
 	//删除选中节点
 	void delSelectItem();
-	//选择节点
+	//选择节点 
 	HTREEITEM getSelectItem() {
 		return m_selectItem;
 	};
+	void setSelectItem();
 	void setSelectItem(HTREEITEM item) {
 		m_selectItem = item;
 	};
@@ -84,18 +79,19 @@ public:
 		m_edit = editHwnd; 
 	};
 	//是否自动滚动
-	bool  getisScroll() {
+	bool  getIsScroll() {
 		return m_isScroll;
 	};
 	void setIsScroll(bool isScroll) {
 		m_isScroll = isScroll;
+		scrollEdit(m_isScroll);
 	};
 
 private:
 	bool initTreeCtrl(CTreeCtrl *treeHwnd);
 
 public: 
-	 
+	 //记录节点操作，避免冲突
 	void setItemRecord(HTREEITEM item, ActBtn act);
 	ItemRecord *getItemRecord(HTREEITEM item) {
 		return &m_tokenMap[item];

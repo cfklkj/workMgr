@@ -49,7 +49,7 @@ BEGIN_MESSAGE_MAP(CRunServerDlg, CDialogEx)
 	ON_NOTIFY(NM_RCLICK, IDC_TREE1, &CRunServerDlg::OnRclickTree)  
 	ON_WM_CTLCOLOR()
 	ON_BN_CLICKED(IDC_RUN2, &CRunServerDlg::OnBnClickedClear)
-	ON_BN_CLICKED(IDC_CHECK1, &CRunServerDlg::OnClickedCheck1)    
+	ON_BN_CLICKED(IDC_CHECK1, &CRunServerDlg::OnIsAutoScroll)    
 END_MESSAGE_MAP()
 
 
@@ -65,8 +65,7 @@ BOOL CRunServerDlg::OnInitDialog()
 
 									// TODO: 在此添加额外的初始化代码   
 	m_tree = (CTreeCtrl*)GetDlgItem(IDC_TREE1);
-	m_edit = (CEdit*)GetDlgItem(IDC_LOG);
-	m_run = (CButton*)GetDlgItem(IDC_RUN);
+	m_edit = (CEdit*)GetDlgItem(IDC_LOG); 
 	m_check = ((CButton*)GetDlgItem(IDC_CHECK1));
 	m_check->SetCheck(m_isLineScroll);
 	CCtrlData::instance()->initCtrl(m_tree, m_edit);
@@ -150,7 +149,8 @@ void CRunServerDlg::OnRclickTree(NMHDR *pNMHDR, LRESULT *pResult)
 { 
 	// TODO: 在此添加控件通知处理程序代码 	 
 	//临时鼠标的屏幕坐标，用来弹出menu
-	CCtrlData::instance()->TreePopMenu(m_tree);
+	CCtrlData::instance()->setSelectItem();
+	CCtrlData::instance()->TreePopMenu();
 	 
 	*pResult = 0;
 }
@@ -195,7 +195,7 @@ BOOL CRunServerDlg::PreTranslateMessage(MSG* pMsg)
 		MenuAct::instance()->dropPush(this);
 		return 1;
 	}
-	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU2_allPush)  //停止-销毁
+	if (pMsg->message == WM_COMMAND && pMsg->wParam == ID_MENU2_allPush)  //开播所以
 	{
 		MenuAct::instance()->allPush();
 		return 1;
@@ -237,7 +237,7 @@ void CRunServerDlg::OnCancel()
 		{
 			if (CCtrlData::instance()->isPushStatu(hCurItem))
 			{ 
-				ffmpegMgr::instance()->dropPush(hCurItem);
+				ffmpegMgr::instance()->dropPush(hCurItem, STOP_TOKEN);
 			}
 			hCurItem = m_tree->GetNextSiblingItem(hCurItem);
 		}  
@@ -252,7 +252,7 @@ void CRunServerDlg::OnBnClickedClear()
 }
 
 
-void CRunServerDlg::OnClickedCheck1()
+void CRunServerDlg::OnIsAutoScroll()
 {
 	// TODO: 在此添加控件通知处理程序代码 	 
 	m_isLineScroll = !m_isLineScroll; 

@@ -12,18 +12,7 @@ CServer::CServer()
 
 CServer::~CServer()
 {
-}
-
-void CServer::AddServer(CString serverName, CString filePath)
-{
-	WritePrivateProfileString(serverName, L"path", filePath, g_configPath);
-}
-
-void CServer::DelServer(CString serverName)
-{  
-	WritePrivateProfileString(serverName, NULL, NULL, g_configPath);
-}
-
+}  
 bool CServer::RunServer(CString serverName, CString lpCmd, CString lpDirectory)
 {
 	if (m_serverBuff.isRun)

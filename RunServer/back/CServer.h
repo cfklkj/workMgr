@@ -8,11 +8,7 @@ class CServer
 {
 public:
 	CServer();
-	~CServer();
-	//添加
-	static void AddServer(CString serverName, CString filePath);
-	//删除
-	static void DelServer(CString serverName);
+	~CServer();  
 	//服务是否在运行
 	bool IsServerRun(CString serverName);
 	//运行

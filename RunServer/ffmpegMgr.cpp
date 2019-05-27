@@ -49,19 +49,9 @@ void ffmpegMgr::readyPush(HTREEITEM oldItem)
 	HANDLE hwnd = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)funcPushCmd, CCtrlData::instance()->getItemRecord(oldItem), NULL, NULL);
 	CloseHandle(hwnd);
 }
-
-void ffmpegMgr::startPush()
-{  
-	startPush(CCtrlData::instance()->getSelectItem());
-}
-
+ 
 void ffmpegMgr::startPush(HTREEITEM oldItem)
-{
-	if (isNeedCreateRoom(oldItem))
-	{
-		CCtrlData::instance()->updateEditCtrlData(L"房间未准备好，请先创建直播房间。。。\r\n");
-		return;
-	}
+{ 
 	CCtrlData::instance()->setItemRecord(oldItem, PUSH);
 	sendHeart(oldItem, false);   //保持心跳  
 	HANDLE hwnd = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)funcPushCmd, CCtrlData::instance()->getItemRecord(oldItem), NULL, NULL);
@@ -76,15 +66,15 @@ void ffmpegMgr::stopPush(HTREEITEM item)
 
 void ffmpegMgr::dropPush()
 { 
-	dropPush(CCtrlData::instance()->getSelectItem()); 
+	dropPush(CCtrlData::instance()->getSelectItem(), STOP_TOKEN);
 }
 
-void ffmpegMgr::dropPush(HTREEITEM item)
+void ffmpegMgr::dropPush(HTREEITEM item, TOKENStatu statu)
 {
 	CString token = CCtrlData::instance()->getSelectItemData(item);
 	stopPush(item);
 	Fly_sys::Process::Run(Fly_string::w2c(getCmdStr(token, DROPROOM)));
-	setHeartTokenStatu(token, STOP_TOKEN);
+	setHeartTokenStatu(token, statu);
 }
 void ffmpegMgr::sendHeart(HTREEITEM item, bool isThread)
 {
@@ -113,25 +103,33 @@ void ffmpegMgr::sendHeart(HTREEITEM item, bool isThread)
 	CCtrlData::instance()->updateEditCtrlData(getBtnActTip(item, oldBtn, true)); 
 	//request 
 	DWORD ends = GetTickCount() + 30000;  //1000 = 1s
-	while (!isNeedCreateRoom(item))
-	{
+	int isCheckAgain = 3;
+	while (1)
+	{ 
 		//request
 		Sleep(1000);//  间隔30s
 		if (isHeartTokenForceStop(token))
+		{
+			CCtrlData::instance()->updateEditCtrlData(L"用户下播了...\r\n");
 			break;
+		}
+		if (isProcessExit(token))
+		{
+			CCtrlData::instance()->updateEditCtrlData(L"循环播放结束...\r\n");
+			break;
+		}
 		if (GetTickCount() >= ends)
 		{
 			ends += 30000;
 			Fly_sys::Process::Run(cmdStr);
 		}
-	}
+	} 
 	if (isCloseWindow())
 		return;
 	//show msg 
 	CCtrlData::instance()->updateEditCtrlData(getBtnActTip(item, oldBtn, false)); 
 
-	dropPush(item);
-	setHeartTokenStatu(token, STOP_TOKEN);
+	dropPush(item, STOP_TOKEN); 
 	WritePrivateProfileString(token, L"heart", L"0", g_ffmpeg.configPath_w);
 }
 
@@ -142,7 +140,7 @@ CString ffmpegMgr::getCmdStr(CString token, ActBtn oldBtn)
 {
 	if (oldBtn == CREATEROOM)
 	{
-		return createRoom(token);
+		return getCreateRoomCmdStr(token);
 	}
 	if (oldBtn == DROPROOM)
 	{
@@ -169,13 +167,13 @@ void ffmpegMgr::sendCmd(HTREEITEM oldItem, CString token, ActBtn oldBtn)
 	std::string cmdStr = Fly_string::w2c(getCmdStr(token, oldBtn));
 	//show msg
 	CCtrlData::instance()->updateEditCtrlData(getBtnActTip(oldItem, oldBtn, true)); 
-	CCtrlData::instance()->changeTreeItemIcon(oldItem, true);
+	CCtrlData::instance()->changeSelectItemIcon(oldItem, true);
 	//request
 	Fly_sys::Process::Run(cmdStr);
 	if (isCloseWindow())
-		return;
+		return; 
 	//show msg
-	CCtrlData::instance()->changeTreeItemIcon(oldItem, false);
+	CCtrlData::instance()->changeSelectItemIcon(oldItem, false);
 	CCtrlData::instance()->updateEditCtrlData(getBtnActTip(oldItem, oldBtn, false));
 }
 
@@ -225,7 +223,7 @@ CString ffmpegMgr::getDropRoomCmdStr(CString token)
 	lpCmd.append(",1");
 	return Fly_string::c2w(lpCmd.c_str()).c_str();
 }
-CString ffmpegMgr::createRoom(CString token)
+CString ffmpegMgr::getCreateRoomCmdStr(CString token)
 {
 	std::string lpCmd = g_ffmpeg.name; //Fly_string::c2w(g_ffmpeg.name.c_str()).c_str();
 	lpCmd.append(",-c ");
@@ -254,9 +252,7 @@ CString ffmpegMgr::getBtnActTip(HTREEITEM item, ActBtn oldBtn,  bool isStart)
 			std::string logFile = g_ffmpeg.path + "\\roomInfo_" + Fly_string::w2c(token) + ".log";
 			std::string logInfo = Fly_string::UTF8ToGBK(Fly_file::File::catFile(logFile).c_str());
 			if (isNeedCreateRoom(item))
-			{
-				stopPush(item);
-				dropPush(item);
+			{ 
 				return rst + logInfo.c_str() + "\r\n 请求失败， 请稍后重试。。\r\n";
 			}
 			this->startPush(item);
@@ -273,8 +269,8 @@ CString ffmpegMgr::getBtnActTip(HTREEITEM item, ActBtn oldBtn,  bool isStart)
 		}
 		else
 		{
-			std::string timeCount = Fly_Time::TIME::TickToTimeStr((time(NULL) - m_oldReqPushTime[token]));
-			dropPush(item);
+			std::string timeCount = Fly_Time::TIME::TickToTimeStr((time(NULL) - m_oldReqPushTime[token])); 
+			dropPush(item, PROCESSEXIT_TOKEN);
 			return token + " 结束直播推流!\r\n" +  Fly_Time::TIME::GetDateTimeString().c_str() + " 用时---- " + timeCount.c_str() + "\r\n";
 		}
 	}
@@ -313,7 +309,7 @@ bool ffmpegMgr::isNeedCreateRoom(HTREEITEM item)
 	if (tick < 35)//  心跳差  50s
 		return false; 
 	stopPush(item);
-	dropPush(item);
+	dropPush(item, STOP_TOKEN);
 	return true;
 }
   
