@@ -1,4 +1,4 @@
-package main
+package Fly_DB
 
 import(    
     "io/ioutil" 
@@ -7,7 +7,7 @@ import(
 	"strconv"
 	"time"
 	"database/sql" 	
-    _ "code.google.com/P/odbc"  
+    // "code.google.com/P/odbc"  
 )  
  
 type DBListStr struct { 

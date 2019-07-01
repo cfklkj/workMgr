@@ -1,0 +1,60 @@
+
+
+POST
+0.获取guid   url\act=guid
+  0.1 获取目录guid  body=folder          D_xxx
+  0.2 获取文件guid  body=file            F_xxx
+  0.3 获取项目guid  body=pro             P_xxx
+
+1.获取项目列表    url\act=prolist 
+  1.0获取项目列表  body={"act":"get"}              [{"guid":"","name":""}]
+  1.1新建项目      body={"act":"create","guid":"项目guid","name":"项目名称"}     true|false
+  1.2删除项目      body={"act":"drop","guid":"项目guid","name":"项目名称"}        true|false
+  1.3修改项目名称   body={"act":"alt","guid":"项目guid","name":"项目名称"}         true|false
+ 
+2.获取垃圾箱列表  url\act=dustbin   --回收站先不做  --暂时无用
+
+3.获取目录列表   url\act=dirlist     
+   3.获取标签名      body={"act":"get", "guid":"文件|目录guid"}       [{"guid":"","name":""}]
+   3.5创建      body={"act":"create", "guid":"文件|目录guid", "name":"名称"}      true|false
+   3.6删除      body={"act":"drop", "guid":"文件|目录guid", "name":"名称"}           true|false 
+   3.7修改      body={"act":"alt","guid":"文档|目录guid", "name":"名称"}           true|false 
+
+   
+31.获取关联信息   url\act=linkData    
+   3.11获取关联guid  body={"act":"get","guid":"项目guid"}    [{"guid":"","name":""}] 
+   3.12创建关联guid     body={"act":"create","parent":"父guid", "guid":"子guid"}         true|false 
+   3.12删除关联guid     body={"act":"drop","parent":"父guid", "guid":"子guid"}         true|false 
+
+4.获取文档内容     url\act=txt   
+  4.0获取文档内容   body={"act":"get","guid":"文档guid"}                       文档内容
+  4.1修改文档内容   body={"act":"alt","guid":"文档guid", "value":"文档内容base64加密"}  true|false 
+  4.4移到回收站    body=mv&文档名称        --回收站先不做  --暂时无用
+
+  
+5.移动位置     
+       5.1  上移   body=up&guid                  true|false
+       5.2  下移   body=down&guid                true|false
+
+
+
+--- 
+根目录.data
+目录guid,目录名称
+[{"guid":"","name":""},{"guid":"","name":""}]
+
+目录.data
+目录guid,目录名称
+[{"guid":"","name":""},{"guid":"","name":""}]
+
+文档.data
+文档guid,文档名称
+[{"guid":"","name":""},{"guid":"","name":""}]
+ 
+
+关联.data
+根目录guid：目录guid 或 文档guid 。。。
+[{"root":"","chile":["","",""]},{"root":"","chile":["","",""]}]
+
+
+
