@@ -1,4 +1,5 @@
-﻿<html>
+﻿<!DOCTYPE html>
+<html>
 <!--
     
                         <option value="1">我是下拉项目1</option>
@@ -9,7 +10,7 @@
 <head>
 <title>工作簿</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link type="text/css" rel="stylesheet" href="css/explorer.css" />   
+<link type="text/css" rel="stylesheet" href="css/weblink.css" />   
 <link type="text/css" rel="stylesheet" href="css/workbook.css" />   
 <script type="text/javascript" src="js/workbook.js"></script>  
 </head>
@@ -17,10 +18,12 @@
 <body> 
     <div class="disTop">
         <p class="zhuantiku" style="float: left;">
-                <a href="http://127.0.0.1" target="_blank">首页</a>
-                <a href="http://127.0.0.1/DBMgr" target="_blank">数据库</a> 
-                <a href="http://127.0.0.1/webLink.html" target="_blank">学习资源</a> 
-                <a href="http://127.0.0.1/explorer.html" target="_blank">目录管理</a> 
+                <a href="http://127.0.0.1" target="_blank">首页</a> 
+                <a href="https://www.baidu.com" target="_blank">百度</a>  
+                <form action=""  enctype="multipart/form-data"  method="post" style="display:none;"> 
+                    <input name="file" type="file"  accept=".zip" >
+                    <input type="submit" value="上传图片">
+                </form> 
         </p>
     </div>
     <div class="main-container">
@@ -28,29 +31,38 @@
             <div class="hd">
                 <div class="create" widget-toggle="false" id="create">
                     <i class="icon-creates"></i>
-                    <span class="create-text">新文档</span>
+                    <span class="create-text">新建</span>
                     <i class="arrow arrowA"></i>
                     <ul class="widget-menu" style="top: 40px; right: -20px; display: block; visibility: hidden;" widget-toggle-content="right">
-                        <li class="widget-menu-item can-disabled" id="new-file">
-                            新建笔记
+                        <li class="widget-menu-item can-disabled" id="list-create">
+                            新建项目
                         </li> 
                         <li class="widget-menu-item can-disabled" id="new-folder">
                             新建文件夹
+                        </li>  
+                        <li class="widget-menu-item can-disabled" id="new-file">
+                            新建笔记
                         </li>   
                     </ul>
                 </div>
             </div>
+            <div class="slidebar-content" id="projectHistory">
+                    <div class="sidebar-item" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">
+                        <i class="icon-recent-modified"></i>
+                        <span class="sidebar-item-text">所有项目</span>                        
+                    </div>
+            </div> 
             <div class="slidebar-content" id="nearOpen">
                     <div class="sidebar-item" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">
                         <i class="icon-recent-modified"></i>
                         <span class="sidebar-item-text">最近浏览</span>                        
                     </div>
             </div> 
-            <div class="slidebar-content" id="loadFolder">    
+            <div  class="slidebar-content" id="loadFolder">    
                     <div class="sidebar-item slidebar-contentMove" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker=""  onmouseenter=mouseenterFileA(this) onmouseleave=mouseleaveFileA()>  
                         <i class="arrow arrowB"></i>                 
                         <i class="icon-file"></i>
-                        <span class="sidebar-item-text" title="newProject">我的文件夹</span>            
+                        <span class="sidebar-item-text" title="newProject" id="choiceFolder">我的文件夹</span>            
                         <i title="删除目录" class="icon_delete editC"></i>
                     </div>
             </div> 
@@ -67,24 +79,12 @@
         </div>
         <div class="viewport" id="flexible-mide"> 
                 <div class="list-search" id="list-search">
-                        <span title="返回上一级" class="icon-back"></span>
+                        <span title="目标上移" id="menu_moveFolder" class="icon-back"></span>
                         <span class="icon-search"></span>
                         <span class="icon-setting" id="list-menu"></span> 
                         <input name="search" class="search-text input-search" placeholder="搜索..." autocomplete="off" id="search-Name"></input>
                         <ul class="widget-menu" style="top: 40px; right: -20px; display: block; visibility: hidden;" widget-toggle-content="right">
-                            <li class="widget-menu-item can-disabled" id="list-create">
-                                新建项目
-                            </li>
-                            <li class="widget-menu-item can-disabled" id="list-open">
-                                打开项目
-                            </li>
-                            <li class="widget-menu-item split-line"></li>
-                            <li class="widget-menu-item can-disabled" id="list-import">
-                                导入项目
-                            </li> 
-                            <li class="widget-menu-item can-disabled" id="list-export">
-                                导出项目
-                            </li>   
+                        
                         </ul>
                 </div>                
                 <ul class="search-result" id='search-Container'>
@@ -101,10 +101,13 @@
             <div class="hdB">
                 <input id="top-fileName" class="top-title" type="text" maxlength="250" value="">
                 <div class="note-tip" id="note-save-btn" style="right: 170px;">保存</div>
-            </div>     
+                <div class="note-act-cmd note-tip" id="note-act-btn">选中执行</div> 
+            </div>   
+            <div id="showWeb"> </div>  
             <textarea class="top-value" id="detail-value" wrap="logic"> 
             </textarea>
         </div>  
+        
     </div>
 </body>
 

@@ -25,6 +25,7 @@ POST
    3.11获取关联guid  body={"act":"get","guid":"项目guid"}    [{"guid":"","name":""}] 
    3.12创建关联guid     body={"act":"create","parent":"父guid", "guid":"子guid"}         true|false 
    3.12删除关联guid     body={"act":"drop","parent":"父guid", "guid":"子guid"}         true|false 
+   3.13交换   body={"act":"swap","guidA":"子guid", "guidB":"子guid"}    
 
 4.获取文档内容     url\act=txt   
   4.0获取文档内容   body={"act":"get","guid":"文档guid"}                       文档内容

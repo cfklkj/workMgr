@@ -28,9 +28,9 @@ const (
 	DART_CLIENT_PATH  = "/js/"
 	IMAGE_CLIENT_PATH = "/image/"
 
-	CSS_SVR_PATH   = "web"
-	DART_SVR_PATH  = "web"
-	IMAGE_SVR_PATH = "web"
+	CSS_SVR_PATH   = "../../web"
+	DART_SVR_PATH  = "../../web"
+	IMAGE_SVR_PATH = "../../web"
 )
 
 func StartServer() {
@@ -43,7 +43,7 @@ func StartServer() {
 	http.Handle(IMAGE_CLIENT_PATH, http.FileServer(http.Dir(IMAGE_SVR_PATH)))
 
 	// 网址与处理逻辑对应起来
-	http.HandleFunc("/", RecordInfo.OnWorkbook)
+	http.HandleFunc("/", HomePage)
 	http.HandleFunc("/workbook", RecordInfo.OnWorkbook)
 	http.HandleFunc("/DBMgr", OnDBMgr)
 	//绑定socket方法
@@ -76,7 +76,7 @@ func HomePage(res http.ResponseWriter, req *http.Request) {
 		fmt.Println("homepage")
 		path := req.URL.Path
 		if req.URL.Path == "/" {
-			path = "/" + webConfig.DefaultHtml
+			path = DART_SVR_PATH + "/" + webConfig.DefaultHtml
 		}
 		t, err := template.ParseFiles(DART_SVR_PATH + path)
 		if err != nil {
@@ -101,7 +101,7 @@ func HomePage(res http.ResponseWriter, req *http.Request) {
 
 func OnDBMgr(res http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
-		t, err := template.ParseFiles("web/DBMgr.html")
+		t, err := template.ParseFiles("web/workbook.html")
 		if err != nil {
 			fmt.Println(err)
 			return
