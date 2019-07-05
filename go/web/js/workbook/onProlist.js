@@ -3,7 +3,7 @@
 json_proList = {};
 g_choiceTag = {}
 
-//----------------
+//----------------new pro
 function onNewPro()
 {    
     g_creatUl.style.visibility = "hidden"
@@ -25,8 +25,8 @@ function resultNewPro(type, res){
         }
     }
 }
-
-function onGetProlist(){ 
+//----------------get pro list
+function onGetProlist(){  
     getProlist()
 }
 function resultGetProlist(res){ 
@@ -41,6 +41,7 @@ function resultGetProlist(res){
 }
 
 //-------------------------------------------------------btn act
+//所有
 function onShowAllPro(id){
     if(id != "projectHistory")
         return false;
@@ -48,58 +49,29 @@ function onShowAllPro(id){
     onGetProlist()
     return true;
 }
-function onChangeStatu(id){
-    
-    if(g_choiceTag.A != null)
-       unSelectDivStatu(g_choiceTag.A)
-    g_choiceTag.A = id
-    selectDivStatu(id)  
-}
-
-function onChangeStatu_file(id){
-    
-    if(g_choiceTag.B != null)
-        unSelectLiStatu(g_choiceTag.B)
-    g_choiceTag.B = id
-    selectLiStatu(id)  
+//单个
+function onShowPro(id){
+    if(id.indexOf("P_") == -1)
+        return false;  
+    setParent(id) 
+    onLoadFolder()
+    return true; 
 }
 
 function isSelFolder(){ 
-     choiceId =  g_searchName.getAttribute("proId")
+     choiceId =  getSearchId()
     if(choiceId.indexOf("D_") == -1)
         return false
     return true
 }
 function isSelProDir(){
-    guid = g_searchName.getAttribute("proId");
+    guid = getSearchId()
     if(guid.indexOf("P_") == -1 && guid.indexOf("D_") == -1)
         return false
     return true
 }
-function setParentID(id){ 
-    if(id.indexOf("P_") != -1)
-         g_choiceFolder.setAttribute("proIdParent", id)
-}
-function getParentID(){ 
-    return   g_choiceFolder.getAttribute("proIdParent")
-}
 
-function onShowPro(id){
-    if(id.indexOf("P_") == -1)
-        return false; 
-    g_loadFolder.Guid  = id;
-    g_searchName.value = getParentObjName(id)  
-    g_searchName.setAttribute("proId", id)
-    g_choiceFolder.setAttribute("proId", id)
-    g_choiceFolder.setAttribute("proName", g_searchName.value)
-    g_choiceFolder.innerText=g_searchName.value
-    setParentID(id)
-    clearProChile()
-    onLoadFolder()
-    return true;
-        
-}
-
+//alt pro result
 function resultAltProName(res){
     if(res == "true")
     { 
@@ -107,33 +79,3 @@ function resultAltProName(res){
         g_choiceFolder.innerText=g_searchName.value
     }
 }
-//--------------------选中菜单状态
-//选中与否 在添加节点后其内存位置会变化所以要分开来
-function unSelectDivStatu(divId)
-{
-    var obj = document.getElementById(divId) 
-    if(!obj)
-        return
-    obj.className =  "" 
-} 
-function selectDivStatu(divId)
-{      
-    var obj = document.getElementById(divId) 
-    if(!obj)
-        return
-    obj.className = "selected"
-}
-function unSelectLiStatu(divId)
-{   
-    obj = document.getElementById(divId)  
-    if(!obj)
-        return
-    obj.className = ""  
-}
-function selectLiStatu(divId)
-{ 
-    obj = document.getElementById(divId)
-    if(!obj)
-        return 
-    obj.className = "fileSelected" 
-} 

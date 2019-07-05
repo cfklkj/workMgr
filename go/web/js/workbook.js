@@ -9,8 +9,8 @@ document.write('<script type="text/javascript" src="js/workbook/drag.js"></scrip
 // document.write('<script type="text/javascript" src="js/workbook/folder.js"></script>')  
 // document.write('<script type="text/javascript" src="js/workbook/project.js"></script>')  
 // document.write('<script type="text/javascript" src="js/workbook/fileJson.js"></script>')  
-// document.write('<script type="text/javascript" src="js/workbook/file.js"></script>')  
-// document.write('<script type="text/javascript" src="js/workbook/nearOpen.js"></script>')   
+document.write('<script type="text/javascript" src="js/workbook/onKeyBoard.js"></script>')  
+document.write('<script type="text/javascript" src="js/workbook/onGetSetTagInfo.js"></script>')   
 document.write('<script type="text/javascript" src="js/workbook/onNearOpen.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/ondirlist.js"></script>')
 document.write('<script type="text/javascript" src="js/workbook/onloadInfo.js"></script>')
@@ -35,8 +35,6 @@ var g_setTime
 function main() {   
     g_post = new Post()
     WorkBookInit()
-    //onGetProHistory() 
-   // onGetProject()
 }   
 
 //获取父节点 父id
@@ -103,21 +101,21 @@ function onKeydown()
     if (event.ctrlKey == true && event.keyCode == 38) {//Ctrl+  up
         if( g_choiceTag.B && g_choiceTag.B == g_topFileName.getAttribute("fileId"))
         {
-            pId = g_searchName.getAttribute("proId");
+            pId = getSearchId();
             tagMoveUp(g_searchContainer, pId, g_choiceTag.B)
-        } else if(g_choiceTag.A && g_choiceTag.A == g_searchName.getAttribute("proId"))
+        } else if(g_choiceTag.A && g_choiceTag.A == getSearchId())
         {
             pId = getParentID();
-            tagMoveUp(g_folderContainer, id, g_choiceTag.A)
+            tagMoveUp(g_folderContainer, pId, g_choiceTag.A)
         }  
         return
     } 
     if (event.ctrlKey == true && event.keyCode == 40) {//Ctrl+  down
         if( g_choiceTag.B && g_choiceTag.B == g_topFileName.getAttribute("fileId"))
         {
-            pId =  g_searchName.getAttribute("proId");
+            pId =  getSearchId();
             tagMoveDown( g_searchContainer, pId, g_choiceTag.B)
-        } else if(g_choiceTag.A && g_choiceTag.A == g_searchName.getAttribute("proId"))
+        } else if(g_choiceTag.A && g_choiceTag.A == getSearchId())
         {
             pId =  getParentID();
             tagMoveDown( g_folderContainer, pId, g_choiceTag.A)
@@ -128,7 +126,7 @@ function onKeydown()
         if( g_choiceTag.B && g_choiceTag.B == g_topFileName.getAttribute("fileId"))
         {
             tagUp(g_searchContainer, g_choiceTag.B)
-        } else if(g_choiceTag.A && g_choiceTag.A == g_searchName.getAttribute("proId"))
+        } else if(g_choiceTag.A && g_choiceTag.A == getSearchId())
         {
             tagUp(g_folderContainer, g_choiceTag.A)
         }  
@@ -138,7 +136,7 @@ function onKeydown()
         if( g_choiceTag.B && g_choiceTag.B == g_topFileName.getAttribute("fileId"))
         {
             tagDown( g_searchContainer, g_choiceTag.B)
-        } else if(g_choiceTag.A && g_choiceTag.A == g_searchName.getAttribute("proId"))
+        } else if(g_choiceTag.A && g_choiceTag.A == getSearchId())
         {
             tagDown( g_folderContainer, g_choiceTag.A)
         }  
@@ -250,7 +248,7 @@ else if(btnNum==0)
     }
 
     var id = getParentObjId(event.srcElement)
-    //所以项目
+    //所有项目
     if(onShowAllPro(id))
         return
     //单个项目

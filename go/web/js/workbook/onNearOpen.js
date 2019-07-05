@@ -3,9 +3,8 @@
 
 json_NearList = [];
 
-function onNearOpen(){ 
-    g_searchName.setAttribute("proId", "")
-    g_searchName.value = ""  
+function onNearOpen(){  
+    setSearchInfo("", "")
     loadProlist(json_NearList)
     onChangeStatu(m_nearOpen.id)
 }

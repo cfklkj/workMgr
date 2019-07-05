@@ -2,75 +2,42 @@
 
 //刷新文件夹  
 g_rootGuid = ""
-g_actOldFolder = []  //A  -- Pro chile   B chile -chile
+
 function clearPro()
-{
-    g_choiceFolderInfo = []
+{ 
     g_folderContainer.innerText = "" 
 }
 function clearProChile()
 {
     g_searchContainer.innerHTML = "" 
-    g_choiceFolder.setAttribute("proId", "")
-    g_choiceFolder.value = ""   
+    setSearchInfo("", "")   
 }
 
 function clearAllText()
 {     
     clearPro()
-    clearProChile()
-  //  g_detailValue.innerText = ""
-  //  g_topFileName.value = "" 
+    clearProChile() 
 }
 
 
 function onLoadFolder()
 {   
-    proGuid = g_loadFolder.Guid 
+    proGuid = getParentID()
     if(typeof(proGuid)=="undefined" || proGuid == "")
     {
         alert("请新建项目或在所有项目中选择项目")
         return ;
     }
-   // clearAllText()
-    getLinkData(proGuid)
     onChangeStatu("")  
+    clearAllText()
+
+    name = getParentName()  
+    setSearchInfo(proGuid, name)
+    setChoiceValue(proGuid, name)
+    
+    getLinkData(proGuid)
 } 
 
-function pushOldFolder(id, name)
-{ 
-    data = {"guid":id, "name":name}
-    g_actOldFolder.push(data)
-}
-
-function pullTopOldFolder()
-{ 
-    if(g_actOldFolder.length < 1)
-        return null
-    return g_actOldFolder.pop()
-}  
-
-
-function onBackUpFolder(){
-    
-    var topEle = pullTopOldFolder()
-    if(topEle != null)
-    { 
-        id = topEle.guid
-        //清理
-        clearProChile()
-        //获取-服务器信息
-        g_searchName.value = topEle.name  
-        g_searchName.setAttribute("proId", id)
-        getLinkData(id)
-        pId = getParentObjId(document.getElementById(id))
-        if(pId != null && pId == "folder-Container")
-         {
-            onChangeStatu(id) 
-            onChangeStatu_file("") 
-         }   
-    }
-}
 
 function onLoadFolderChile(id)
 {    
@@ -79,14 +46,15 @@ function onLoadFolderChile(id)
         return false;
     }  
     //存上一级id
-    oldId = g_searchName.getAttribute("proId", id)
+    oldId = getSearchId()
     oldName = g_searchName.value
     pushOldFolder(oldId, oldName)
     //获取-本地信息
-    g_searchName.value = getParentObjName(id)   
-    g_searchName.setAttribute("proId", id)
+    name = getParentObjName(id) 
     //清理
     clearProChile()
+    //设置
+    setSearchInfo(id, name)
     //获取-服务器信息
     getLinkData(id)
     pId = getParentObjId(document.getElementById(id))
@@ -97,7 +65,7 @@ function onLoadFolderChile(id)
     }   
     return true
 }  
-
+//修改名称
 function resultAltDirName(res)
 {
     if(res == "true")
@@ -106,9 +74,6 @@ function resultAltDirName(res)
         if(obj)
             obj.innerText = g_searchName.value  
     }
-}
-function getChoiceFolderId(){
-    return g_searchName.getAttribute("proId")
 }
 function resultGetLinklist(type, res){
     
