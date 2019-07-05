@@ -80,7 +80,7 @@ function setParentID(id){
     if(id.indexOf("P_") != -1)
          g_choiceFolder.setAttribute("proIdParent", id)
 }
-function getParentID(id){ 
+function getParentID(){ 
     return   g_choiceFolder.getAttribute("proIdParent")
 }
 

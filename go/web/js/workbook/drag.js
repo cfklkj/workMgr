@@ -221,3 +221,94 @@ function sortFolderJson(thisId, changeId)  //交换
     return true
 }
  
+
+//--------------------------------------------------drag to
+//----获取选择类型
+g_moveInFolder = 0
+tempEvent = 0
+function getParentDiv(obj)
+{
+    if(!obj)
+        return obj
+    var par = obj.parentNode
+    if(par)
+    {     
+        if(par.id != "")
+            return par;
+        return getParentDiv(par)
+    }
+    return par;
+}
+function divCompare(obj, divId)
+{
+    if(getParentDiv(obj).id == divId)
+        return true;
+    return false;
+}
+
+function getParentTagLi(obj)
+{
+    if(!obj)
+        return obj
+    if(obj.tagName == "LI")
+        return obj
+    var par = obj.parentNode
+    if(par && par.tagName != "LI")
+    {      
+        return getParentTagLi(par)
+    } 
+    return par;
+}
+
+function InFolder(event)
+{
+    parId = getParentDiv(event.target).id;  
+     if(parId ==  g_loadFolder.id)  //根
+    {
+        parId = getParentID()
+    }
+    
+    pId = getChoiceFolderId()
+    if(pId == parId)
+     {
+        g_moveInFolder = 0
+        return;
+     }    
+    event.preventDefault();  
+    if(g_moveInFolder != parId)
+    { 
+        g_moveInFolder = parId 
+    }
+}
+function OutFolder(event)
+{  
+    g_moveInFolder = 0
+}
+function FileLeave(event)
+{
+    event.preventDefault();   
+    pId = getParentObjId(document.getElementById(event.target.id)) 
+    if(pId ==  g_folderContainer.id)  //根
+    {
+        pId = getParentID()
+    }else{
+        pId = getChoiceFolderId();
+    } 
+    if(g_moveInFolder < 1 || g_moveInFolder == pId)
+        return;
+    moveIn = g_moveInFolder 
+    tempEvent = event
+    mvLinkData(pId, event.target.id, moveIn)
+}
+function resultMvFile(res){
+    if(res == "true")
+    {
+        id = tempEvent.target.id
+        name = document.getElementById('span'+id).innerText
+        tempEvent.target.remove()  //移除  
+        if(g_moveInFolder == getParentID()) 
+        {
+            addFolder2RootUiTag(id, name)
+        }      
+    }
+}

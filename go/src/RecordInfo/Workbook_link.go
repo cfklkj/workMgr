@@ -24,6 +24,12 @@ func onLinkData(res http.ResponseWriter, req *http.Request) bool {
 		} else if exp.Act == "drop" {
 			rst := droplinkDirlist(exp.Parent, exp.Guid)
 			io.WriteString(res, rst)
+		} else if exp.Act == "swap" {
+			rst := swaplinkDirlist(exp.Parent, exp.GuidA, exp.GuidB)
+			io.WriteString(res, rst)
+		} else if exp.Act == "mv" {
+			rst := mvlinkDirlist(exp.Parent, exp.Guid, exp.ToParent)
+			io.WriteString(res, rst)
 		} else {
 			io.WriteString(res, "erro msg")
 		}
@@ -107,4 +113,65 @@ func droplinkDirlist(parentGuid string, guid string) string {
 		}
 	}
 	return "false -0"
+}
+
+func swaplink(a, b *string) {
+
+	*a, *b = *b, *a
+
+}
+func swaplinkDirlist(parentGuid string, guidA string, guidB string) string {
+	indexParent := -1
+	indexA := -1
+	indexB := -1
+	for index, value := range g_linkDataInfo {
+		if value.Root == parentGuid {
+			indexParent = index
+			for indexChile, chileValue := range g_linkDataInfo[index].Chile {
+				if chileValue == guidA {
+					indexA = indexChile
+				}
+				if chileValue == guidB {
+					indexB = indexChile
+				}
+			}
+			break
+		}
+	}
+	if indexA > -1 && indexB > -1 {
+		swaplink(&g_linkDataInfo[indexParent].Chile[indexA], &g_linkDataInfo[indexParent].Chile[indexB])
+		return "true"
+	}
+	return "false"
+}
+
+func mvlinkDirlist(parentGuid string, guid string, toParentGuid string) string {
+
+	//父目录下只能是子目录
+	if findTagIndex(toParentGuid, g_rootDataInfo) > -1 &&
+		findTagIndex(guid, g_folderDataInfo) < 0 {
+		return "false -4"
+	}
+
+	indexParent := findTagIndex(parentGuid, g_folderDataInfo)
+	if indexParent < 0 {
+		indexParent = findTagIndex(parentGuid, g_rootDataInfo)
+	}
+	if indexParent < 0 {
+		return "false -1"
+	}
+
+	indexToParent := findTagIndex(toParentGuid, g_folderDataInfo)
+	if indexToParent < 0 {
+		indexToParent = findTagIndex(toParentGuid, g_rootDataInfo)
+	}
+	if indexToParent < 0 {
+		return "false -2"
+	}
+
+	if droplinkDirlist(parentGuid, guid) != "true" {
+		return "false -3"
+	}
+
+	return addlinkDirlist(toParentGuid, guid)
 }

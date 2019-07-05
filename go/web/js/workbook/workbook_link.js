@@ -46,3 +46,11 @@ function swapLinkData(parentGuid, guidA, guidB){
 function waitSwapLinkData(res){
     console.log(res)
 }
+
+function mvLinkData(parentGuid, guid, toParentGuid){
+    g_post.linkDataMv("mv", parentGuid, guid, toParentGuid, waitMvLinkData)
+}
+function waitMvLinkData(res){
+    console.log(res)
+    resultMvFile(res)
+}

@@ -3,7 +3,6 @@
 //刷新文件夹  
 g_rootGuid = ""
 g_actOldFolder = []  //A  -- Pro chile   B chile -chile
-
 function clearPro()
 {
     g_choiceFolderInfo = []
@@ -13,7 +12,7 @@ function clearProChile()
 {
     g_searchContainer.innerHTML = "" 
     g_choiceFolder.setAttribute("proId", "")
-    g_choiceFolder.value = ""  
+    g_choiceFolder.value = ""   
 }
 
 function clearAllText()
@@ -30,7 +29,7 @@ function onLoadFolder()
     proGuid = g_loadFolder.Guid 
     if(typeof(proGuid)=="undefined" || proGuid == "")
     {
-        alert("请新建项目")
+        alert("请新建项目或在所有项目中选择项目")
         return ;
     }
    // clearAllText()
@@ -104,7 +103,8 @@ function resultAltDirName(res)
     if(res == "true")
     {
         obj = document.getElementById( "span" + getChoiceFolderId())
-        obj.innerText = g_searchName.value  
+        if(obj)
+            obj.innerText = g_searchName.value  
     }
 }
 function getChoiceFolderId(){
@@ -149,44 +149,4 @@ function resultGetChileLinklist(type, res){
         return; 
     loadProlist(jsonInfo);
     limitFolderHeigh()      
-}
-
-
-//--加载到标签
-function loadFolder(jsonInfo)
-{
-    if(!jsonInfo)
-        return; 
-    g_folderContainer.innerHTML = ""  
-    for( i = 0; jsonInfo[i] && jsonInfo[i].id; i++)
-    {  
-        if(jsonInfo[i].type != FolderType.document)
-           continue;
-        addFolder(jsonInfo[i].id, jsonInfo[i].name) 
-    }
-    return i > 0
-}
-function addFolder(dirID, dirName)
-{
-    Ta = '\
-    <li draggable="true"  ondragover="InFolder(event)" ondragleave="OutFolder(event)" id=' + dirID + ' value= ' + dirName + '>\
-        <div class="slidebar-content">\
-            <div class="sidebar-item search-resulMove" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">\
-                <i class="arrow arrowB" style="visibility: hidden;"></i>\
-                <i class="icon-folder folderA"></i>\
-                <span class="sidebar-item-text">' + dirName + '</span>\
-            </div>\
-        </div>\
-    </li>'
-    g_folderContainer.innerHTML += Ta
 } 
-
-
-//--------------------------------btn act---
-function onShowDir(id){
-    if(id)
-        return false
-
-        return true;
-        
-}

@@ -28,6 +28,10 @@ function Post(){
         var data = {"act":act,"guidA":guidA,"guidB":guidB, "parent":parentGuid}   
         this.request("post",serverUrl + '/Workbook&act=linkData', data, resFunc)   
     }
+    this.linkDataMv = function(act, parentGuid, guid, toParentGuid, resFunc){ 
+        var data = {"act":act,"guid":guid,"toParent":toParentGuid, "parent":parentGuid}   
+        this.request("post",serverUrl + '/Workbook&act=linkData', data, resFunc)   
+    }
     //txt post
     this.txt = function(act, guid, data, resFunc){ 
         var data = {"act":act,"guid":guid, "value":data}   

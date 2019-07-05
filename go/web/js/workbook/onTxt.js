@@ -50,6 +50,7 @@ function onShowTxt(id){
     obj = document.getElementById( "span" + id) 
     g_topFileName.value = obj.innerText;
     g_topFileName.setAttribute("fileId", id) 
+    addNearOpen(id, obj.innerText)
     onChangeStatu_file(id) 
     getTxt(id)
     return true

@@ -54,7 +54,7 @@ function altRootUiTag(guid, name)
 function addLiTag_icoFolder(obj, dirID, dirName)
 {
     Ta = '\
-    <li draggable="true"  ondragover="InFolder(event)" ondragleave="OutFolder(event)" id=' + dirID + '>\
+    <li draggable="true" ondragend="FileLeave(event)"  ondragover="InFolder(event)" ondragleave="OutFolder(event)" id=' + dirID + '>\
         <div class="slidebar-content">\
             <div class="sidebar-item search-resulMove" file-droppable="" filedroppablesupport="true" trackaction="click" trackcategory="recent" tracker="">\
                 <i class="arrow arrowB" style="visibility: hidden;"></i>\

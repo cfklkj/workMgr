@@ -53,11 +53,14 @@ type C2SREQ_Txt struct {
 }
 
 type C2SREQ_Dirlist struct {
-	Act    string
-	Guid   string
-	Name   string
-	Type   string
-	Parent string
+	Act      string
+	Guid     string
+	Name     string
+	Type     string
+	Parent   string
+	GuidA    string
+	GuidB    string
+	ToParent string
 }
 
 var g_rootDataInfo []TagInfo

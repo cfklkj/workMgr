@@ -10,7 +10,7 @@ function WorkBookInit(){
         m_crash = document.getElementById('crash'); 
       //  m_crash.onclick = onDelete
         m_nearOpen = document.getElementById('nearOpen'); 
-       // m_nearOpen.onclick = onNearOpen
+        m_nearOpen.onclick = onNearOpen
         m_showWeb = document.getElementById('showWeb');  
 
         m_saveTxt = document.getElementById('note-save-btn'); 

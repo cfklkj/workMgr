@@ -223,42 +223,6 @@ function search_UpFileName()
 }
  
 
-function InFolder(event)
-{
-    parId = getParentDiv(event.target).id; 
-    if(g_choiceFolderInfo.id == parId)
-     {
-        g_moveInFolder = 0
-        return;
-     }   
-    event.preventDefault();  
-    if(g_moveInFolder != parId)
-    { 
-        g_moveInFolder = parId 
-    }
-}
-function OutFolder(event)
-{  
-    g_moveInFolder = 0
-}
-function FileLeave(event)
-{
-    event.preventDefault();   
-    if(g_moveInFolder < 1 || g_moveInFolder == g_choiceFolderInfo.id)
-        return;
-    moveIn = g_moveInFolder
-    g_moveInFolder = 0; 
-    jsonInfo = getFileJsonObj()
-    for(var index = 0; index < jsonInfo.length; index ++)
-    {
-        if(jsonInfo[index] && jsonInfo[index].id == event.target.id)
-        {
-            jsonInfo[index].folderId = moveIn
-            break;
-        }
-    }
-     event.target.remove()  //移除
-}
 function addNearViewFile(spanID, spanValue)
 {  
     addFile(spanID, spanValue) 

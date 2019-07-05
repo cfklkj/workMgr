@@ -11,7 +11,7 @@ document.write('<script type="text/javascript" src="js/workbook/drag.js"></scrip
 // document.write('<script type="text/javascript" src="js/workbook/fileJson.js"></script>')  
 // document.write('<script type="text/javascript" src="js/workbook/file.js"></script>')  
 // document.write('<script type="text/javascript" src="js/workbook/nearOpen.js"></script>')   
-// document.write('<script type="text/javascript" src="js/workbook/listSearch.js"></script>')  
+document.write('<script type="text/javascript" src="js/workbook/onNearOpen.js"></script>')  
 document.write('<script type="text/javascript" src="js/workbook/ondirlist.js"></script>')
 document.write('<script type="text/javascript" src="js/workbook/onloadInfo.js"></script>')
 document.write('<script type="text/javascript" src="js/workbook/onload_dirlist.js"></script>')      
@@ -196,6 +196,11 @@ function onMouseUp()
         g_dragMove = 0; 
    }
 
+   var id = getParentObjId(event.srcElement)
+   //子目录
+   if(onLoadFolderChile(id))
+       return
+
 }
 function onMouseMove(event)
 {
@@ -254,10 +259,7 @@ else if(btnNum==0)
     //子文件
     if(onShowTxt(id))
         return;
-    //子目录
-    if(onLoadFolderChile(id))
-        return
-    return;
+    return; 
     //选择菜单
     //--setChoiceDivType(event.target)  
     //移动目录位置
@@ -291,7 +293,7 @@ else if(btnNum==0)
             return ;
         }
         return
-    }   
+    }  
     //删除
     if(event.target.className.indexOf('icon_delete') != -1) 
     { 
