@@ -27,11 +27,6 @@ function onBackUpFolder(){
         setSearchInfo(id, topEle.name) 
 
         getLinkData(id)
-        pId = getParentObjId(document.getElementById(id))
-        if(pId != null && pId == "folder-Container")
-         {
-            onChangeStatu(id) 
-            onChangeStatu_file("") 
-         }   
+        setChileFolderStatu(id) 
     }
 }

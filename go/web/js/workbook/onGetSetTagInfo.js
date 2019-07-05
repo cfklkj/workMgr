@@ -62,6 +62,10 @@ function onChangeStatu(id){
     if(g_choiceTag.A != null)
        unSelectDivStatu(g_choiceTag.A)
     g_choiceTag.A = id
+    if(id != "")
+    {
+        g_choiceTag.chile='A'
+    }
     selectDivStatu(id)  
 }
 
@@ -70,7 +74,23 @@ function onChangeStatu_file(id){
     if(g_choiceTag.B != null)
         unSelectLiStatu(g_choiceTag.B)
     g_choiceTag.B = id
+    if(id != "")
+    {
+        g_choiceTag.chile='B'
+    }
     selectLiStatu(id)  
+} 
+function getChoiceTagType(){
+    return g_choiceTag.chile
+}
+
+function setChileFolderStatu(id){ 
+    pId = getParentObjId(document.getElementById(id))
+    if(pId != null && pId == "folder-Container")
+     {
+        onChangeStatu(id) 
+        onChangeStatu_file("") 
+     }  
 }
 //--------------------选中菜单状态
 //选中与否 在添加节点后其内存位置会变化所以要分开来

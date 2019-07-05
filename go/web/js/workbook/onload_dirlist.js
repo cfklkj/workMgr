@@ -56,13 +56,8 @@ function onLoadFolderChile(id)
     //设置
     setSearchInfo(id, name)
     //获取-服务器信息
-    getLinkData(id)
-    pId = getParentObjId(document.getElementById(id))
-    if(pId != null && pId == "folder-Container")
-    {
-       onChangeStatu(id) 
-       onChangeStatu_file("") 
-    }   
+    getLinkData(id)   
+    setChileFolderStatu(id) 
     return true
 }  
 //修改名称

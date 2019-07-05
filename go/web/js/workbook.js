@@ -88,7 +88,7 @@ function findParentObj(obj, id)
 }
 function onKeydown()
 {     
-    timeOutCheckEdit()
+    timeOutCheckEdit()  
     if (event.ctrlKey == true && event.keyCode == 83) {//Ctrl+S 
         event.returnvalue = false;  
         onKeeptxt()
@@ -99,11 +99,11 @@ function onKeydown()
         return
     } 
     if (event.ctrlKey == true && event.keyCode == 38) {//Ctrl+  up
-        if( g_choiceTag.B && g_choiceTag.B == g_topFileName.getAttribute("fileId"))
+        if( g_choiceTag.B && 'B' == getChoiceTagType())
         {
             pId = getSearchId();
             tagMoveUp(g_searchContainer, pId, g_choiceTag.B)
-        } else if(g_choiceTag.A && g_choiceTag.A == getSearchId())
+        } else if(g_choiceTag.A && 'A' == getChoiceTagType())
         {
             pId = getParentID();
             tagMoveUp(g_folderContainer, pId, g_choiceTag.A)
@@ -111,11 +111,11 @@ function onKeydown()
         return
     } 
     if (event.ctrlKey == true && event.keyCode == 40) {//Ctrl+  down
-        if( g_choiceTag.B && g_choiceTag.B == g_topFileName.getAttribute("fileId"))
+        if( g_choiceTag.B && 'B' == getChoiceTagType())
         {
             pId =  getSearchId();
             tagMoveDown( g_searchContainer, pId, g_choiceTag.B)
-        } else if(g_choiceTag.A && g_choiceTag.A == getSearchId())
+        } else if(g_choiceTag.A && 'A' == getChoiceTagType())
         {
             pId =  getParentID();
             tagMoveDown( g_folderContainer, pId, g_choiceTag.A)
@@ -123,10 +123,10 @@ function onKeydown()
         return
     } 
     if (event.keyCode == 38) {//Ctrl+  up
-        if( g_choiceTag.B && g_choiceTag.B == g_topFileName.getAttribute("fileId"))
+        if( g_choiceTag.B && 'B' == getChoiceTagType())
         {
             tagUp(g_searchContainer, g_choiceTag.B)
-        } else if(g_choiceTag.A && g_choiceTag.A == getSearchId())
+        } else if(g_choiceTag.A && 'A' == getChoiceTagType())
         {
             tagUp(g_folderContainer, g_choiceTag.A)
         }  
@@ -196,8 +196,14 @@ function onMouseUp()
 
    var id = getParentObjId(event.srcElement)
    //子目录
-   if(onLoadFolderChile(id))
-       return
+   if(event.ctrlKey == true)  //选中目录
+   { 
+         onChangeStatu_file(id)
+   }else
+   {
+    if(onLoadFolderChile(id)) 
+        return
+   }
 
 }
 function onMouseMove(event)
@@ -219,18 +225,8 @@ var btnNum = event.button;
 if (btnNum==2)
 { 
     //console.log("您点击了鼠标右键！")
-    if(event.srcElement.id == "menu_moveFolder")
-    {
-        if(g_choiceFolderType = FolderType.document)
-        {
-            if(sortThisFolder(g_choiceDirObj.par))
-             {
-                g_folderContainer.prepend(par.parentNode)
-             }
-            alert("请先选择需要移动的目录!")
-            return ;
-        } 
-    }
+        
+    //g_folderContainer.prepend(par.parentNode) 
 
 }
 else if(btnNum==0)

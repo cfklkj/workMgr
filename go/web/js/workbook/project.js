@@ -12,12 +12,7 @@ function loadProHistoryJson(proInfo)
 {  
     g_proHistory = JSON.parse(proInfo) 
 }
-
-function onGetProject()
-{     
-    setChoiceDivType(g_loadFolder, true)  
-    g_post.prolist("get", "", "", loadProJson) 
-}
+ 
 function loadProJson(proInfo)
 {  
     if(proInfo == "")
@@ -38,18 +33,7 @@ function UpProject()
 function choicePro(id, proPath, proName)
 {       
     g_post.choice("choice",id, proPath, proName, onUpProject) 
-}
-function onUpProject(info)
-{
-    if(info == 'ok')
-    { 
-        onGetProHistory()
-        onGetProject()
-    }else
-    {
-        alert(info)
-    }
-}
+} 
 function onNewPro()
 {    
     g_proName = "newPro"
@@ -80,20 +64,7 @@ function loadProHistory()
         addProHistory(item, jsonInfo[item].ProName, jsonInfo[item].ProPath)  
     }    
 }
-
-function choiceHistroryPro(index)
-{ 
-    var jsonInfo = g_proHistory.ProInfos  
-    for(item in jsonInfo){    
-        if(item == index) 
-        { 
-            choicePro(jsonInfo[index].id, jsonInfo[index].ProPath, jsonInfo[index].ProName);
-            onGetProject();  
-            break;
-        } 
-    } 
-}
-
+ 
  //清理浏览历史
 function clearNearInfo()
 {
