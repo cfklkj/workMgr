@@ -9,6 +9,13 @@ import (
 	"os"
 )
 
+func CatPath(pathName string) string {
+	dir := "./document/"
+	dir += pathName
+	os.MkdirAll(dir, os.ModePerm)
+	return dir
+}
+
 func ReadJsonFile(filePath string, v interface{}) error {
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
