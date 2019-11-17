@@ -26,7 +26,6 @@ func ReadJsonFile(filePath string, v interface{}) error {
 		fmt.Println("LoadDBlist config decode failed")
 		return err
 	}
-	fmt.Println("config load suceess:", data)
 	return nil
 }
 
@@ -37,6 +36,5 @@ func WriteJsonFile(filePath string, v interface{}) error {
 		return err
 	}
 	err = ioutil.WriteFile(filePath, data, os.ModeAppend)
-	fmt.Println("config Upload :", string(data), " err:", err)
 	return nil
 }

@@ -1,0 +1,55 @@
+/*https://blog.csdn.net/m0_37934173/article/details/74327882
+ul和li实现分两列][https://blog.csdn.net/itmyhome1990/article/details/19756399
+*/
+
+ .list-init{
+   margin-top: 38px;
+   font-weight: bolder;   
+   font-family: "Microsoft Yahei","微软雅黑",arial,"宋体",sans-serif;    
+ }
+   
+ .list-init:hover ul li {
+    display: block;
+    z-index: inherit 88; 
+    -moz-border-radius:5px;-webkit-border-radius:5px /*圆角*/
+ }
+ .list-init > h4 {
+    background-color: #b19191;
+    text-align: center;
+    color: black;
+    font-size: 15px;
+    margin-bottom: 0px;
+    cursor:pointer 
+ }
+.list-init ul{    
+   top: 60%;
+   left: 5%;  
+   width: 90%;
+   position: absolute; 
+   overflow-y: auto;/*auto;*隐藏滚动条*/ 
+}
+.list-init li{ 
+   background: rgb(183, 183, 211);
+   color: rgb(197, 143, 143);
+   width:20%; 
+   text-align: center; 
+   float: left;
+   display: none; 
+   cursor:pointer 
+}
+.list-init li a{ 
+text-decoration: none;
+margin: 0px;
+padding-top: 8px;
+display: block; /* 作为一个块 */
+padding-right: 50px; /* 设置块的属性 */
+padding-bottom: 8px;
+padding-left: 50px;
+}
+.list-init li a:hover{
+background-color: #0099CC;
+}
+  
+.list-init-folder {
+   color: rgb(190, 61, 61);
+}

@@ -11,8 +11,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-
-	"tzj.com/define"
 )
 
 type Config struct {
@@ -118,11 +116,11 @@ func (c *Config) getValue(jsonFile string, key string) interface{} {
 
 //-----test
 func main() {
-	ret := NewConfig()
-	var tmp define.SvrConfig
-	t := ret.GetConfigInfo("svr_discover1", &tmp)
-	if !t {
-		ret.SetConfigInfo("svr_discover1", tmp)
-	}
-	fmt.Println(t, tmp)
+	// ret := NewConfig()
+	// var tmp define.SvrConfig
+	// t := ret.GetConfigInfo("svr_discover1", &tmp)
+	// if !t {
+	// 	ret.SetConfigInfo("svr_discover1", tmp)
+	// }
+	// fmt.Println(t, tmp)
 }

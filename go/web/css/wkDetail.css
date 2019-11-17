@@ -1,0 +1,27 @@
+
+ .detail-init{ 
+    width: 100%;  
+    margin-top: 5px;
+    height: 749px; 
+ }
+ .detail-init > h4 {
+    display: block; 
+    height: 20px;
+    background-color: #f3eaea;
+    text-align: center;
+    color: black;
+    font-size: 13px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+ }
+ /*居中 https://blog.csdn.net/weixin_42504145/article/details/82869736 */
+ .detail-init textarea {   
+   display: block; 
+   margin:0 auto;
+   width: 97%; 
+   height: 100%;
+   font-family: Arial,Verdana,sans-serif;
+   overflow-y: auto;
+   font-size: 15px;  
+   margin-bottom: 100px;
+ }

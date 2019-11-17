@@ -13,9 +13,6 @@ const (
 	TypeGuid_File = 101
 	TypeGuid_Dir  = 102
 )
-const (
-	Err_TypeGuid = 30001 //类型错误
-)
 
 // //监听
 // func (c *Http) setGuidHandleFunc() {

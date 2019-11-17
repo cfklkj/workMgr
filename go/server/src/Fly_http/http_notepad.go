@@ -2,20 +2,20 @@ package Fly_http
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"../notepad"
 )
 
 const ( //tagType
-	Tag_Pro  = 10001 //项目
 	Tag_Root = 10002 //项目根
 	Tag_Dir  = 10003 //根下子目录
 	Tag_File = 10004 //目录下文件
 	Tag_Link = 10005 //标签联系
 )
 const (
-	Tag_ProStr = "project"
+	Tag_rootStr = "root"
 )
 
 type GuidInfo struct {
@@ -43,8 +43,8 @@ type FileInfo struct {
 }
 
 func (c *Http) setNotepadHandleFunc() {
-	http.HandleFunc(Version+"/workbook/pro/create", c.wkProCreate)
-	http.HandleFunc(Version+"/workbook/pro/get", c.wkProGet)
+	//http.HandleFunc(Version+"/workbook/pro/create", c.wkProCreate)
+	http.HandleFunc(Version+"/workbook/dir/get", c.wkProGet)
 	http.HandleFunc(Version+"/workbook/dir/create", c.wkDirCreate)
 	http.HandleFunc(Version+"/workbook/file/create", c.wkFileCreate)
 	http.HandleFunc(Version+"/workbook/file/alt", c.wkFileAlt)
@@ -56,21 +56,21 @@ func (c *Http) setNotepadHandleFunc() {
 }
 
 //----------------------handle
-func (c *Http) wkProCreate(res http.ResponseWriter, req *http.Request) {
-	path, _ := c.headCheck(res, req)
-	if path == "" {
-		return
-	}
-	rst, value := c.prolistCreate(path)
-	c.sendBack(res, rst, value)
-}
+// func (c *Http) wkProCreate(res http.ResponseWriter, req *http.Request) {
+// 	path, _ := c.headCheck(res, req)
+// 	if path == "" {
+// 		return
+// 	}
+// 	rst, value := c.prolistCreate(path)
+// 	c.sendBack(res, rst, value)
+// }
 
 func (c *Http) wkProGet(res http.ResponseWriter, req *http.Request) {
 	path, body := c.headCheck(res, req)
 	if body == nil {
 		return
 	}
-	rst, value := c.prolistGet(path)
+	rst, value := c.prolistGet(path, body)
 	c.sendBack(res, rst, value)
 }
 
@@ -147,52 +147,55 @@ func (c *Http) wkChangelink(res http.ResponseWriter, req *http.Request) {
 //-----------------------------actPro
 //创建
 func (c *Http) prolistCreate(path string) (int, interface{}) {
-	guid := c.getGuid(TypeGuid_Pro)
-	c.note.SetGuid(path, guid, "newPro")
-	c.note.Setlink(path, Tag_ProStr, guid)
-	return 0, c.note.GetGuid(path, guid)
+	guid := c.getGuid(TypeGuid_Dir)
+	c.note.GetNoteBook(path).AddGuid(guid, "newDir")
+	c.note.GetNoteBook(path).AddLink(Tag_rootStr, guid)
+	return Err_null, c.note.GetNoteBook(path).GetGuid(guid)
 }
 
-//删除
-// func (c *Http) prolistDel(path string, body []byte) (int, interface{}) {
-// 	guid := string(body)
-// 	c.note.SetGuid(path, guid, "newPro")
-// 	c.note.Setlink(path, Tag_ProStr, guid)
-// 	return 0, c.note.GetGuids(path, guid)
-// }
 //获取
-func (c *Http) prolistGet(path string) (int, interface{}) {
-	return 0, c.note.GetGuids(path, Tag_ProStr)
+func (c *Http) prolistGet(path string, body []byte) (int, interface{}) {
+	root := string(body)
+	if root == "" {
+		root = Tag_rootStr
+	}
+	return Err_null, c.note.GetNoteBook(path).GetGuids(root)
 }
 
 //-----------------------------dir
 func (c *Http) dirCreate(path string, body []byte) (int, interface{}) {
 	root := string(body)
-	typeGuid := c.getGuidType(root)
-	if typeGuid != TypeGuid_Pro && TypeGuid_Dir != typeGuid {
-		return Err_TypeGuid, nil
+	if root == "" {
+		return c.prolistCreate(path)
 	}
 	guid := c.getGuid(TypeGuid_Dir)
-	c.note.SetGuid(path, guid, "newDir")
-	c.note.Setlink(path, root, guid)
-	return 0, c.note.GetGuid(path, guid)
+	c.note.GetNoteBook(path).AddGuid(guid, "newDir")
+	if c.note.GetNoteBook(path).AddLink(root, guid) {
+		return Err_null, c.note.GetNoteBook(path).GetGuid(guid)
+	} else {
+		return Err_addDir, nil
+	}
 }
 
 //-----------------------------file
 func (c *Http) fileCreate(path string, body []byte) (int, interface{}) {
 	root := string(body)
-	typeGuid := c.getGuidType(root)
-	if TypeGuid_Dir != typeGuid {
-		return Err_TypeGuid, nil
+	if root == "" {
+		root = Tag_rootStr
 	}
 	guid := c.getGuid(TypeGuid_File)
-	c.note.SetGuid(path, guid, "newFile")
-	c.note.Setlink(path, root, guid)
-	return 0, c.note.GetGuid(path, guid)
+	c.note.GetNoteBook(path).AddGuid(guid, "newFile")
+	c.note.GetNoteBook(path).AddLink(root, guid)
+	rst := c.note.GetNoteBook(path).SetTxtData(guid, "")
+	if rst != Err_null {
+		return rst, ""
+	}
+	return Err_null, c.note.GetNoteBook(path).GetGuid(guid)
 }
 func (c *Http) fileAlt(path string, body []byte) (int, interface{}) {
 	var fileInfo FileInfo
 	err := json.Unmarshal(body, &fileInfo)
+	fmt.Println("fileAlt", string(body))
 	if err != nil {
 		return Err_Ummarshal, ""
 	}
@@ -200,8 +203,8 @@ func (c *Http) fileAlt(path string, body []byte) (int, interface{}) {
 	if typeGuid != TypeGuid_File {
 		return Err_TypeGuid, nil
 	}
-	rst := c.note.SetTxt(path, fileInfo.Guid, fileInfo.Data)
-	return 0, rst
+	rst := c.note.GetNoteBook(path).SetTxtData(fileInfo.Guid, fileInfo.Data)
+	return Err_null, rst
 }
 func (c *Http) fileGet(path string, body []byte) (int, interface{}) {
 	guid := string(body)
@@ -209,7 +212,11 @@ func (c *Http) fileGet(path string, body []byte) (int, interface{}) {
 	if typeGuid != TypeGuid_File {
 		return Err_TypeGuid, nil
 	}
-	return c.note.GetTxt(path, guid)
+	err, data := c.note.GetNoteBook(path).GetTxtData(guid)
+	var rst FileInfo
+	rst.Guid = guid
+	rst.Data = data
+	return err, rst
 }
 
 //-----------------------------altName
@@ -220,8 +227,14 @@ func (c *Http) altName(path string, body []byte) (int, interface{}) {
 	if err != nil {
 		return Err_Ummarshal, ""
 	}
-	c.note.SetGuid(path, guidInfo.Guid, guidInfo.Name)
-	return 0, c.note.GetGuids(path, guidInfo.Guid)
+	if len(guidInfo.Name) < 3 || len(guidInfo.Name) > 32 {
+		return Err_dataLen, ""
+	}
+	if guidInfo.Guid == "" || c.note.GetNoteBook(path).GetGuid(guidInfo.Guid).Guid != guidInfo.Guid {
+		return Err_TypeGuid, nil
+	}
+	c.note.GetNoteBook(path).AddGuid(guidInfo.Guid, guidInfo.Name)
+	return Err_null, c.note.GetNoteBook(path).GetGuid(guidInfo.Guid)
 }
 
 //-----------------------------link
@@ -232,8 +245,8 @@ func (c *Http) addLink(path string, body []byte) (int, interface{}) {
 	if err != nil {
 		return Err_Ummarshal, ""
 	}
-	c.note.Setlink(path, linkInfo.RootGuid, linkInfo.ChileGuid)
-	return 0, c.note.GetGuids(path, linkInfo.RootGuid)
+	c.note.GetNoteBook(path).AddLink(linkInfo.RootGuid, linkInfo.ChileGuid)
+	return Err_null, c.note.GetNoteBook(path).GetGuids(linkInfo.RootGuid)
 }
 
 //修改联系
@@ -243,8 +256,8 @@ func (c *Http) swapLink(path string, body []byte) (int, interface{}) {
 	if err != nil {
 		return Err_Ummarshal, ""
 	}
-	rst := c.note.Swaplink(path, swapInfo.RootGuid, swapInfo.GuidA, swapInfo.GuidB)
-	return 0, rst
+	rst := c.note.GetNoteBook(path).SwapLink(swapInfo.RootGuid, swapInfo.GuidA, swapInfo.GuidB)
+	return Err_null, rst
 }
 
 func (c *Http) changeLink(path string, body []byte) (int, interface{}) {
@@ -253,6 +266,6 @@ func (c *Http) changeLink(path string, body []byte) (int, interface{}) {
 	if err != nil {
 		return Err_Ummarshal, ""
 	}
-	rst := c.note.Changelink(path, changeInfo.RootGuidA, changeInfo.RootGuidB, changeInfo.Guid)
-	return 0, rst
+	rst := c.note.GetNoteBook(path).ChangeLink(changeInfo.RootGuidA, changeInfo.RootGuidB, changeInfo.Guid)
+	return Err_null, rst
 }

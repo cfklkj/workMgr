@@ -80,7 +80,12 @@ func (c *Http) headCheck(w http.ResponseWriter, req *http.Request) (string, []by
 		return "", nil
 	}
 	req.ParseForm()
-	proid := req.Form.Get("proid")
+	tokenStr := req.Form.Get("proid")
+	proid, err1 := c.getTokensData(TokenKey, tokenStr)
+	if err1 != Err_null {
+		c.sendBack(w, err1, len(proid))
+		return "", nil
+	}
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil || len(proid) < 3 || len(proid) > 64 {
 		c.sendBack(w, Err_Ummarshal, len(proid))
@@ -94,7 +99,7 @@ func (c *Http) headCheck(w http.ResponseWriter, req *http.Request) (string, []by
 func (c *Http) sendBack(w http.ResponseWriter, code int, data interface{}) {
 	var rst S2CBody
 	rst.Code = code
-	rst.CodeMsg = ""
+	rst.CodeMsg = c.getCodeStr(code)
 	rst.Data = data
 	dataStr, _ := json.Marshal(rst)
 	print.Println("sendBack", string(dataStr))
