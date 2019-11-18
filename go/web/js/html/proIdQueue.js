@@ -8,7 +8,11 @@ var wkQueue = queue.Method = {
     getTips:function(){
         str = ""
         for(index in this.tips){
-            str += this.tips[index]  + "/"
+            if (str != "")
+            {
+                str  += "/"
+            }
+            str += this.tips[index] 
         }
         return str
     },

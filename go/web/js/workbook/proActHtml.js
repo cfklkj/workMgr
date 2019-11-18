@@ -4,10 +4,11 @@ var wkMsg = postReturn.commonMethod  = {
     print: function(res){
         console.debug(res)     
     },
-    //请求头 
+    //列表 
     proGet: function(data){  
         guids = data.Data.Guids  
         wkList.clearli()
+        wkClick.clickTitleEvent(wkList.name)
         for( let index in guids)
         {    
             id = guids[index].Guid
@@ -26,6 +27,7 @@ var wkMsg = postReturn.commonMethod  = {
             }
         }         
     },
+    //添加
     proAdd: function(data){ 
         id = data.Data.Guid
         name = data.Data.Name
@@ -34,20 +36,23 @@ var wkMsg = postReturn.commonMethod  = {
                 wkList.setli(id, name)    
                 wkPost.fileGet(wkQueue.getPath(), id, wkMsg.fileGet)
             } else{ 
-                wkList.addLiLink(id,name)
+                wkList.setliLink(id,name)
             }
             util.addEvent(id, "wkClick.clickLi(event)")  
         }
     },
+    //获取文件
     fileGet: function(data){ 
         id = data.Data.Guid 
         var base = new Base64(); 
         data = base.decode(data.Data.Data)
         wkQueue.setFile(id)
         name = util.getEleName(id)
-        wkDetail.setH4Name(name)
-        wkDetail.setTextareaData(data)
+        wkDetail.setH4Name(name)      
+        wkDetail.setTextareaData(data)  
+        wkClick.clickTitleEvent(wkDetail.name)
     },
+    //修改名称
     nameAlt:function(data){
         id = data.Data.Guid 
         name = data.Data.Name
@@ -56,8 +61,10 @@ var wkMsg = postReturn.commonMethod  = {
                 wkDetail.setH4Name(name) 
                 util.setEleName(id, name)
             break;
-            case "D_":
-                wkList.setUlName(name)  
+            case "D_":                
+                wkQueue.popTips() 
+                wkQueue.pushTips(name)
+                wkList.setUlName(wkQueue.getTips())  
             break; 
         }
     },

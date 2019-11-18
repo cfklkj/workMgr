@@ -2,6 +2,9 @@ var click = click || {};
 var wkClick = click.Method = { 
     clickTitle: function(event){
         id = event.srcElement.id 
+        this.clickTitleEvent(id)
+    },
+    clickTitleEvent: function(id){ 
         switch (id) {
             case wkDetail.name:
                 wkQueue.setRename(wkQueue.getFile())

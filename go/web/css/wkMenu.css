@@ -3,7 +3,8 @@
 
  .menu-init{ 
     background-color: #9b8b8b; 
-    
+    margin-bottom: 5px;  
+    padding-bottom: 5px;
     /* width: 300px;
 
     position: fixed;
@@ -11,7 +12,16 @@
     top: 0; */
 
    /* z-index: 9999;   层叠显示*/ 
+ } 
+ .menu-init a{
+    margin-left: 8px;
+    color: rgb(71, 62, 8);
+ }
+ .menu-init textarea {
+    margin-top: 3px;
+    height: 20px;
+    margin-right: 3px;
  }
  .menu-init.button{     
-    width: 300px; 
+    width: 300px;  
  }
