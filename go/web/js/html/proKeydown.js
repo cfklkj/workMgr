@@ -5,6 +5,10 @@
         wkList.showUI(false)
         return
      }
+     if (event.ctrlKey && event.keyCode == 72) {  //ctrl + h
+         help()
+         return
+     }
     if ((event.ctrlKey && event.keyCode == 67) && wkDrag.ondragstart(event)) {  //ctrl + c
             return
     }else if ((event.ctrlKey && event.keyCode == 86) && wkDrag.ondragend(wkDrag.typeswap) ) { //ctrl + v         
@@ -42,3 +46,10 @@
     }
 }
  
+function help()
+{
+    tips = "ctrl+c\t选中目标   \nctrl+v\t交换    ctrl+i\t移入    ctrl+o\t移出\n"
+    tips +="ctrl+s\t保存    ctrl+d\t建目录  ctrl+f\t建文件\n"
+    tips +="ctrl+backspace\t返回上个目录"
+    alert(tips)
+}

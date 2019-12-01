@@ -13,7 +13,7 @@ var wkDiv = ProDiv.Method = {
   addFooter:function(user, email, version){
     return "<footer><p>posted by:" + user + "</P>" +
       '<p>Contact information:<a href="mailto:' + email + '">' + email +'</a><p>' +
-      '<p>version:' + version + "</p></footer>"
+      '<p>version:' + version + "</p><p>使用:ctrl + h弹出使用提示</p></footer>"
   },
   //初始化div
   initDiv: function(){    
