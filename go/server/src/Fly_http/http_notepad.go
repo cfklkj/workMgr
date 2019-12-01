@@ -257,7 +257,7 @@ func (c *Http) swapLink(path string, body []byte) (int, interface{}) {
 		return Err_Ummarshal, ""
 	}
 	rst := c.note.GetNoteBook(path).SwapLink(swapInfo.RootGuid, swapInfo.GuidA, swapInfo.GuidB)
-	return Err_null, rst
+	return rst, swapInfo.RootGuid
 }
 
 func (c *Http) changeLink(path string, body []byte) (int, interface{}) {
@@ -267,5 +267,5 @@ func (c *Http) changeLink(path string, body []byte) (int, interface{}) {
 		return Err_Ummarshal, ""
 	}
 	rst := c.note.GetNoteBook(path).ChangeLink(changeInfo.RootGuidA, changeInfo.RootGuidB, changeInfo.Guid)
-	return Err_null, rst
+	return rst, changeInfo.Guid
 }

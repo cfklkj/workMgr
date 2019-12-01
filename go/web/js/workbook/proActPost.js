@@ -7,7 +7,7 @@ var wkPost = proActPost.commonMethod  = {
     checkData: function(res){
         data = JSON.parse(res)
         if (data == null || data.Code != 200) {        
-            alert("checkData", "err", res) 
+            alert(res) 
             return null
         }else{ 
             return data
@@ -88,7 +88,7 @@ var wkPost = proActPost.commonMethod  = {
         this.requestJson("post",this.version + '/workbook/link/swap?proid='+path, data, resFunc)  
     },    
     //change link
-    linkChange: function(path, rootA, rootB, guid, resFunc){
+    linkChange: function(path, rootA, rootB, guid, resFunc){ 
         var data = {"RootGuidA":rootA, "RootGuidB":rootB, "Guid":guid}
         this.requestJson("post",this.version + '/workbook/link/change?proid='+path, data, resFunc)  
     }

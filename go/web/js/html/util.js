@@ -35,11 +35,32 @@ var util = flyUtil.commonMethod  = {
     },    
     //删除css
     delClass: function(ele, classname){ 
+        console.log("ddd", ele, classname)
       var oldClass = ele.className;
       var pattern = new RegExp('(^|\\s)' + classname + '(\\s|$)');      
       if (!pattern.test(oldClass)) {         
             ele.className = ele.className.replace(pattern, ' ');
         } 
+    },
+    dropClass:function(id, parent){
+        console.log("dropClass", id)
+        ele =  util.getEleById(id)
+        if (ele == null) {
+            return
+        }
+        if (parent)
+        { 
+            if (ele.parentElement.className == null){
+                return
+            } 
+             ele.parentElement.className = null
+             return
+        }
+        if (ele.className == null)
+        {
+            return
+        }
+        ele.className = null
     },
     //添加元素
     addElement: function(ele, html){ 
@@ -50,9 +71,17 @@ var util = flyUtil.commonMethod  = {
         ele = util.getEleById(id)
         ele.setAttribute("onclick",callBack);  
       },
-    addMouseOut:function(id, callBack){
+      addMouseOut:function(id, callBack){
+          ele = util.getEleById(id)
+          ele.setAttribute("onmouseout",callBack);   
+      },
+    addMouseOver:function(id, callBack){
         ele = util.getEleById(id)
-        ele.setAttribute("onmouseout",callBack);   
+        ele.setAttribute("onmouseover",callBack);   
+    },
+    addMouseDown:function(id, callBack){
+        ele = util.getEleById(id)
+        ele.setAttribute("onmousedown",callBack);   
     }
 
 }   

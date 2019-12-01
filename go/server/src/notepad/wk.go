@@ -2,13 +2,13 @@ package notepad
 
 import (
 	"encoding/base64" //https://www.cnblogs.com/unqiang/p/6677208.html
+	"fmt"
 	"io/ioutil"
 	"os"
 	"sync"
 
 	"../Fly_file"
 	_ "github.com/typa01/go-utils"
-	"tzj.com/svr_logic/print"
 )
 
 type GuidInfo struct {
@@ -24,12 +24,15 @@ const (
 	FileName_link = "link.json"
 )
 const (
-	Err_null     = 200   //无错误
-	Err_guid     = 20001 //id错误
-	Err_guidFile = 20005 //文件id错误
-	Err_remove   = 20003 //删除文件失败
-	Err_write    = 20002 //写入文件失败
-	Err_read     = 20004 //读取文件失败
+	Err_null        = 200   //无错误
+	Err_guid        = 20001 //id错误
+	Err_guidFile    = 20005 //文件id错误
+	Err_remove      = 20003 //删除文件失败
+	Err_write       = 20002 //写入文件失败
+	Err_read        = 20004 //读取文件失败
+	Err_changeSame  = 20006 //根目录相同
+	Err_NoFindIndex = 20007 //当前目录没有找到目标
+	Err_swapSame    = 20008 //交换的对象相同
 )
 
 type guidInfo struct {
@@ -83,7 +86,7 @@ func (c *linkInfo) addlinks(root, guid string) bool {
 			if value != guid {
 				continue
 			} else {
-				print.Println("addlinks", "err", c.data)
+				fmt.Println("addlinks", "err", c.data)
 				return false
 			}
 		}
@@ -123,42 +126,48 @@ func (c *linkInfo) getGuidIndex(root, guid string) int {
 }
 
 //更改
-func (c *linkInfo) changelink(rootA, rootB, guid string) bool {
+func (c *linkInfo) changelink(rootA, rootB, guid string) int {
+	if rootA == "" || rootB == "" || guid == "" {
+		return Err_guid
+	}
 	if rootA == rootB {
-		return false
+		return Err_changeSame
 	}
 
 	indexA := c.getGuidIndex(rootA, guid)
 	if indexA == -1 {
-		return false
+		return Err_NoFindIndex
 	}
 	indexB := c.getGuidIndex(rootB, guid)
 	if indexB != -1 {
-		return false
+		return Err_NoFindIndex
 	}
 	c.dellink(rootA, guid)
 	c.addlinks(rootB, guid)
-	return true
+	return Err_null
 }
 func swapDataInfo(a, b *string) {
 	*a, *b = *b, *a
 }
 
 //交换
-func (c *linkInfo) swaplink(root, guidA, guidB string) bool {
+func (c *linkInfo) swaplink(root, guidA, guidB string) int {
+	if root == "" || guidB == "" || guidA == "" {
+		return Err_guid
+	}
 	if guidA == guidB {
-		return false
+		return Err_swapSame
 	}
 	indexA := c.getGuidIndex(root, guidA)
 	if indexA == -1 {
-		return false
+		return Err_NoFindIndex
 	}
 	indexB := c.getGuidIndex(root, guidB)
 	if indexB == -1 {
-		return false
+		return Err_NoFindIndex
 	}
 	swapDataInfo(&c.data[root][indexA], &c.data[root][indexB])
-	return true
+	return Err_null
 }
 
 //-----proTags--------------------------
@@ -195,19 +204,19 @@ func (c *proTags) AddLink(root, guid string) bool {
 	}
 	return false
 }
-func (c *proTags) SwapLink(root, guidA, guidB string) bool {
-	if c.link.swaplink(root, guidA, guidB) {
+func (c *proTags) SwapLink(root, guidA, guidB string) int {
+	rst := c.link.swaplink(root, guidA, guidB)
+	if rst == Err_null {
 		c.keepToFile(FileName_link, c.link.data)
-		return true
 	}
-	return false
+	return rst
 }
-func (c *proTags) ChangeLink(rootA, rootB, guid string) bool {
-	if c.link.changelink(rootA, rootB, guid) {
+func (c *proTags) ChangeLink(rootA, rootB, guid string) int {
+	rst := c.link.changelink(rootA, rootB, guid)
+	if rst == Err_null {
 		c.keepToFile(FileName_link, c.link.data)
-		return true
 	}
-	return false
+	return rst
 }
 
 //--get

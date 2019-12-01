@@ -15,3 +15,17 @@ footer p{
   float: left;
   margin-right: 9px;
 }
+
+.hide {
+  display:none
+}
+.choice{
+  cursor: all-scroll;
+} 
+.choiceReady{  
+  cursor: all-scroll; 
+  background-color:grey; 
+} 
+.choiceReady li a:hover{
+  background-color:grey; 
+}

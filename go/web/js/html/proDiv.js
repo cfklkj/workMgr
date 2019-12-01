@@ -4,7 +4,7 @@ var wkDiv = ProDiv.Method = {
   div_Menu: 'menu',
   div_List:'list',
   div_Detail: 'detail', 
-  div_Snapshot: 'snapshot',
+  div_Snapshot: 'snapshot', 
   //function
   addDiv: function(id){   
     return "<div id="+id +"></div>" 
@@ -29,7 +29,7 @@ var wkDiv = ProDiv.Method = {
     wkDiv.initDiv()
     wkMenu.initBtn(this.div_Menu)
     wkList.initUl(this.div_List)
-    wkDetail.initDetail(this.div_Detail)
+    wkDetail.initDetail(this.div_Detail) 
   }
 }
  

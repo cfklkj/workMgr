@@ -6,9 +6,18 @@ var wkMsg = postReturn.commonMethod  = {
     },
     //列表 
     proGet: function(data){  
+        
+        liId = wkQueue.getID()
+        if (liId != "root") { 
+            wkList.setUlName(wkQueue.getTips())
+        }else{  
+            wkList.setUlName("根---")
+            wkMenu.setRename("") 
+        }
+
         guids = data.Data.Guids  
         wkList.clearli()
-        wkClick.clickTitleEvent(wkList.name)
+        wkClick.clickTitleEvent(wkList.name)  
         for( let index in guids)
         {    
             id = guids[index].Guid
@@ -22,10 +31,14 @@ var wkMsg = postReturn.commonMethod  = {
                 break;
                 case "D_": 
                     wkList.setliLink(id, name)    
-                    util.addEvent(id, "wkClick.clickLi(event)")  
+                    util.addEvent(id, "wkClick.clickLi(event)")   
                 break; 
             }
         }         
+    },
+    //重新获取
+    proReGet: function(data){ 
+        wkMsg.proGet(data) 
     },
     //添加
     proAdd: function(data){ 
@@ -35,10 +48,11 @@ var wkMsg = postReturn.commonMethod  = {
             if(id.slice(0,2) == "F_") { 
                 wkList.setli(id, name)    
                 wkPost.fileGet(wkQueue.getPath(), id, wkMsg.fileGet)
-            } else{ 
-                wkList.setliLink(id,name)
+                util.addEvent(id, "wkClick.clickLi(event)")  
+            } else{  
+                wkClick.clickLiAct(id, name)
+                wkMenu.focusSetRename()
             }
-            util.addEvent(id, "wkClick.clickLi(event)")  
         }
     },
     //获取文件
@@ -68,4 +82,25 @@ var wkMsg = postReturn.commonMethod  = {
             break; 
         }
     },
+    //变更
+    linkSwap:function(data){ 
+        if(data.Data) {  
+            liId = wkQueue.getID()
+            wkPost.proGet(wkQueue.getPath(), liId, wkMsg.proReGet)
+        } 
+    },
+    linkChangeIn:function(data){ 
+        if(data.Data) {  
+            wkQueue.push(this.des)
+            liId = wkQueue.getID()
+            wkPost.proGet(wkQueue.getPath(), liId, wkMsg.proReGet)
+        } 
+    },
+    linkChangeOut:function(data){  
+        if(data.Data) {  
+            wkQueue.pop()
+            liId = wkQueue.getID()
+            wkPost.proGet(wkQueue.getPath(), liId, wkMsg.proReGet)
+        } 
+    }
 }   

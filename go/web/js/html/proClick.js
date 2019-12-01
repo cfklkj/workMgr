@@ -13,14 +13,16 @@ var wkClick = click.Method = {
             case wkList.name:
                 wkQueue.setRename(wkQueue.getID())
                 wkMenu.setRename(wkQueue.topTips())
-                wkList.forkUl()
+                wkList.showUI(true)
             break;  
         }
     },
     clickLi: function(event){
         id = event.srcElement.id
-        name = event.srcElement.innerText
-        console.debug("clickLi",  event.srcElement.innerText, event.srcElement.id)
+        name = event.srcElement.innerText 
+        this.clickLiAct(id, name)
+    },
+    clickLiAct:function(id, name){
         switch (id.slice(0,2)) {
             case "F_":
                 wkPost.fileGet(wkQueue.getPath(), id, wkMsg.fileGet)
@@ -53,18 +55,12 @@ var wkClick = click.Method = {
                 wkPost.fileAlt(wkQueue.getPath(), wkQueue.getFile(), wkDetail.getTextareaData(), wkMsg.print)
             break; 
             case wkMenu.btn_PgUp:
-                    wkQueue.pop()
-                    wkQueue.popTips()
-                    liId = wkQueue.getID()
-                    if (liId) {
-                        name = util.getEleName(liId)
-                        wkList.setUlName(wkQueue.getTips())
-                        wkPost.proGet(wkQueue.getPath(), id, wkMsg.proGet) 
-                    }else{ 
-                        name =  wkQueue.getPath()
-                        wkList.setUlName("根---")
-                        wkPost.proGet(name, "", wkMsg.proGet)
+                    if (wkQueue.dataLen() > 1){ 
+                        wkQueue.pop()
+                        wkQueue.popTips()
                     }
+                    liId = wkQueue.getID()
+                    wkPost.proGet(wkQueue.getPath(), liId, wkMsg.proGet) 
             break;
             case wkMenu.btn_rename:
                 wkPost.nameAlt(wkQueue.getPath(), wkQueue.getRename(), wkMenu.getRename(), wkMsg.nameAlt)

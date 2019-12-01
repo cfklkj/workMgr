@@ -13,7 +13,6 @@ import (
 
 	"../config"
 	"../notepad"
-	"tzj.com/svr_logic/print"
 )
 
 type Http struct {
@@ -45,7 +44,7 @@ func (c *Http) Listen() {
 func (c *Http) HomePage(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "GET" && req.Method != "get" {
 		c.sendBack(w, Err_MethodGet, "")
-		print.Println("HomePage", "err", req.URL.Path)
+		fmt.Println("HomePage", "err", req.URL.Path)
 		return
 	}
 	path := req.URL.Path
@@ -91,7 +90,7 @@ func (c *Http) headCheck(w http.ResponseWriter, req *http.Request) (string, []by
 		c.sendBack(w, Err_Ummarshal, len(proid))
 		return "", nil
 	}
-	print.Println("headCheck", string(body))
+	fmt.Println("headCheck", string(body))
 	return proid, body
 }
 
@@ -102,6 +101,6 @@ func (c *Http) sendBack(w http.ResponseWriter, code int, data interface{}) {
 	rst.CodeMsg = c.getCodeStr(code)
 	rst.Data = data
 	dataStr, _ := json.Marshal(rst)
-	print.Println("sendBack", string(dataStr))
+	fmt.Println("sendBack", string(dataStr))
 	io.WriteString(w, string(dataStr))
 }

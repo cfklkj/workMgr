@@ -18,6 +18,9 @@ var ErrStr = map[int]string{
 	20003: "删除文件失败",
 	20002: "写入文件失败",
 	20004: "读取文件失败",
+	20006: "根目录相同",
+	20007: "当前目录没有找到目标",
+	20008: "交换的对象相同",
 }
 
 func (c *Http) getCodeStr(code int) string {

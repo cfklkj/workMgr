@@ -19,6 +19,9 @@ var wkMenu = Menu.commonMethod  = {
         return textarea
     }, 
     setRename:function(name){
+        if (name == null ){ 
+            return
+        }
         ele = util.getEleById(this.txt_rename)
         ele.innerHTML = name
     },
@@ -53,5 +56,13 @@ var wkMenu = Menu.commonMethod  = {
            return true
        }
        return false
-    }
+    },
+    focusRename:function(){
+        ele = util.getEleById(this.btn_rename)
+        ele.focus()
+    },
+    focusSetRename:function(){
+        ele = util.getEleById(this.txt_rename)
+        ele.focus()
+    },
 }   

@@ -49,7 +49,13 @@ var wkQueue = queue.Method = {
     pop:function(){ 
         this.data.pop() 
     },
+    dataLen:function(){
+        return this.data.length
+    },
     getID:function(){ 
         return this.data[this.data.length-1]  
+    },
+    getIDpre:function(){
+        return this.data[this.data.length-2]
     }
 } 
