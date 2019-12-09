@@ -31,19 +31,21 @@ var util = flyUtil.commonMethod  = {
         if (!pattern.test(oldClass))
         {         
                 ele.className += ' ' + classname;   
-        }  
+        } 
     },    
     //删除css
     delClass: function(ele, classname){ 
-        console.log("ddd", ele, classname)
       var oldClass = ele.className;
       var pattern = new RegExp('(^|\\s)' + classname + '(\\s|$)');      
       if (!pattern.test(oldClass)) {         
             ele.className = ele.className.replace(pattern, ' ');
+        }else {
+            if (ele.className != null) { 
+                ele.className  = null
+            }
         } 
     },
-    dropClass:function(id, parent){
-        console.log("dropClass", id)
+    dropClass:function(id, parent){ 
         ele =  util.getEleById(id)
         if (ele == null) {
             return

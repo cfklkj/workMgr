@@ -21,6 +21,7 @@ var wkDetail = Detail.commonMethod  = {
         util.addElement(ele, this.addH4(this.name))  //添加表头
         util.addElement(ele, this.addTextarea(this.data))  //添加内容
         util.addEvent(this.name,"wkClick.clickTitle(event)")
+        util.addMouseOver(this.data,"wkDrag.ondragCancel(event)") 
     },
     //set
     setH4Name:function(name){
@@ -32,7 +33,7 @@ var wkDetail = Detail.commonMethod  = {
         ele.innerHTML = data
     },
     getTextareaData:function() {
-        ele = util.getEleById(this.data)
+        ele = util.getEleById(this.data) 
         return ele.innerHTML
     },
     isEdit:function(){
@@ -41,5 +42,17 @@ var wkDetail = Detail.commonMethod  = {
            return true
        }
        return false
+    },
+    blurEdit:function(){
+        ul = util.getEleById(this.data)
+        ul.blur()
+    },
+    keepStatu:function(keep){
+        if (keep) {
+            util.addClass(util.getEleById(this.name),  "keepFile") 
+        }else{
+            util.delClass(util.getEleById(this.name),  "keepFile") 
+        }
     }
 }   
+

@@ -5,16 +5,23 @@ var wkQueue = queue.Method = {
     file:"",  //文件
     rename:"",  //重命名
     tips:[],//提示路径
-    getTips:function(){
-        str = ""
-        for(index in this.tips){
-            if (str != "")
-            {
-                str  += "/"
-            }
-            str += this.tips[index] 
+    popTipsEndByIndex:function(index){ 
+        for ( ;this.tips.length > 0 && (index < this.tips.length -1); ) {
+            this.popTips()
+            this.pop() 
         }
-        return str
+    },
+    getTips:function(){
+        // str = ""
+        // for(index in this.tips){
+        //     if (str != "")
+        //     {
+        //         str  += "/"
+        //     }
+        //     str += this.tips[index] 
+        // }
+        // return str
+        return this.tips
     },
     topTips:function(){
         return this.tips[this.tips.length-1]  

@@ -8,12 +8,12 @@ var wkMsg = postReturn.commonMethod  = {
     proGet: function(data){  
         
         liId = wkQueue.getID()
-        if (liId != "root") { 
-            wkList.setUlName(wkQueue.getTips())
-        }else{  
-            wkList.setUlName("根---")
-            wkMenu.setRename("") 
-        }
+        wkList.clearUlname() 
+        tips = wkQueue.getTips()
+        wkList.setUlName(-1, "/")
+            for(index in tips){ 
+            wkList.setUlName(index, tips[index] )
+        }   
 
         guids = data.Data.Guids  
         wkList.clearli()
@@ -66,6 +66,10 @@ var wkMsg = postReturn.commonMethod  = {
         wkDetail.setTextareaData(data)  
         wkClick.clickTitleEvent(wkDetail.name)
     },
+    //保存文件
+    fileKeep:function(data){
+        wkDetail.keepStatu(true)
+    },
     //修改名称
     nameAlt:function(data){
         id = data.Data.Guid 
@@ -77,8 +81,12 @@ var wkMsg = postReturn.commonMethod  = {
             break;
             case "D_":                
                 wkQueue.popTips() 
-                wkQueue.pushTips(name)
-                wkList.setUlName(wkQueue.getTips())  
+                wkQueue.pushTips(name)  
+                tips = wkQueue.getTips()
+                wkList.clearUlname()
+                for(index in tips){ 
+                   wkList.setUlName(index, tips[index] )
+               }  
             break; 
         }
     },

@@ -20,8 +20,7 @@ function main() {
 }   
  
 function load (){
-    wkQueue.setPath(TokenStr)
-    wkList.setUlName("根-----")
+    wkQueue.setPath(TokenStr) 
     wkQueue.push("root")
     wkPost.proGet(TokenStr, "", wkMsg.proGet)
    // wkPost.proCreate("test", wkMsg.proAdd) 

@@ -53,3 +53,8 @@ background-color: #0099CC;
 .list-init-folder {
    color: rgb(190, 61, 61);
 }
+
+.list-init > h4  >p{  /*居中*/
+   display: inline;
+   text-align: left;
+}

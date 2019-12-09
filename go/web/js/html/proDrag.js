@@ -16,8 +16,7 @@ var wkDrag = ProDrag.Method = {
      typein:1,
      typeout:2,
      typeswap:0,
-     ondragstart:function(event){  
-          console.debug("ondrag---21", this.src) 
+     ondragstart:function(event){   
           if (this.src != this.des){     
                util.dropClass(this.src, true)   
                this.src = this.des 
@@ -29,18 +28,26 @@ var wkDrag = ProDrag.Method = {
      ondrag:function(event){ 
           this.des = event.srcElement.id 
           if ( this.src == ""){
-               util.dropClass(this.des, true)  
+               util.dropClass(this.des, true)                 
                return
           }else{    
                if (this.des != this.src){  
                     util.getEleById(this.des).parentElement.className =  "choice"
-               }
+               } 
           } 
      },
+     ondragCancel:function(){
+          if ( this.src != ""){
+               util.dropClass(this.src, true) 
+               this.src = ""
+          }
+     },
      ondragend:function(event){ 
+          if (this.src == "") {
+               return
+          }
           util.dropClass(this.des, true)
-          util.dropClass(this.src, true) 
-          console.debug("ondrag---23", this.des, this.src, event)  
+          util.dropClass(this.src, true)  
           des = this.des
           src = this.src
           this.des = ""
@@ -52,8 +59,7 @@ var wkDrag = ProDrag.Method = {
                     break
                case this.typeout:
                     root = wkQueue.getID()
-                    des = wkQueue.getIDpre()
-                    console.debug("ondrag---23", des, root, src)   
+                    des = wkQueue.getIDpre()  
                     wkPost.linkChange(wkQueue.getPath(), root, des,  src, wkMsg.linkSwap)
                     break;
                case this.typeswap:
